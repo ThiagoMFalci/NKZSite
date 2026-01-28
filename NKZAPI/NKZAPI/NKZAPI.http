@@ -1,0 +1,6 @@
+@NKZAPI_HostAddress = http://localhost:5232
+
+GET {{NKZAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
