@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Kitsune Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-gamepad"></i> NKZ ACADEMY</div>
+    <nav>
+        <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="tournaments.html" class="nav-link"><i class="fas fa-trophy"></i> Torneios</a>
+        <a href="teams.html" class="nav-link"><i class="fas fa-users"></i> Times</a>
+        <a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <button class="btn-outline"><i class="fas fa-sign-out-alt"></i> SAIR</button>
+    </nav>
+</header>
+
+<section class="hero-small">
+    <h1 class="reveal"><i class="fas fa-chart-line"></i> MEU DASHBOARD</h1>
+    <p class="reveal">Acompanhe suas estatísticas e progresso</p>
+</section>
+
+<section class="dashboard-section">
+    <div class="dashboard-grid">
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-user-circle"></i> MEU PERFIL</h3>
+            </div>
+            <div class="card-body">
+                <div class="profile-info">
+                    <div class="profile-avatar" style="background: linear-gradient(135deg, #9c27b0, #5c6cff);"></div>
+                    <div class="profile-details">
+                        <h4>Igor Parente</h4>
+                        <p class="rank-badge">Rank: Diamante II</p>
+                        <p class="lp">1.245 LP</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-trophy"></i> MEU TIME</h3>
+            </div>
+            <div class="card-body">
+                <h4>Kitsune Legends</h4>
+                <p>Rank: #12 Brasil</p>
+                <div class="stats-row">
+                    <span><i class="fas fa-check"></i> 8-3 (72%)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-fire"></i> ESTATÍSTICAS</h3>
+            </div>
+            <div class="card-body">
+                <div class="stat-item">
+                    <span>Partidas Jogadas:</span>
+                    <strong>127</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Win Rate:</span>
+                    <strong>62%</strong>
+                </div>
+                <div class="stat-item">
+                    <span>Campeão Principal:</span>
+                    <strong>Ahri</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-star"></i> ÚLTIMAS PARTIDAS</h3>
+            </div>
+            <div class="card-body">
+                <div class="match-item victory">
+                    <span class="match-result">V</span>
+                    <span class="match-info">vs ProFire Gaming - 32m 15s</span>
+                </div>
+                <div class="match-item victory">
+                    <span class="match-result">V</span>
+                    <span class="match-info">vs Alpha Legends - 28m 42s</span>
+                </div>
+                <div class="match-item defeat">
+                    <span class="match-result">D</span>
+                    <span class="match-info">vs Elite Squad - 25m 30s</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-calendar-check"></i> PRÓXIMOS TORNEIOS</h3>
+            </div>
+            <div class="card-body">
+                <div class="tournament-item">
+                    <h5>Campeonato Brasileiro 2026</h5>
+                    <p><i class="fas fa-clock"></i> 15 de Fevereiro</p>
+                </div>
+                <div class="tournament-item">
+                    <h5>Scrim League</h5>
+                    <p><i class="fas fa-clock"></i> 01 de Março</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-settings"></i> AÇÕES RÁPIDAS</h3>
+            </div>
+            <div class="card-body">
+                <button class="quick-action-btn" onclick="window.location.href='stats.html'">
+                    <i class="fas fa-chart-bar"></i> Ver Estatísticas
+                </button>
+                <button class="quick-action-btn" onclick="window.location.href='champions.html'">
+                    <i class="fas fa-wand-magic-sparkles"></i> Meus Campeões
+                </button>
+                <button class="quick-action-btn" onclick="window.location.href='matches.html'">
+                    <i class="fas fa-history"></i> Histórico
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-section">
+    <h2 class="reveal" style="color: var(--secondary); margin-bottom: 30px; text-align: center; font-size: 2rem;"><i class="fas fa-chart-bar"></i> ANÁLISE DE PERFORMANCE</h2>
+    
+    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));gap: 30px;">
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> PROGRESSÃO DE LP</h3>
+            </div>
+            <div class="card-body chart-body">
+                <canvas id="lpChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-percent"></i> WIN RATE MENSAL</h3>
+            </div>
+            <div class="card-body chart-body">
+                <canvas id="winRateChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-dumbbell"></i> DESEMPENHO POR CAMPEÃO</h3>
+            </div>
+            <div class="card-body chart-body">
+                <canvas id="championChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card reveal">
+            <div class="card-header">
+                <h3><i class="fas fa-clock"></i> DURAÇÃO DAS PARTIDAS</h3>
+            </div>
+            <div class="card-body chart-body">
+                <canvas id="matchDurationChart"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2026 <span class="neon-text">KITSUNE ACADEMY</span> — Elevando o competitivo brasileiro.</p>
+        <div class="footer-socials">
+            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="interactive.js"></script>
+<script src="charts.js"></script>
+</body>
+</html>

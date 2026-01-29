@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Histórico de Partidas - Kitsune Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-gamepad"></i> NKZ ACADEMY</div>
+    <nav>
+        <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="tournaments.html" class="nav-link"><i class="fas fa-trophy"></i> Torneios</a>
+        <a href="teams.html" class="nav-link"><i class="fas fa-users"></i> Times</a>
+        <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="champions.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i> Campeões</a>
+        <button class="btn-outline"><i class="fas fa-sign-out-alt"></i> SAIR</button>
+    </nav>
+</header>
+
+<section class="hero-small">
+    <h1 class="reveal"><i class="fas fa-history"></i> HISTÓRICO DE PARTIDAS</h1>
+    <p class="reveal">Revise todas as suas partidas recentes</p>
+</section>
+
+<section class="dashboard-section">
+    <div class="matches-container">
+        <div class="matches-filter reveal">
+            <input type="search" placeholder="Buscar por time..." class="filter-input">
+            <select class="filter-select">
+                <option>Todas as Partidas</option>
+                <option>Apenas Vitórias</option>
+                <option>Apenas Derrotas</option>
+            </select>
+        </div>
+
+        <div class="matches-list">
+            <!-- Partida 1 - Vitória -->
+            <div class="match-record reveal victory">
+                <div class="match-result-badge">
+                    <i class="fas fa-check"></i> VITÓRIA
+                </div>
+                <div class="match-details">
+                    <div class="match-header">
+                        <span class="match-time">28 de Janeiro • 20:45</span>
+                    </div>
+                    <h3>vs ProFire Gaming</h3>
+                    <div class="match-info-grid">
+                        <div class="match-info-item">
+                            <span class="label">Campeão</span>
+                            <strong>🦊 Ahri</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Duração</span>
+                            <strong>32m 15s</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">LP Ganhado</span>
+                            <strong class="win-color">+25 LP</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Rank</span>
+                            <strong>Diamante II</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partida 2 - Vitória -->
+            <div class="match-record reveal victory">
+                <div class="match-result-badge">
+                    <i class="fas fa-check"></i> VITÓRIA
+                </div>
+                <div class="match-details">
+                    <div class="match-header">
+                        <span class="match-time">28 de Janeiro • 19:10</span>
+                    </div>
+                    <h3>vs Alpha Legends</h3>
+                    <div class="match-info-grid">
+                        <div class="match-info-item">
+                            <span class="label">Campeão</span>
+                            <strong>✨ Lux</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Duração</span>
+                            <strong>28m 42s</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">LP Ganhado</span>
+                            <strong class="win-color">+23 LP</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Rank</span>
+                            <strong>Diamante II</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partida 3 - Derrota -->
+            <div class="match-record reveal defeat">
+                <div class="match-result-badge">
+                    <i class="fas fa-times"></i> DERROTA
+                </div>
+                <div class="match-details">
+                    <div class="match-header">
+                        <span class="match-time">28 de Janeiro • 17:35</span>
+                    </div>
+                    <h3>vs Elite Squad</h3>
+                    <div class="match-info-grid">
+                        <div class="match-info-item">
+                            <span class="label">Campeão</span>
+                            <strong>🌙 Syndra</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Duração</span>
+                            <strong>25m 30s</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">LP Perdido</span>
+                            <strong class="loss-color">-18 LP</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Rank</span>
+                            <strong>Diamante II</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partida 4 - Vitória -->
+            <div class="match-record reveal victory">
+                <div class="match-result-badge">
+                    <i class="fas fa-check"></i> VITÓRIA
+                </div>
+                <div class="match-details">
+                    <div class="match-header">
+                        <span class="match-time">27 de Janeiro • 21:20</span>
+                    </div>
+                    <h3>vs Thunder Kings</h3>
+                    <div class="match-info-grid">
+                        <div class="match-info-item">
+                            <span class="label">Campeão</span>
+                            <strong>👁️ Vel'Koz</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Duração</span>
+                            <strong>31m 05s</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">LP Ganhado</span>
+                            <strong class="win-color">+26 LP</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Rank</span>
+                            <strong>Diamante III</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partida 5 - Vitória -->
+            <div class="match-record reveal victory">
+                <div class="match-result-badge">
+                    <i class="fas fa-check"></i> VITÓRIA
+                </div>
+                <div class="match-details">
+                    <div class="match-header">
+                        <span class="match-time">27 de Janeiro • 19:45</span>
+                    </div>
+                    <h3>vs Celestial Forces</h3>
+                    <div class="match-info-grid">
+                        <div class="match-info-item">
+                            <span class="label">Campeão</span>
+                            <strong>⚡ Xerath</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Duração</span>
+                            <strong>29m 18s</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">LP Ganhado</span>
+                            <strong class="win-color">+24 LP</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Rank</span>
+                            <strong>Diamante III</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Partida 6 - Derrota -->
+            <div class="match-record reveal defeat">
+                <div class="match-result-badge">
+                    <i class="fas fa-times"></i> DERROTA
+                </div>
+                <div class="match-details">
+                    <div class="match-header">
+                        <span class="match-time">27 de Janeiro • 18:10</span>
+                    </div>
+                    <h3>vs Radiant Phoenix</h3>
+                    <div class="match-info-grid">
+                        <div class="match-info-item">
+                            <span class="label">Campeão</span>
+                            <strong>🦊 Ahri</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Duração</span>
+                            <strong>22m 40s</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">LP Perdido</span>
+                            <strong class="loss-color">-20 LP</strong>
+                        </div>
+                        <div class="match-info-item">
+                            <span class="label">Rank</span>
+                            <strong>Diamante III</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2026 <span class="neon-text">KITSUNE ACADEMY</span> — Elevando o competitivo brasileiro.</p>
+        <div class="footer-socials">
+            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="interactive.js"></script>
+</body>
+</html>

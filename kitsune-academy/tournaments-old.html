@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Torneios - Kitsune Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-gamepad"></i> NKZ ACADEMY</div>
+    <nav>
+        <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="tournaments.html" class="nav-link active"><i class="fas fa-trophy"></i> Torneios</a>
+        <a href="teams.html" class="nav-link"><i class="fas fa-users"></i> Times</a>
+        <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="champions.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i> Campeões</a>
+        <button class="btn-outline" onclick="openRegisterModal()"><i class="fas fa-sign-in-alt"></i> ENTRAR</button>
+    </nav>
+</header>
+
+<section class="hero-small">
+    <h1 class="reveal"><i class="fas fa-trophy"></i> TORNEIOS ELITE</h1>
+    <p class="reveal">Participe dos melhores campeonatos de League of Legends</p>
+</section>
+
+<section class="tournaments-list">
+    <h2 class="reveal">Torneios Ativos</h2>
+    
+    <div class="tournament-card reveal">
+        <div class="tournament-header">
+            <h3><i class="fas fa-crown"></i> Campeonato Brasileiro 2026</h3>
+            <span class="badge active">Inscrições Abertas</span>
+        </div>
+        <div class="tournament-info">
+            <p><i class="fas fa-users"></i> 32 Equipes | <i class="fas fa-dollar-sign"></i> R$ 50.000 em Prêmios</p>
+            <p><i class="fas fa-calendar"></i> Início: 15 de Fevereiro | <i class="fas fa-hourglass-end"></i> Inscrições até: 10 de Fevereiro</p>
+        </div>
+        <div class="tournament-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 75%;"></div>
+            </div>
+            <p>24 de 32 equipes inscritas</p>
+        </div>
+        <button class="btn-participate" onclick="joinTournament(1)"><i class="fas fa-sign-in-alt"></i> INSCREVER EQUIPE</button>
+    </div>
+
+    <div class="tournament-card reveal">
+        <div class="tournament-header">
+            <h3><i class="fas fa-fire"></i> Torneio Solo Ranking 2026</h3>
+            <span class="badge running">Em Andamento</span>
+        </div>
+        <div class="tournament-info">
+            <p><i class="fas fa-users"></i> 256 Jogadores | <i class="fas fa-dollar-sign"></i> R$ 20.000 em Prêmios</p>
+            <p><i class="fas fa-calendar"></i> Etapa: Qualificatórias | <i class="fas fa-hourglass-end"></i> Finais: 28 de Fevereiro</p>
+        </div>
+        <div class="tournament-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 45%;"></div>
+            </div>
+            <p>Fase de Grupos - Semana 2</p>
+        </div>
+        <button class="btn-participate" onclick="viewTournament(2)"><i class="fas fa-tv"></i> VER RESULTADOS</button>
+    </div>
+
+    <div class="tournament-card reveal">
+        <div class="tournament-header">
+            <h3><i class="fas fa-star"></i> Scrim League - Treinamento Profissional</h3>
+            <span class="badge upcoming">Em Breve</span>
+        </div>
+        <div class="tournament-info">
+            <p><i class="fas fa-users"></i> 16 Equipes Pro | <i class="fas fa-dollar-sign"></i> Sem Prêmios (Treinamento)</p>
+            <p><i class="fas fa-calendar"></i> Início: 01 de Março | <i class="fas fa-hourglass-end"></i> Inscrições: 25 de Fevereiro</p>
+        </div>
+        <div class="tournament-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 0%;"></div>
+            </div>
+            <p>Aguardando inscrições...</p>
+        </div>
+        <button class="btn-participate" onclick="joinTournament(3)"><i class="fas fa-bell"></i> NOTIFIQUE-ME</button>
+    </div>
+</section>
+
+<section class="final-cta">
+    <h2 class="reveal"><i class="fas fa-bolt"></i> CRIE SEU PRÓPRIO TORNEIO</h2>
+    <p class="reveal">Gerencie campeonatos e domine o esports</p>
+    <button class="cta-primary glow reveal" onclick="openRegisterModal()"><i class="fas fa-plus-circle"></i> CRIAR TORNEIO AGORA</button>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2026 <span class="neon-text">KITSUNE ACADEMY</span> — Elevando o competitivo brasileiro.</p>
+        <div class="footer-socials">
+            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="interactive.js"></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estatísticas - Kitsune Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-gamepad"></i> NKZ ACADEMY</div>
+    <nav>
+        <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="tournaments.html" class="nav-link"><i class="fas fa-trophy"></i> Torneios</a>
+        <a href="teams.html" class="nav-link"><i class="fas fa-users"></i> Times</a>
+        <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="champions.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i> Campeões</a>
+        <button class="btn-outline"><i class="fas fa-sign-out-alt"></i> SAIR</button>
+    </nav>
+</header>
+
+<section class="hero-small">
+    <h1 class="reveal"><i class="fas fa-chart-bar"></i> ESTATÍSTICAS GERAIS</h1>
+    <p class="reveal">Analise seus dados de desempenho em detalhes</p>
+</section>
+
+<section class="dashboard-section">
+    <div class="stats-container">
+        <!-- Cards de Estatísticas Principais -->
+        <div class="stats-main-grid reveal">
+            <div class="stat-box">
+                <div class="stat-icon"><i class="fas fa-crown"></i></div>
+                <div class="stat-content">
+                    <span>Rank Atual</span>
+                    <strong>Diamante II</strong>
+                    <p>1.245 LP</p>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
+                <div class="stat-content">
+                    <span>Taxa de Vitória</span>
+                    <strong>62%</strong>
+                    <p>Excelente</p>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+                <div class="stat-content">
+                    <span>Partidas Jogadas</span>
+                    <strong>127</strong>
+                    <p>Este mês</p>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                <div class="stat-content">
+                    <span>Streak Atual</span>
+                    <strong>+5W</strong>
+                    <p>Em alta!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Distribuição de Vitórias/Derrotas -->
+        <div class="stats-section reveal">
+            <h3><i class="fas fa-chart-pie"></i> Distribuição de Resultados</h3>
+            <div class="stats-grid">
+                <div class="result-stat">
+                    <div class="result-box victory">
+                        <i class="fas fa-check-circle"></i>
+                        <h4>79 Vitórias</h4>
+                        <p>62% de taxa</p>
+                    </div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-box defeat">
+                        <i class="fas fa-times-circle"></i>
+                        <h4>48 Derrotas</h4>
+                        <p>38% de taxa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas por Tempo -->
+        <div class="stats-section reveal">
+            <h3><i class="fas fa-hourglass"></i> Tempo Médio por Partida</h3>
+            <div class="time-stats">
+                <div class="time-stat-item">
+                    <span class="label">Partidas Curtas (< 25min)</span>
+                    <div class="stat-bar">
+                        <div class="bar-fill" style="width: 25%"></div>
+                    </div>
+                    <span class="value">22 jogos</span>
+                </div>
+                <div class="time-stat-item">
+                    <span class="label">Partidas Médias (25-35min)</span>
+                    <div class="stat-bar">
+                        <div class="bar-fill" style="width: 65%"></div>
+                    </div>
+                    <span class="value">85 jogos</span>
+                </div>
+                <div class="time-stat-item">
+                    <span class="label">Partidas Longas (> 35min)</span>
+                    <div class="stat-bar">
+                        <div class="bar-fill" style="width: 30%"></div>
+                    </div>
+                    <span class="value">20 jogos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campeões Mais Jogados -->
+        <div class="stats-section reveal">
+            <h3><i class="fas fa-star"></i> Top Campeões</h3>
+            <div class="top-champions">
+                <div class="champion-stat-item">
+                    <span class="champion-rank">1º</span>
+                    <span class="champion-icon">🦊</span>
+                    <div class="champion-info-compact">
+                        <h4>Ahri</h4>
+                        <p>32 partidas • 75% WR</p>
+                    </div>
+                    <span class="champion-badge">24W-8L</span>
+                </div>
+
+                <div class="champion-stat-item">
+                    <span class="champion-rank">2º</span>
+                    <span class="champion-icon">✨</span>
+                    <div class="champion-info-compact">
+                        <h4>Lux</h4>
+                        <p>25 partidas • 72% WR</p>
+                    </div>
+                    <span class="champion-badge">18W-7L</span>
+                </div>
+
+                <div class="champion-stat-item">
+                    <span class="champion-rank">3º</span>
+                    <span class="champion-icon">🌙</span>
+                    <div class="champion-info-compact">
+                        <h4>Syndra</h4>
+                        <p>20 partidas • 75% WR</p>
+                    </div>
+                    <span class="champion-badge">15W-5L</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tendências -->
+        <div class="stats-section reveal">
+            <h3><i class="fas fa-chart-line"></i> Tendências Recentes</h3>
+            <div class="trends-grid">
+                <div class="trend-item">
+                    <span class="trend-label">LP Ganhado Esta Semana</span>
+                    <strong class="trend-value positive">+215 LP</strong>
+                    <small>Semana anterior: +120 LP</small>
+                </div>
+                <div class="trend-item">
+                    <span class="trend-label">Win Rate Este Mês</span>
+                    <strong class="trend-value positive">62%</strong>
+                    <small>Mês anterior: 59%</small>
+                </div>
+                <div class="trend-item">
+                    <span class="trend-label">Melhor Streak</span>
+                    <strong class="trend-value highlight">+8 Vitórias</strong>
+                    <small>Semana passada</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2026 <span class="neon-text">KITSUNE ACADEMY</span> — Elevando o competitivo brasileiro.</p>
+        <div class="footer-socials">
+            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="interactive.js"></script>
+</body>
+</html>

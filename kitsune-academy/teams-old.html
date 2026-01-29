@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Times - Kitsune Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-gamepad"></i> NKZ ACADEMY</div>
+    <nav>
+        <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+        <a href="tournaments.html" class="nav-link"><i class="fas fa-trophy"></i> Torneios</a>
+        <a href="teams.html" class="nav-link active"><i class="fas fa-users"></i> Times</a>
+        <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="champions.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i> Campeões</a>
+        <button class="btn-outline" onclick="openRegisterModal()"><i class="fas fa-sign-in-alt"></i> ENTRAR</button>
+    </nav>
+</header>
+
+<section class="hero-small">
+    <h1 class="reveal"><i class="fas fa-users"></i> TIMES COMPETITIVOS</h1>
+    <p class="reveal">Explore as melhores equipes do Brasil</p>
+</section>
+
+<section class="teams-section">
+    <h2 class="reveal">Top Times 2026</h2>
+    
+    <div class="teams-grid">
+        <div class="team-card reveal">
+            <div class="team-banner" style="background: linear-gradient(135deg, #9c27b0, #5c6cff);"></div>
+            <div class="team-info">
+                <h3><i class="fas fa-crown"></i> KSN Esports</h3>
+                <p class="rank">Rank #1 Brasil</p>
+                <div class="team-stats">
+                    <div class="stat">
+                        <span class="stat-value">15-2</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">94%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Jogadores</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-view-team" onclick="viewTeam('KSN Esports')"><i class="fas fa-eye"></i> VER TIME</button>
+        </div>
+
+        <div class="team-card reveal">
+            <div class="team-banner" style="background: linear-gradient(135deg, #ff5722, #9c27b0);"></div>
+            <div class="team-info">
+                <h3><i class="fas fa-medal"></i> ProFire Gaming</h3>
+                <p class="rank">Rank #2 Brasil</p>
+                <div class="team-stats">
+                    <div class="stat">
+                        <span class="stat-value">13-3</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">81%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Jogadores</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-view-team" onclick="viewTeam('ProFire Gaming')"><i class="fas fa-eye"></i> VER TIME</button>
+        </div>
+
+        <div class="team-card reveal">
+            <div class="team-banner" style="background: linear-gradient(135deg, #5c6cff, #ff5722);"></div>
+            <div class="team-info">
+                <h3><i class="fas fa-star"></i> Alpha Legends</h3>
+                <p class="rank">Rank #3 Brasil</p>
+                <div class="team-stats">
+                    <div class="stat">
+                        <span class="stat-value">12-4</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">75%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Jogadores</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-view-team" onclick="viewTeam('Alpha Legends')"><i class="fas fa-eye"></i> VER TIME</button>
+        </div>
+
+        <div class="team-card reveal">
+            <div class="team-banner" style="background: linear-gradient(135deg, #9c27b0, #ff5722);"></div>
+            <div class="team-info">
+                <h3><i class="fas fa-rocket"></i> Elite Squad</h3>
+                <p class="rank">Rank #4 Brasil</p>
+                <div class="team-stats">
+                    <div class="stat">
+                        <span class="stat-value">10-5</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">66%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Jogadores</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-view-team" onclick="viewTeam('Elite Squad')"><i class="fas fa-eye"></i> VER TIME</button>
+        </div>
+
+        <div class="team-card reveal">
+            <div class="team-banner" style="background: linear-gradient(135deg, #5c6cff, #9c27b0);"></div>
+            <div class="team-info">
+                <h3><i class="fas fa-flame"></i> Apex Titans</h3>
+                <p class="rank">Rank #5 Brasil</p>
+                <div class="team-stats">
+                    <div class="stat">
+                        <span class="stat-value">9-6</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">60%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Jogadores</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-view-team" onclick="viewTeam('Apex Titans')"><i class="fas fa-eye"></i> VER TIME</button>
+        </div>
+
+        <div class="team-card reveal">
+            <div class="team-banner" style="background: linear-gradient(135deg, #ff5722, #5c6cff);"></div>
+            <div class="team-info">
+                <h3><i class="fas fa-trophy"></i> Shadow Legends</h3>
+                <p class="rank">Rank #6 Brasil</p>
+                <div class="team-stats">
+                    <div class="stat">
+                        <span class="stat-value">8-7</span>
+                        <span class="stat-label">Vitórias</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">53%</span>
+                        <span class="stat-label">Win Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">5</span>
+                        <span class="stat-label">Jogadores</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-view-team" onclick="viewTeam('Shadow Legends')"><i class="fas fa-eye"></i> VER TIME</button>
+        </div>
+    </div>
+</section>
+
+<section class="final-cta">
+    <h2 class="reveal"><i class="fas fa-users-plus"></i> CRIE SEU TIME</h2>
+    <p class="reveal">Reúna seus amigos e comece a competir</p>
+    <button class="cta-primary glow reveal" onclick="openRegisterModal()"><i class="fas fa-plus-circle"></i> CRIAR TIME AGORA</button>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <p>© 2026 <span class="neon-text">KITSUNE ACADEMY</span> — Elevando o competitivo brasileiro.</p>
+        <div class="footer-socials">
+            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="interactive.js"></script>
+</body>
+</html>

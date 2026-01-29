@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campeões - Kitsune Academy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9c27b0',
+                        secondary: '#5c6cff',
+                        tertiary: '#ff5722',
+                        dark: '#0a0e27',
+                        'dark-2': '#1a1f3a',
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        roboto: ['Roboto', 'sans-serif'],
+                        audiowide: ['Audiowide', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-dark text-white font-roboto">
+    <!-- HEADER/NAV -->
+    <header class="fixed w-full top-0 z-50 bg-dark-2 bg-opacity-98 backdrop-blur-md border-b border-primary border-opacity-20">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-20">
+            <!-- LOGO SECTION -->
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xl font-bold">
+                    🦊
+                </div>
+                <div>
+                    <h1 class="text-sm font-audiowide font-bold text-primary leading-none">NKZ</h1>
+                    <p class="text-xs font-roboto text-gray-400 leading-none">ACADEMY</p>
+                </div>
+            </div>
+
+            <!-- NAVIGATION CENTER -->
+            <nav class="hidden lg:flex items-center gap-1">
+                <a href="index.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-home text-xs"></i> Home
+                </a>
+                <a href="tournaments.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-trophy text-xs"></i> Torneios
+                </a>
+                <a href="teams.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-users text-xs"></i> Times
+                </a>
+                <a href="dashboard.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-chart-line text-xs"></i> Dashboard
+                </a>
+                <a href="champions.html" class="px-4 py-2 text-sm font-bold text-secondary hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-wand-magic-sparkles text-xs"></i> Campeões
+                </a>
+            </nav>
+
+            <!-- CTA BUTTON -->
+            <div class="flex items-center gap-2">
+                <button onclick="openRegisterModal()" class="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-sign-in-alt text-xs"></i> ENTRAR
+                </button>
+                
+                <!-- MOBILE MENU BUTTON -->
+                <button id="mobileMenuBtn" class="lg:hidden w-10 h-10 rounded-lg hover:bg-primary/10 transition flex items-center justify-center text-primary">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- MOBILE NAVIGATION -->
+        <nav id="mobileMenu" class="hidden lg:hidden bg-dark-2 border-t border-primary border-opacity-20 px-6 py-4 space-y-2">
+            <a href="index.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="tournaments.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-trophy"></i> Torneios
+            </a>
+            <a href="teams.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-users"></i> Times
+            </a>
+            <a href="dashboard.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a href="champions.html" class="block px-4 py-2.5 text-sm font-bold text-secondary hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-wand-magic-sparkles"></i> Campeões
+            </a>
+        </nav>
+    </header>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close menu when clicking on a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
+
+    <!-- HERO SECTION -->
+    <section class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-dark-2 to-dark">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-4xl font-orbitron font-bold mb-2 reveal text-primary flex items-center gap-3">
+                <i class="fas fa-wand-magic-sparkles"></i> MEUS CAMPEÕES
+            </h1>
+            <p class="text-gray-400 reveal">Veja suas estatísticas detalhadas por campeão</p>
+        </div>
+    </section>
+
+    <!-- CHAMPIONS GRID -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- AHRI -->
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="h-32 bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-6xl">
+                        🦊
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-orbitron font-bold text-primary mb-4">Ahri</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>Vitórias:</span>
+                                <span class="text-primary font-bold">24</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Derrotas:</span>
+                                <span class="text-secondary font-bold">8</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Taxa de Vitória:</span>
+                                <span class="text-green-500 font-bold">75%</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-2 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded hover:shadow-lg hover:shadow-primary/30 transition cta-primary">
+                            Visualizar Detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LUX -->
+                <div class="reveal bg-gradient-to-br from-secondary/10 to-tertiary/10 rounded-lg overflow-hidden border border-secondary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-secondary/20">
+                    <div class="h-32 bg-gradient-to-r from-secondary to-tertiary flex items-center justify-center text-6xl">
+                        ✨
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-orbitron font-bold text-secondary mb-4">Lux</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>Vitórias:</span>
+                                <span class="text-primary font-bold">18</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Derrotas:</span>
+                                <span class="text-secondary font-bold">7</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Taxa de Vitória:</span>
+                                <span class="text-green-500 font-bold">72%</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-2 bg-gradient-to-r from-secondary to-tertiary text-white font-bold rounded hover:shadow-lg hover:shadow-secondary/30 transition cta-primary">
+                            Visualizar Detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SYNDRA -->
+                <div class="reveal bg-gradient-to-br from-tertiary/10 to-primary/10 rounded-lg overflow-hidden border border-tertiary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-tertiary/20">
+                    <div class="h-32 bg-gradient-to-r from-tertiary to-primary flex items-center justify-center text-6xl">
+                        🌙
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-orbitron font-bold text-tertiary mb-4">Syndra</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>Vitórias:</span>
+                                <span class="text-primary font-bold">15</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Derrotas:</span>
+                                <span class="text-secondary font-bold">5</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Taxa de Vitória:</span>
+                                <span class="text-green-500 font-bold">75%</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-2 bg-gradient-to-r from-tertiary to-primary text-white font-bold rounded hover:shadow-lg hover:shadow-tertiary/30 transition cta-primary">
+                            Visualizar Detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- VEL'KOZ -->
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="h-32 bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-6xl">
+                        👁️
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-orbitron font-bold text-primary mb-4">Vel'Koz</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>Vitórias:</span>
+                                <span class="text-primary font-bold">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Derrotas:</span>
+                                <span class="text-secondary font-bold">4</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Taxa de Vitória:</span>
+                                <span class="text-green-500 font-bold">75%</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-2 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded hover:shadow-lg hover:shadow-primary/30 transition cta-primary">
+                            Visualizar Detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- XERATH -->
+                <div class="reveal bg-gradient-to-br from-secondary/10 to-tertiary/10 rounded-lg overflow-hidden border border-secondary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-secondary/20">
+                    <div class="h-32 bg-gradient-to-r from-secondary to-tertiary flex items-center justify-center text-6xl">
+                        ⚡
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-2xl font-orbitron font-bold text-secondary mb-4">Xerath</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>Vitórias:</span>
+                                <span class="text-primary font-bold">10</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Derrotas:</span>
+                                <span class="text-secondary font-bold">3</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Taxa de Vitória:</span>
+                                <span class="text-green-500 font-bold">77%</span>
+                            </div>
+                        </div>
+                        <button class="w-full mt-6 py-2 bg-gradient-to-r from-secondary to-tertiary text-white font-bold rounded hover:shadow-lg hover:shadow-secondary/30 transition cta-primary">
+                            Visualizar Detalhes
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STATS GERAIS -->
+                <div class="reveal bg-gradient-to-br from-tertiary/10 to-primary/10 rounded-lg border border-tertiary border-opacity-30 p-6 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-2xl font-orbitron font-bold text-tertiary mb-6">Estatísticas Gerais</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <div>
+                                <p class="text-sm mb-1">Campeões Jogados</p>
+                                <p class="text-3xl font-orbitron font-bold text-tertiary">5</p>
+                            </div>
+                            <div>
+                                <p class="text-sm mb-1">Total de Vitórias</p>
+                                <p class="text-3xl font-orbitron font-bold text-primary">79</p>
+                            </div>
+                            <div>
+                                <p class="text-sm mb-1">Total de Derrotas</p>
+                                <p class="text-3xl font-orbitron font-bold text-secondary">27</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark-2 border-t border-primary border-opacity-20 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="max-w-6xl mx-auto text-center text-gray-400">
+            <p>&copy; 2024 NKZ Academy. Todos os direitos reservados. League of Legends é uma marca registrada da Riot Games.</p>
+        </div>
+    </footer>
+
+    <script src="interactive.js"></script>
+    <script src="main.js"></script>
+    <script src="functions.js"></script>
+</body>
+</html>

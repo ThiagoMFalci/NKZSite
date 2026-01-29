@@ -1,96 +1,352 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Kitsune Academy - A Elite Competitiva de League of Legends</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kitsune Academy - A Elite Competitiva de League of Legends</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9c27b0',
+                        secondary: '#5c6cff',
+                        tertiary: '#ff5722',
+                        dark: '#0a0e27',
+                        'dark-2': '#1a1f3a',
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        roboto: ['Roboto', 'sans-serif'],
+                        audiowide: ['Audiowide', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="bg-dark text-white font-roboto">
+    <!-- HEADER/NAV -->
+    <header class="fixed w-full top-0 z-50 bg-dark-2 bg-opacity-98 backdrop-blur-md border-b border-primary border-opacity-20">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-20">
+            <!-- LOGO SECTION -->
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xl font-bold">
+                    🦊
+                </div>
+                <div>
+                    <h1 class="text-sm font-audiowide font-bold text-primary leading-none">NKZ</h1>
+                    <p class="text-xs font-roboto text-gray-400 leading-none">ACADEMY</p>
+                </div>
+            </div>
 
-<header>
-    <div class="logo">Kitsune Academy</div>
-    <nav>
-        <button class="btn-outline">Entrar</button>
-        <button class="btn-primary">Criar Conta</button>
-    </nav>
-</header>
+            <!-- NAVIGATION CENTER -->
+            <nav class="hidden lg:flex items-center gap-1">
+                <a href="index.html" class="px-4 py-2 text-sm font-bold text-secondary hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-home text-xs"></i> Home
+                </a>
+                <a href="tournaments.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-trophy text-xs"></i> Torneios
+                </a>
+                <a href="teams.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-users text-xs"></i> Times
+                </a>
+                <a href="dashboard.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-chart-line text-xs"></i> Dashboard
+                </a>
+                <a href="champions.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-wand-magic-sparkles text-xs"></i> Campeões
+                </a>
+            </nav>
 
-<section class="hero">
-    <h1 class="reveal">Domine o Rift. Ascenda à Elite.</h1>
-    <p class="reveal">A plataforma premium para jogadores sérios de League of Legends.</p>
-    <div class="cta-group reveal">
-        <button class="cta-primary glow">Começar Agora – Gratuito</button>
-        <button class="cta-secondary">Explorar Recursos</button>
-    </div>
-</section>
-
-<section class="about">
-    <h2 class="reveal">Tudo o que o competitivo precisa</h2>
-    <p class="reveal">
-        A plataforma mais completa para campeonatos e gerenciamento de equipes de League of Legends.
-        <br><br>
-        Conecte-se com milhares de jogadores, participe de torneios profissionais e eleve sua equipe ao próximo nível competitivo.
-    </p>
-</section>
-
-<section class="features">
-    <h2 class="reveal">Recursos de Nível Profissional</h2>
-    <div class="feature-grid">
-        <div class="feature-card reveal">
-            <div class="icon">Torneios</div>
-            <h3>Torneios de Elite</h3>
-            <p>Estrutura profissional com ranking real.</p>
+            <!-- CTA BUTTON -->
+            <div class="flex items-center gap-2">
+                <button onclick="openRegisterModal()" class="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-sign-in-alt text-xs"></i> ENTRAR
+                </button>
+                
+                <!-- MOBILE MENU BUTTON -->
+                <button id="mobileMenuBtn" class="lg:hidden w-10 h-10 rounded-lg hover:bg-primary/10 transition flex items-center justify-center text-primary">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
         </div>
-        <div class="feature-card reveal">
-            <div class="icon">Equipes</div>
-            <h3>Gestão de Times</h3>
-            <p>Monte e gerencie equipes competitivas.</p>
-        </div>
-        <div class="feature-card reveal">
-            <div class="icon">Scrims</div>
-            <h3>Scrims Inteligentes</h3>
-            <p>Treinos estratégicos organizados.</p>
-        </div>
-        <div class="feature-card reveal">
-            <div class="icon">Live</div>
-            <h3>Análise em Tempo Real</h3>
-            <p>Dados ao vivo para decisões rápidas.</p>
-        </div>
-        <div class="feature-card reveal">
-            <div class="icon">Rank</div>
-            <h3>Ranking Global</h3>
-            <p>Suba e seja visto por times.</p>
-        </div>
-        <div class="feature-card reveal">
-            <div class="icon">Seguro</div>
-            <h3>Anti-Cheat</h3>
-            <p>Competição justa acima de tudo.</p>
-        </div>
-    </div>
-</section>
 
-<section class="final-cta">
-    <h2 class="reveal">Crie Sua Conta Gratuitamente</h2>
-    <p class="reveal">Não perca mais tempo!</p>
+        <!-- MOBILE NAVIGATION -->
+        <nav id="mobileMenu" class="hidden lg:hidden bg-dark-2 border-t border-primary border-opacity-20 px-6 py-4 space-y-2">
+            <a href="index.html" class="block px-4 py-2.5 text-sm font-bold text-secondary hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="tournaments.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-trophy"></i> Torneios
+            </a>
+            <a href="teams.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-users"></i> Times
+            </a>
+            <a href="dashboard.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a href="champions.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-wand-magic-sparkles"></i> Campeões
+            </a>
+        </nav>
+    </header>
 
-    <div class="benefits-grid reveal">
-        <div class="benefit-item">✔ Gratuito eternamente</div>
-        <div class="benefit-item">✔ Sem taxas escondidas</div>
-        <div class="benefit-item">✔ Suporte 24/7</div>
-    </div>
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
 
-    <button class="cta-primary glow reveal">Criar Conta Agora</button>
-</section>
+        // Close menu when clicking on a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
 
-<footer>
-© 2026 Kitsune Academy — Elevando o competitivo brasileiro.
-</footer>
+    <!-- HERO SECTION -->
+    <section class="hero pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url('bannerprincipal.jpeg'); background-size: cover; background-position: center; background-attachment: fixed;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-dark to-dark opacity-70 pointer-events-none"></div>
+        <div class="absolute inset-0 transmission-glitch pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-4xl mx-auto text-center">
+            <div class="mb-8">
+                <h1 class="text-5xl sm:text-6xl md:text-7xl font-orbitron font-bold mb-4 reveal glitch text-primary" data-text="DOMINE O RIFT">
+                    DOMINE O RIFT
+                </h1>
+                <h2 class="text-2xl sm:text-3xl font-orbitron text-secondary mb-6 reveal">
+                    Ascenda à Elite Competitiva
+                </h2>
+            </div>
+            
+            <p class="text-lg sm:text-xl text-gray-300 mb-10 reveal max-w-2xl mx-auto">
+                A plataforma de esports para jogadores sérios de League of Legends.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center reveal">
+                <button onclick="openRegisterModal()" class="px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition transform hover:scale-105 flex items-center gap-2 glow">
+                    <i class="fas fa-rocket"></i> COMEÇAR AGORA – GRATUITO
+                </button>
+                <button class="px-8 py-4 border-2 border-secondary text-secondary font-bold rounded-lg hover:bg-secondary hover:text-dark transition flex items-center gap-2">
+                    <i class="fas fa-flask"></i> EXPLORAR RECURSOS
+                </button>
+            </div>
+        </div>
+    </section>
 
-<script src="main.js"></script>
+    <!-- ABOUT SECTION -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-dark-2">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl font-orbitron font-bold mb-8 reveal text-primary">
+                <i class="fas fa-crown"></i> TUDO PARA DOMINAR O COMPETITIVO
+            </h2>
+            <p class="text-lg text-gray-300 leading-relaxed reveal">
+                A plataforma mais completa para campeonatos e gerenciamento de equipes.
+                <br><br>
+                Conecte-se com milhares de jogadores pro, participe de torneios profissionais e leve sua equipe ao topo do ranking global.
+            </p>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-orbitron font-bold mb-16 text-center reveal text-primary">
+                <i class="fas fa-star"></i> RECURSOS DE NÍVEL PRO
+            </h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature Cards -->
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-lg border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="text-4xl text-primary mb-4">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold mb-3 text-primary">Torneios Elite</h3>
+                    <p class="text-gray-300">Estrutura profissional com ranking real e prêmios.</p>
+                </div>
+
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-lg border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="text-4xl text-secondary mb-4">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold mb-3 text-secondary">Gestão de Times</h3>
+                    <p class="text-gray-300">Monte e gerencie equipes competitivas com facilidade.</p>
+                </div>
+
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-lg border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="text-4xl text-tertiary mb-4">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold mb-3 text-tertiary">Scrims Estratégicos</h3>
+                    <p class="text-gray-300">Treinos profissionais organizados contra boas equipes.</p>
+                </div>
+
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-lg border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="text-4xl text-secondary mb-4">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold mb-3 text-secondary">Análise em Tempo Real</h3>
+                    <p class="text-gray-300">Dados ao vivo para decisões rápidas e estratégicas.</p>
+                </div>
+
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-lg border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="text-4xl text-primary mb-4">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold mb-3 text-primary">Ranking Global</h3>
+                    <p class="text-gray-300">Suba no ranking e seja visto por times profissionais.</p>
+                </div>
+
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 p-8 rounded-lg border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="text-4xl text-secondary mb-4">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold mb-3 text-secondary">Anti-Cheat Avançado</h3>
+                    <p class="text-gray-300">Competição 100% justa sem cheaters.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIDEOS SECTION -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-dark-2">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl font-orbitron font-bold mb-4 text-center reveal text-primary">
+                <i class="fas fa-play-circle"></i> CONFIRA NOSSOS VÍDEOS
+            </h2>
+            <p class="text-center text-gray-300 mb-16 reveal text-lg">
+                Aprenda com os melhores jogadores profissionais
+            </p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
+                <!-- Video Card 1 -->
+                <div class="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="relative w-full pt-[56.25%] bg-dark">
+                        <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/9UmkXtqL8SI" title="League of Legends - Gameplay Highlights" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold mb-2 text-primary">Highlights - Melhores Jogadas</h3>
+                        <p class="text-gray-300">Confira as melhores plays e momentos incríveis</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="relative w-full pt-[56.25%] bg-dark">
+                        <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/9UmkXtqL8SI" title="League of Legends - Tournament Highlight" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold mb-2 text-secondary">Torneio - Clipes Profissionais</h3>
+                        <p class="text-gray-300">Reviva os melhores momentos dos campeonatos</p>
+                    </div>
+                </div>
+
+                <!-- Video Card 3 -->
+                <div class="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20">
+                    <div class="relative w-full pt-[56.25%] bg-dark">
+                        <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/9UmkXtqL8SI" title="League of Legends - Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-orbitron font-bold mb-2 text-tertiary">Tutorial - Como Começar</h3>
+                        <p class="text-gray-300">Guia completo para criar sua conta e participar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl font-orbitron font-bold mb-6 reveal text-primary">
+                Pronto para Dominar?
+            </h2>
+            <p class="text-xl text-gray-300 mb-10 reveal">
+                Junte-se a milhares de jogadores competitivos na plataforma mais avançada de esports.
+            </p>
+            <button onclick="openRegisterModal()" class="px-10 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-lg hover:shadow-lg hover:shadow-primary/50 transition transform hover:scale-105 reveal glow">
+                COMEÇAR AGORA – 100% GRATUITO
+            </button>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark-2 border-t border-primary border-opacity-20 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="text-primary" style="fill: currentColor;">
+                            <!-- Fox Logo -->
+                            <ellipse cx="50" cy="60" rx="35" ry="38" fill="currentColor"/>
+                            <!-- Head -->
+                            <circle cx="50" cy="45" r="32" fill="currentColor"/>
+                            <!-- Left Ear -->
+                            <polygon points="20,15 10,5 18,30" fill="currentColor"/>
+                            <!-- Right Ear -->
+                            <polygon points="80,15 90,5 82,30" fill="currentColor"/>
+                            <!-- Eyes -->
+                            <circle cx="40" cy="40" r="4" fill="#0a0e27"/>
+                            <circle cx="60" cy="40" r="4" fill="#0a0e27"/>
+                            <!-- Snout -->
+                            <ellipse cx="50" cy="55" rx="12" ry="15" fill="#1a1f3a"/>
+                            <!-- Nose -->
+                            <circle cx="50" cy="50" r="3" fill="#0a0e27"/>
+                            <!-- Tail (curved) -->
+                            <path d="M 70 70 Q 85 75 90 60 Q 88 50 80 55" fill="currentColor" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <h3 class="text-lg font-orbitron font-bold text-primary">NKZ ACADEMY</h3>
+                    </div>
+                    <p class="text-gray-400">A elite competitiva de League of Legends</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-primary mb-4">Plataforma</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-primary transition">Torneios</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Campeões</a></li>
+                        <li><a href="#" class="hover:text-primary transition">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-secondary mb-4">Comunidade</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-secondary transition">Discord</a></li>
+                        <li><a href="#" class="hover:text-secondary transition">Forum</a></li>
+                        <li><a href="#" class="hover:text-secondary transition">Contato</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-secondary mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-secondary transition">Privacidade</a></li>
+                        <li><a href="#" class="hover:text-secondary transition">Termos</a></li>
+                        <li><a href="#" class="hover:text-secondary transition">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-primary border-opacity-20 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 NKZ Academy. Todos os direitos reservados. League of Legends é uma marca registrada da Riot Games.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="interactive.js"></script>
+    <script src="main.js"></script>
+    <script src="functions.js"></script>
 </body>
 </html>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#0a0e27" stroke="#9c27b0" stroke-width="2"/>
+  
+  <!-- Outer Trophy Outline -->
+  <path d="M 50 80 L 60 50 L 75 45 L 100 40 L 125 45 L 140 50 L 150 80" 
+        stroke="#5c6cff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Trophy Cup -->
+  <ellipse cx="100" cy="70" rx="35" ry="20" fill="none" stroke="#9c27b0" stroke-width="2.5"/>
+  <path d="M 65 70 Q 60 90 70 105 L 130 105 Q 140 90 135 70" 
+        fill="none" stroke="#ff5722" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Trophy Base -->
+  <rect x="90" y="105" width="20" height="15" fill="#5c6cff" rx="2"/>
+  <ellipse cx="100" cy="120" rx="30" ry="8" fill="#9c27b0" opacity="0.7"/>
+  
+  <!-- Trophy Handle (Left) -->
+  <path d="M 65 75 Q 45 75 45 90 Q 45 100 55 105" 
+        fill="none" stroke="#ff5722" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Trophy Handle (Right) -->
+  <path d="M 135 75 Q 155 75 155 90 Q 155 100 145 105" 
+        fill="none" stroke="#ff5722" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- Stars Around -->
+  <circle cx="100" cy="30" r="3" fill="#ff5722"/>
+  <circle cx="60" cy="50" r="2.5" fill="#5c6cff"/>
+  <circle cx="140" cy="50" r="2.5" fill="#5c6cff"/>
+  <circle cx="40" cy="100" r="2" fill="#9c27b0"/>
+  <circle cx="160" cy="100" r="2" fill="#9c27b0"/>
+  
+  <!-- Glow Effect -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="#ff5722" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Text -->
+  <text x="100" y="155" font-family="Audiowide, sans-serif" font-size="14" font-weight="bold" 
+        fill="#ff5722" text-anchor="middle" letter-spacing="1">TORNEIOS</text>
+</svg>

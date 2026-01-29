@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneios - Kitsune Academy</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto:wght@400;500;700&family=Audiowide&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9c27b0',
+                        secondary: '#5c6cff',
+                        tertiary: '#ff5722',
+                        dark: '#0a0e27',
+                        'dark-2': '#1a1f3a',
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        roboto: ['Roboto', 'sans-serif'],
+                        audiowide: ['Audiowide', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-dark text-white font-roboto">
+    <!-- HEADER/NAV -->
+    <header class="fixed w-full top-0 z-50 bg-dark-2 bg-opacity-98 backdrop-blur-md border-b border-primary border-opacity-20">
+        <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 flex items-center justify-between h-20">
+            <!-- LOGO SECTION -->
+            <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xl font-bold">
+                    🦊
+                </div>
+                <div>
+                    <h1 class="text-sm font-audiowide font-bold text-primary leading-none">NKZ</h1>
+                    <p class="text-xs font-roboto text-gray-400 leading-none">ACADEMY</p>
+                </div>
+            </div>
+
+            <!-- NAVIGATION CENTER -->
+            <nav class="hidden lg:flex items-center gap-1">
+                <a href="index.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-home text-xs"></i> Home
+                </a>
+                <a href="tournaments.html" class="px-4 py-2 text-sm font-bold text-secondary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-trophy text-xs"></i> Torneios
+                </a>
+                <a href="teams.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-users text-xs"></i> Times
+                </a>
+                <a href="dashboard.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-chart-line text-xs"></i> Dashboard
+                </a>
+                <a href="champions.html" class="px-4 py-2 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md flex items-center gap-2">
+                    <i class="fas fa-wand-magic-sparkles text-xs"></i> Campeões
+                </a>
+            </nav>
+
+            <!-- CTA BUTTON -->
+            <div class="flex items-center gap-2">
+                <button onclick="openRegisterModal()" class="px-5 py-2.5 bg-gradient-to-r from-primary to-secondary text-white text-sm font-bold rounded-lg hover:shadow-lg hover:shadow-primary/30 transition transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-sign-in-alt text-xs"></i> ENTRAR
+                </button>
+                
+                <!-- MOBILE MENU BUTTON -->
+                <button id="mobileMenuBtn" class="lg:hidden w-10 h-10 rounded-lg hover:bg-primary/10 transition flex items-center justify-center text-primary">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- MOBILE NAVIGATION -->
+        <nav id="mobileMenu" class="hidden lg:hidden bg-dark-2 border-t border-primary border-opacity-20 px-6 py-4 space-y-2">
+            <a href="index.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="tournaments.html" class="block px-4 py-2.5 text-sm font-bold text-secondary">
+                <i class="fas fa-trophy"></i> Torneios
+            </a>
+            <a href="teams.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-users"></i> Times
+            </a>
+            <a href="dashboard.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a href="champions.html" class="block px-4 py-2.5 text-sm font-bold text-gray-300 hover:text-primary hover:bg-primary/10 transition rounded-md">
+                <i class="fas fa-wand-magic-sparkles"></i> Campeões
+            </a>
+        </nav>
+    </header>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close menu when clicking on a link
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
+
+    <!-- HERO SECTION -->
+    <section class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-dark-2 to-dark">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-4xl font-orbitron font-bold mb-2 reveal text-primary flex items-center gap-3">
+                <i class="fas fa-trophy"></i> TORNEIOS ELITE
+            </h1>
+            <p class="text-gray-400 reveal">Participe dos melhores campeonatos de League of Legends</p>
+        </div>
+    </section>
+
+    <!-- TOURNAMENTS GRID -->
+    <section class="py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- TOURNAMENT 1 -->
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20 flex flex-col">
+                    <div class="h-32 bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                        <span class="text-5xl"><i class="fas fa-crown"></i></span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-orbitron font-bold text-primary">Elite Championship</h3>
+                                <span class="px-3 py-1 bg-green-500/30 text-green-400 rounded-full text-sm font-bold">ATIVO</span>
+                            </div>
+                            <p class="text-gray-300 mb-4">O maior campeonato de League of Legends com prêmios milionários.</p>
+                            <div class="space-y-2 text-gray-400 text-sm mb-6">
+                                <p><i class="fas fa-users"></i> 256 Equipes Inscritas</p>
+                                <p><i class="fas fa-calendar"></i> Inicia em 2 dias</p>
+                                <p><i class="fas fa-trophy"></i> Prêmio: $50.000</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded hover:shadow-lg hover:shadow-primary/30 transition cta-primary">
+                            Inscrever Agora
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOURNAMENT 2 -->
+                <div class="reveal bg-gradient-to-br from-secondary/10 to-tertiary/10 rounded-lg overflow-hidden border border-secondary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-secondary/20 flex flex-col">
+                    <div class="h-32 bg-gradient-to-r from-secondary to-tertiary flex items-center justify-center">
+                        <span class="text-5xl"><i class="fas fa-medal"></i></span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-orbitron font-bold text-secondary">Masters Series</h3>
+                                <span class="px-3 py-1 bg-blue-500/30 text-blue-400 rounded-full text-sm font-bold">EM BREVE</span>
+                            </div>
+                            <p class="text-gray-300 mb-4">Série especial para jogadores master e profissionais.</p>
+                            <div class="space-y-2 text-gray-400 text-sm mb-6">
+                                <p><i class="fas fa-users"></i> 64 Equipes Máximo</p>
+                                <p><i class="fas fa-calendar"></i> Inicia em 7 dias</p>
+                                <p><i class="fas fa-trophy"></i> Prêmio: $25.000</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-gradient-to-r from-secondary to-tertiary text-white font-bold rounded hover:shadow-lg hover:shadow-secondary/30 transition cta-primary">
+                            Inscrever Agora
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOURNAMENT 3 -->
+                <div class="reveal bg-gradient-to-br from-tertiary/10 to-primary/10 rounded-lg overflow-hidden border border-tertiary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-tertiary/20 flex flex-col">
+                    <div class="h-32 bg-gradient-to-r from-tertiary to-primary flex items-center justify-center">
+                        <span class="text-5xl"><i class="fas fa-star"></i></span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-orbitron font-bold text-tertiary">Rising Stars</h3>
+                                <span class="px-3 py-1 bg-yellow-500/30 text-yellow-400 rounded-full text-sm font-bold">FINALIZANDO</span>
+                            </div>
+                            <p class="text-gray-300 mb-4">Campeonato para novatos e jogadores em desenvolvimento.</p>
+                            <div class="space-y-2 text-gray-400 text-sm mb-6">
+                                <p><i class="fas fa-users"></i> 512 Equipes Inscritas</p>
+                                <p><i class="fas fa-calendar"></i> Finaliza em 1 dia</p>
+                                <p><i class="fas fa-trophy"></i> Prêmio: $10.000</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-gradient-to-r from-tertiary to-primary text-white font-bold rounded hover:shadow-lg hover:shadow-tertiary/30 transition cta-primary" disabled>
+                            Inscrições Fechadas
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOURNAMENT 4 -->
+                <div class="reveal bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden border border-primary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-primary/20 flex flex-col">
+                    <div class="h-32 bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                        <span class="text-5xl"><i class="fas fa-fire"></i></span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-orbitron font-bold text-primary">Regional Open</h3>
+                                <span class="px-3 py-1 bg-orange-500/30 text-orange-400 rounded-full text-sm font-bold">PLANEJAMENTO</span>
+                            </div>
+                            <p class="text-gray-300 mb-4">Campeonatos regionais com qualificação para elite.</p>
+                            <div class="space-y-2 text-gray-400 text-sm mb-6">
+                                <p><i class="fas fa-users"></i> 128 Equipes por Região</p>
+                                <p><i class="fas fa-calendar"></i> Inicia em 30 dias</p>
+                                <p><i class="fas fa-trophy"></i> Prêmio: $5.000</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded hover:shadow-lg hover:shadow-primary/30 transition cta-primary">
+                            Saiba Mais
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOURNAMENT 5 -->
+                <div class="reveal bg-gradient-to-br from-secondary/10 to-tertiary/10 rounded-lg overflow-hidden border border-secondary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-secondary/20 flex flex-col">
+                    <div class="h-32 bg-gradient-to-r from-secondary to-tertiary flex items-center justify-center">
+                        <span class="text-5xl"><i class="fas fa-flask"></i></span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-orbitron font-bold text-secondary">Monthly Scrim</h3>
+                                <span class="px-3 py-1 bg-purple-500/30 text-purple-400 rounded-full text-sm font-bold">RECORRENTE</span>
+                            </div>
+                            <p class="text-gray-300 mb-4">Scrimmages mensais para treino competitivo.</p>
+                            <div class="space-y-2 text-gray-400 text-sm mb-6">
+                                <p><i class="fas fa-users"></i> Equipes Variadas</p>
+                                <p><i class="fas fa-calendar"></i> Todo 1º Sábado</p>
+                                <p><i class="fas fa-trophy"></i> Prêmio: Streaming</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-gradient-to-r from-secondary to-tertiary text-white font-bold rounded hover:shadow-lg hover:shadow-secondary/30 transition cta-primary">
+                            Participar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOURNAMENT 6 -->
+                <div class="reveal bg-gradient-to-br from-tertiary/10 to-primary/10 rounded-lg overflow-hidden border border-tertiary border-opacity-30 hover:border-opacity-100 transition hover:shadow-lg hover:shadow-tertiary/20 flex flex-col">
+                    <div class="h-32 bg-gradient-to-r from-tertiary to-primary flex items-center justify-center">
+                        <span class="text-5xl"><i class="fas fa-globe"></i></span>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-orbitron font-bold text-tertiary">World Cup</h3>
+                                <span class="px-3 py-1 bg-red-500/30 text-red-400 rounded-full text-sm font-bold">ANUAL</span>
+                            </div>
+                            <p class="text-gray-300 mb-4">Campeonato mundial com as melhores equipes.</p>
+                            <div class="space-y-2 text-gray-400 text-sm mb-6">
+                                <p><i class="fas fa-users"></i> 32 Equipes Convidadas</p>
+                                <p><i class="fas fa-calendar"></i> Dezembro 2024</p>
+                                <p><i class="fas fa-trophy"></i> Prêmio: $100.000</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-gradient-to-r from-tertiary to-primary text-white font-bold rounded hover:shadow-lg hover:shadow-tertiary/30 transition cta-primary">
+                            Qualifique-se
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark-2 border-t border-primary border-opacity-20 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="max-w-6xl mx-auto text-center text-gray-400">
+            <p>&copy; 2024 NKZ Academy. Todos os direitos reservados. League of Legends é uma marca registrada da Riot Games.</p>
+        </div>
+    </footer>
+
+    <script src="interactive.js"></script>
+    <script src="main.js"></script>
+    <script src="functions.js"></script>
+</body>
+</html>
