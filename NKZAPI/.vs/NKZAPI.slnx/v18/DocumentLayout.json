@@ -60,7 +60,7 @@
               "RelativeDocumentMoniker": "NKZAPI\\appsettings.json",
               "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
               "RelativeToolTip": "NKZAPI\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-01-28T17:15:50.684Z",
               "EditorCaption": ""
@@ -75,8 +75,7 @@
               "RelativeToolTip": "NKZAPI\\Data\\NKZAPIContext.cs",
               "ViewState": "AgIAAAoAAAAAAAAAAAAQwBkAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T17:03:34.37Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T17:03:34.37Z"
             },
             {
               "$type": "Document",
@@ -88,8 +87,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\Game.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T16:45:12.406Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T16:45:12.406Z"
             },
             {
               "$type": "Document",
@@ -101,8 +99,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\Profiler.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T16:38:59.985Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T16:38:59.985Z"
             },
             {
               "$type": "Document",
@@ -114,8 +111,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\Team.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:30:08.333Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T15:30:08.333Z"
             },
             {
               "$type": "Document",
@@ -127,8 +123,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\BaseEntity.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAABCAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:29:27.459Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T15:29:27.459Z"
             },
             {
               "$type": "Document",
@@ -140,8 +135,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\Player.cs",
               "ViewState": "AgIAABEAAAAAAAAAAAAswCAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:20:28.759Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T15:20:28.759Z"
             },
             {
               "$type": "Document",
@@ -153,8 +147,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\User.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:18:07.325Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T15:18:07.325Z"
             },
             {
               "$type": "Document",
@@ -178,8 +171,7 @@
               "RelativeToolTip": "NKZAPI\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-27T11:17:13.207Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-27T11:17:13.207Z"
             }
           ]
         }
