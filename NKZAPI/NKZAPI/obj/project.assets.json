@@ -44,6 +44,49 @@
           }
         }
       },
+      "MemoryPack.Core/1.10.0": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/MemoryPack.Core.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/MemoryPack.Core.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MessagePack/2.5.140": {
+        "type": "package",
+        "dependencies": {
+          "MessagePack.Annotations": "2.5.140",
+          "Microsoft.NET.StringTools": "17.6.3"
+        },
+        "compile": {
+          "lib/net6.0/MessagePack.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/MessagePack.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MessagePack.Annotations/2.5.140": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/MessagePack.Annotations.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/MessagePack.Annotations.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.OpenApi/10.0.2": {
         "type": "package",
         "dependencies": {
@@ -64,6 +107,19 @@
         ],
         "build": {
           "build/Microsoft.AspNetCore.OpenApi.targets": {}
+        }
+      },
+      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
+            "related": ".xml"
+          }
         }
       },
       "Microsoft.Build.Framework/18.0.2": {
@@ -461,7 +517,7 @@
           "Microsoft.EntityFrameworkCore": "10.0.2"
         },
         "compile": {
-          "lib/net10.0/_._": {
+          "lib/net10.0/Microsoft.EntityFrameworkCore.Relational.dll": {
             "related": ".xml"
           }
         },
@@ -504,6 +560,19 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "Microsoft.NET.StringTools/17.6.3": {
+        "type": "package",
+        "compile": {
+          "ref/net7.0/_._": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/Microsoft.NET.StringTools.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.OpenApi/2.3.0": {
         "type": "package",
         "compile": {
@@ -513,6 +582,19 @@
         },
         "runtime": {
           "lib/net8.0/Microsoft.OpenApi.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "Microsoft.Toolkit.HighPerformance/7.1.2": {
+        "type": "package",
+        "compile": {
+          "lib/net5.0/Microsoft.Toolkit.HighPerformance.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Microsoft.Toolkit.HighPerformance.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -570,12 +652,43 @@
       "Newtonsoft.Json/13.0.3": {
         "type": "package",
         "compile": {
-          "lib/net6.0/_._": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
           "lib/net6.0/Newtonsoft.Json.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Npgsql/10.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net10.0/Npgsql.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Npgsql.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Npgsql.EntityFrameworkCore.PostgreSQL/10.0.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "[10.0.0, 11.0.0)",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.0, 11.0.0)",
+          "Npgsql": "10.0.0"
+        },
+        "compile": {
+          "lib/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {
             "related": ".xml"
           }
         }
@@ -612,6 +725,133 @@
           "runtimes/win-x86/native/sni.dll": {
             "assetType": "native",
             "rid": "win-x86"
+          }
+        }
+      },
+      "Stl/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "MemoryPack.Core": "1.10.0",
+          "MessagePack": "2.5.140",
+          "Microsoft.Toolkit.HighPerformance": "7.1.2",
+          "Newtonsoft.Json": "13.0.3",
+          "System.Linq.Async": "6.0.1",
+          "System.Reactive": "6.0.0",
+          "ZString": "2.5.1"
+        },
+        "compile": {
+          "lib/net8.0/Stl.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "Stl.CommandR/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "Stl": "6.8.11",
+          "Stl.Interception": "6.8.11",
+          "Stl.Rpc": "6.8.11"
+        },
+        "compile": {
+          "lib/net8.0/Stl.CommandR.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.CommandR.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "Stl.Fusion/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "Stl": "6.8.11",
+          "Stl.CommandR": "6.8.11",
+          "Stl.Interception": "6.8.11"
+        },
+        "compile": {
+          "lib/net8.0/Stl.Fusion.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.Fusion.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "Stl.Fusion.EntityFramework/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.0",
+          "Microsoft.EntityFrameworkCore.Relational": "8.0.0",
+          "Stl.Fusion": "6.8.11",
+          "Ulid": "1.3.3"
+        },
+        "compile": {
+          "lib/net8.0/Stl.Fusion.EntityFramework.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.Fusion.EntityFramework.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "Stl.Fusion.EntityFramework.Npgsql/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.0",
+          "Stl.Fusion.EntityFramework": "6.8.11"
+        },
+        "compile": {
+          "lib/net8.0/Stl.Fusion.EntityFramework.Npgsql.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.Fusion.EntityFramework.Npgsql.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "Stl.Interception/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "Stl": "6.8.11"
+        },
+        "compile": {
+          "lib/net8.0/Stl.Interception.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.Interception.dll": {
+            "related": ".pdb"
+          }
+        }
+      },
+      "Stl.Rpc/6.8.11": {
+        "type": "package",
+        "dependencies": {
+          "Stl": "6.8.11",
+          "Stl.Interception": "6.8.11"
+        },
+        "compile": {
+          "lib/net8.0/Stl.Rpc.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Stl.Rpc.dll": {
+            "related": ".pdb"
           }
         }
       },
@@ -895,6 +1135,38 @@
           }
         }
       },
+      "System.Linq.Async/6.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
+        },
+        "compile": {
+          "ref/net6.0/System.Linq.Async.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/System.Linq.Async.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "System.Reactive/6.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/System.Reactive.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/System.Reactive.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
       "System.Security.Cryptography.ProtectedData/6.0.0": {
         "type": "package",
         "compile": {
@@ -955,6 +1227,32 @@
           "runtimes/win/lib/net6.0/System.Windows.Extensions.dll": {
             "assetType": "runtime",
             "rid": "win"
+          }
+        }
+      },
+      "Ulid/1.3.3": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Ulid.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Ulid.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "ZString/2.5.1": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/ZString.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/ZString.dll": {
+            "related": ".xml"
           }
         }
       }
@@ -1041,6 +1339,50 @@
         "logo.png"
       ]
     },
+    "MemoryPack.Core/1.10.0": {
+      "sha512": "MxQ7jag9AOXyAbq7DGvaJBANINLxnkzibOMuwdYAjQDaeIWamIi8Z/QmkOJGBUPGANjIxv2J07rMsFFnHJW/iQ==",
+      "type": "package",
+      "path": "memorypack.core/1.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net7.0/MemoryPack.Core.dll",
+        "lib/net7.0/MemoryPack.Core.xml",
+        "lib/netstandard2.1/MemoryPack.Core.dll",
+        "lib/netstandard2.1/MemoryPack.Core.xml",
+        "memorypack.core.1.10.0.nupkg.sha512",
+        "memorypack.core.nuspec"
+      ]
+    },
+    "MessagePack/2.5.140": {
+      "sha512": "nkIsgy8BkIfv40bSz9XZb4q//scI1PF3AYeB5X66nSlIhBIqbdpLz8Qk3gHvnjV3RZglQLO/ityK3eNfLii2NA==",
+      "type": "package",
+      "path": "messagepack/2.5.140",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/MessagePack.dll",
+        "lib/net6.0/MessagePack.xml",
+        "lib/netstandard2.0/MessagePack.dll",
+        "lib/netstandard2.0/MessagePack.xml",
+        "messagepack.2.5.140.nupkg.sha512",
+        "messagepack.nuspec"
+      ]
+    },
+    "MessagePack.Annotations/2.5.140": {
+      "sha512": "JE3vwluOrsJ4t3hnfXzIxJUh6lhx6M/KR8Sark/HOUw1DJ5UKu5JsAnnuaQngg6poFkRx1lzHSLTkxHNJO7+uQ==",
+      "type": "package",
+      "path": "messagepack.annotations/2.5.140",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/MessagePack.Annotations.dll",
+        "lib/netstandard2.0/MessagePack.Annotations.xml",
+        "messagepack.annotations.2.5.140.nupkg.sha512",
+        "messagepack.annotations.nuspec"
+      ]
+    },
     "Microsoft.AspNetCore.OpenApi/10.0.2": {
       "sha512": "YuEjUNpsoZLs0I5ONt013Z+Udsz3f9sPUh1Xm59LN7+/Z8oVG/swCUYLBbANtfreiunWnoT2uk+5kst4s2jr3Q==",
       "type": "package",
@@ -1057,6 +1399,27 @@
         "lib/net10.0/Microsoft.AspNetCore.OpenApi.xml",
         "microsoft.aspnetcore.openapi.10.0.2.nupkg.sha512",
         "microsoft.aspnetcore.openapi.nuspec"
+      ]
+    },
+    "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "sha512": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg==",
+      "type": "package",
+      "path": "microsoft.bcl.asyncinterfaces/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll",
+        "lib/net461/Microsoft.Bcl.AsyncInterfaces.xml",
+        "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll",
+        "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.xml",
+        "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
+        "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml",
+        "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+        "microsoft.bcl.asyncinterfaces.nuspec",
+        "useSharedDesignerContext.txt"
       ]
     },
     "Microsoft.Build.Framework/18.0.2": {
@@ -2530,6 +2893,35 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Microsoft.NET.StringTools/17.6.3": {
+      "sha512": "N0ZIanl1QCgvUumEL1laasU0a7sOE5ZwLZVTn0pAePnfhq8P7SvTjF8Axq+CnavuQkmdQpGNXQ1efZtu5kDFbA==",
+      "type": "package",
+      "path": "microsoft.net.stringtools/17.6.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "MSBuild-NuGet-Icon.png",
+        "README.md",
+        "lib/net472/Microsoft.NET.StringTools.dll",
+        "lib/net472/Microsoft.NET.StringTools.pdb",
+        "lib/net472/Microsoft.NET.StringTools.xml",
+        "lib/net7.0/Microsoft.NET.StringTools.dll",
+        "lib/net7.0/Microsoft.NET.StringTools.pdb",
+        "lib/net7.0/Microsoft.NET.StringTools.xml",
+        "lib/netstandard2.0/Microsoft.NET.StringTools.dll",
+        "lib/netstandard2.0/Microsoft.NET.StringTools.pdb",
+        "lib/netstandard2.0/Microsoft.NET.StringTools.xml",
+        "microsoft.net.stringtools.17.6.3.nupkg.sha512",
+        "microsoft.net.stringtools.nuspec",
+        "notices/THIRDPARTYNOTICES.txt",
+        "ref/net472/Microsoft.NET.StringTools.dll",
+        "ref/net472/Microsoft.NET.StringTools.xml",
+        "ref/net7.0/Microsoft.NET.StringTools.dll",
+        "ref/net7.0/Microsoft.NET.StringTools.xml",
+        "ref/netstandard2.0/Microsoft.NET.StringTools.dll",
+        "ref/netstandard2.0/Microsoft.NET.StringTools.xml"
+      ]
+    },
     "Microsoft.OpenApi/2.3.0": {
       "sha512": "5RZpjyt0JMmoc/aEgY9c1vE5pusdDGvkPl9qKIy9KFbRiIXD+w7gBJxX+unSjzzOcfgRoYxnO4okZyqDAL2WEw==",
       "type": "package",
@@ -2546,6 +2938,38 @@
         "lib/netstandard2.0/Microsoft.OpenApi.xml",
         "microsoft.openapi.2.3.0.nupkg.sha512",
         "microsoft.openapi.nuspec"
+      ]
+    },
+    "Microsoft.Toolkit.HighPerformance/7.1.2": {
+      "sha512": "cezzRky0BUJyYmSrcQUcX8qAv90JfUwCqWEbqfWZLHyeANo9/LWgW6y50pqbyc8r8SPXVsu2GNH98fB3VxrnvA==",
+      "type": "package",
+      "path": "microsoft.toolkit.highperformance/7.1.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "License.md",
+        "ThirdPartyNotices.txt",
+        "lib/net5.0/Microsoft.Toolkit.HighPerformance.dll",
+        "lib/net5.0/Microsoft.Toolkit.HighPerformance.pdb",
+        "lib/net5.0/Microsoft.Toolkit.HighPerformance.xml",
+        "lib/netcoreapp2.1/Microsoft.Toolkit.HighPerformance.dll",
+        "lib/netcoreapp2.1/Microsoft.Toolkit.HighPerformance.pdb",
+        "lib/netcoreapp2.1/Microsoft.Toolkit.HighPerformance.xml",
+        "lib/netcoreapp3.1/Microsoft.Toolkit.HighPerformance.dll",
+        "lib/netcoreapp3.1/Microsoft.Toolkit.HighPerformance.pdb",
+        "lib/netcoreapp3.1/Microsoft.Toolkit.HighPerformance.xml",
+        "lib/netstandard1.4/Microsoft.Toolkit.HighPerformance.dll",
+        "lib/netstandard1.4/Microsoft.Toolkit.HighPerformance.pdb",
+        "lib/netstandard1.4/Microsoft.Toolkit.HighPerformance.xml",
+        "lib/netstandard2.0/Microsoft.Toolkit.HighPerformance.dll",
+        "lib/netstandard2.0/Microsoft.Toolkit.HighPerformance.pdb",
+        "lib/netstandard2.0/Microsoft.Toolkit.HighPerformance.xml",
+        "lib/netstandard2.1/Microsoft.Toolkit.HighPerformance.dll",
+        "lib/netstandard2.1/Microsoft.Toolkit.HighPerformance.pdb",
+        "lib/netstandard2.1/Microsoft.Toolkit.HighPerformance.xml",
+        "microsoft.toolkit.highperformance.7.1.2.nupkg.sha512",
+        "microsoft.toolkit.highperformance.nuspec"
       ]
     },
     "Microsoft.VisualStudio.SolutionPersistence/1.0.52": {
@@ -2642,6 +3066,40 @@
         "packageIcon.png"
       ]
     },
+    "Npgsql/10.0.0": {
+      "sha512": "xZAYhPOU2rUIFpV48xsqhCx9vXs6Y+0jX2LCoSEfDFYMw9jtAOUk3iQsCnDLrFIv9NT3JGMihn7nnuZsPKqJmA==",
+      "type": "package",
+      "path": "npgsql/10.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net10.0/Npgsql.dll",
+        "lib/net10.0/Npgsql.xml",
+        "lib/net8.0/Npgsql.dll",
+        "lib/net8.0/Npgsql.xml",
+        "lib/net9.0/Npgsql.dll",
+        "lib/net9.0/Npgsql.xml",
+        "npgsql.10.0.0.nupkg.sha512",
+        "npgsql.nuspec",
+        "postgresql.png"
+      ]
+    },
+    "Npgsql.EntityFrameworkCore.PostgreSQL/10.0.0": {
+      "sha512": "E2+uSWxSB8LdsUVwPaqRWOcGOP92biry2JEwc0KJMdLJF+aZdczeIdEXVwEyv4nSVMQJH0o8tLhyAMiR6VF0lw==",
+      "type": "package",
+      "path": "npgsql.entityframeworkcore.postgresql/10.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll",
+        "lib/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.xml",
+        "npgsql.entityframeworkcore.postgresql.10.0.0.nupkg.sha512",
+        "npgsql.entityframeworkcore.postgresql.nuspec",
+        "postgresql.png"
+      ]
+    },
     "runtime.native.System.Data.SqlClient.sni/4.7.0": {
       "sha512": "9kyFSIdN3T0qjDQ2R0HRXYIhS3l5psBzQi6qqhdLz+SzFyEy4sVxNOke+yyYv8Cu8rPER12c3RDjLT8wF3WBYQ==",
       "type": "package",
@@ -2703,6 +3161,181 @@
         "runtimes/win-x86/native/sni.dll",
         "useSharedDesignerContext.txt",
         "version.txt"
+      ]
+    },
+    "Stl/6.8.11": {
+      "sha512": "waYTlTp4honrcUDWMQt573fNnXLMegqnMMaBFKHJwVrOlqfiv8cvq1aHLnwDG3utxWVQy5Du/nSnxFVezwwopg==",
+      "type": "package",
+      "path": "stl/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.dll",
+        "lib/net5.0/Stl.pdb",
+        "lib/net6.0/Stl.dll",
+        "lib/net6.0/Stl.pdb",
+        "lib/net7.0/Stl.dll",
+        "lib/net7.0/Stl.pdb",
+        "lib/net8.0/Stl.dll",
+        "lib/net8.0/Stl.pdb",
+        "lib/netcoreapp3.1/Stl.dll",
+        "lib/netcoreapp3.1/Stl.pdb",
+        "lib/netstandard2.0/Stl.dll",
+        "lib/netstandard2.0/Stl.pdb",
+        "lib/netstandard2.1/Stl.dll",
+        "lib/netstandard2.1/Stl.pdb",
+        "stl.6.8.11.nupkg.sha512",
+        "stl.nuspec"
+      ]
+    },
+    "Stl.CommandR/6.8.11": {
+      "sha512": "BvNcGvu6Thg1bVi43J8RBfbpJsV40p/ZL6ZP2xgnL0xKJtuKIjbwAz4mT97ehsbweZCGB2lkfibaCBp8rnBtbA==",
+      "type": "package",
+      "path": "stl.commandr/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.CommandR.dll",
+        "lib/net5.0/Stl.CommandR.pdb",
+        "lib/net6.0/Stl.CommandR.dll",
+        "lib/net6.0/Stl.CommandR.pdb",
+        "lib/net7.0/Stl.CommandR.dll",
+        "lib/net7.0/Stl.CommandR.pdb",
+        "lib/net8.0/Stl.CommandR.dll",
+        "lib/net8.0/Stl.CommandR.pdb",
+        "lib/netcoreapp3.1/Stl.CommandR.dll",
+        "lib/netcoreapp3.1/Stl.CommandR.pdb",
+        "lib/netstandard2.0/Stl.CommandR.dll",
+        "lib/netstandard2.0/Stl.CommandR.pdb",
+        "lib/netstandard2.1/Stl.CommandR.dll",
+        "lib/netstandard2.1/Stl.CommandR.pdb",
+        "stl.commandr.6.8.11.nupkg.sha512",
+        "stl.commandr.nuspec"
+      ]
+    },
+    "Stl.Fusion/6.8.11": {
+      "sha512": "Ys80waz1uuNBCJUpCWQ+1sG5K/uFtg6uE0eTwPIieJ5zUZgMDjDMeLPlWZm2WMnT6Xu8AX9GwfsRrSOZiazL/Q==",
+      "type": "package",
+      "path": "stl.fusion/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.Fusion.dll",
+        "lib/net5.0/Stl.Fusion.pdb",
+        "lib/net6.0/Stl.Fusion.dll",
+        "lib/net6.0/Stl.Fusion.pdb",
+        "lib/net7.0/Stl.Fusion.dll",
+        "lib/net7.0/Stl.Fusion.pdb",
+        "lib/net8.0/Stl.Fusion.dll",
+        "lib/net8.0/Stl.Fusion.pdb",
+        "lib/netcoreapp3.1/Stl.Fusion.dll",
+        "lib/netcoreapp3.1/Stl.Fusion.pdb",
+        "lib/netstandard2.0/Stl.Fusion.dll",
+        "lib/netstandard2.0/Stl.Fusion.pdb",
+        "lib/netstandard2.1/Stl.Fusion.dll",
+        "lib/netstandard2.1/Stl.Fusion.pdb",
+        "stl.fusion.6.8.11.nupkg.sha512",
+        "stl.fusion.nuspec"
+      ]
+    },
+    "Stl.Fusion.EntityFramework/6.8.11": {
+      "sha512": "ydvjUJlg9o+QqaEbxJxOQR4AHJIgwPawZQ5vwCWY4xFqVkPT6C4azW8e5IotRa1GJfGGRVAe+5We4+SLxZjPHQ==",
+      "type": "package",
+      "path": "stl.fusion.entityframework/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.Fusion.EntityFramework.dll",
+        "lib/net5.0/Stl.Fusion.EntityFramework.pdb",
+        "lib/net6.0/Stl.Fusion.EntityFramework.dll",
+        "lib/net6.0/Stl.Fusion.EntityFramework.pdb",
+        "lib/net7.0/Stl.Fusion.EntityFramework.dll",
+        "lib/net7.0/Stl.Fusion.EntityFramework.pdb",
+        "lib/net8.0/Stl.Fusion.EntityFramework.dll",
+        "lib/net8.0/Stl.Fusion.EntityFramework.pdb",
+        "lib/netcoreapp3.1/Stl.Fusion.EntityFramework.dll",
+        "lib/netcoreapp3.1/Stl.Fusion.EntityFramework.pdb",
+        "lib/netstandard2.0/Stl.Fusion.EntityFramework.dll",
+        "lib/netstandard2.0/Stl.Fusion.EntityFramework.pdb",
+        "lib/netstandard2.1/Stl.Fusion.EntityFramework.dll",
+        "lib/netstandard2.1/Stl.Fusion.EntityFramework.pdb",
+        "stl.fusion.entityframework.6.8.11.nupkg.sha512",
+        "stl.fusion.entityframework.nuspec"
+      ]
+    },
+    "Stl.Fusion.EntityFramework.Npgsql/6.8.11": {
+      "sha512": "Jy4PY8puhM4gDqDCDULAA65OZJ0vPSU8M4flSAgOwsVr7uz7lfZzY/dqoqfO83nOkEcRdIwyFiL6Wzf1wIEihw==",
+      "type": "package",
+      "path": "stl.fusion.entityframework.npgsql/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/net5.0/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "lib/net6.0/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/net6.0/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "lib/net7.0/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/net7.0/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "lib/net8.0/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/net8.0/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "lib/netcoreapp3.1/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/netcoreapp3.1/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "lib/netstandard2.0/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/netstandard2.0/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "lib/netstandard2.1/Stl.Fusion.EntityFramework.Npgsql.dll",
+        "lib/netstandard2.1/Stl.Fusion.EntityFramework.Npgsql.pdb",
+        "stl.fusion.entityframework.npgsql.6.8.11.nupkg.sha512",
+        "stl.fusion.entityframework.npgsql.nuspec"
+      ]
+    },
+    "Stl.Interception/6.8.11": {
+      "sha512": "wMPqNbhOE5E/+RXfRfDwPLFW4rQqHaQQFQEdNejhIhnqjSWj83rUcwVK9dvLjTv6o1sBSInDd9SusfL3nKd8OA==",
+      "type": "package",
+      "path": "stl.interception/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.Interception.dll",
+        "lib/net5.0/Stl.Interception.pdb",
+        "lib/net6.0/Stl.Interception.dll",
+        "lib/net6.0/Stl.Interception.pdb",
+        "lib/net7.0/Stl.Interception.dll",
+        "lib/net7.0/Stl.Interception.pdb",
+        "lib/net8.0/Stl.Interception.dll",
+        "lib/net8.0/Stl.Interception.pdb",
+        "lib/netcoreapp3.1/Stl.Interception.dll",
+        "lib/netcoreapp3.1/Stl.Interception.pdb",
+        "lib/netstandard2.0/Stl.Interception.dll",
+        "lib/netstandard2.0/Stl.Interception.pdb",
+        "lib/netstandard2.1/Stl.Interception.dll",
+        "lib/netstandard2.1/Stl.Interception.pdb",
+        "stl.interception.6.8.11.nupkg.sha512",
+        "stl.interception.nuspec"
+      ]
+    },
+    "Stl.Rpc/6.8.11": {
+      "sha512": "YbOlggja8tkHL0oMTw1ivnN28btA2/VetoPzCHgcSeDEHHfpzuCUweI2RU+X+JbpzAfINCtevW8L/lIwAjYf4g==",
+      "type": "package",
+      "path": "stl.rpc/6.8.11",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Stl.Rpc.dll",
+        "lib/net5.0/Stl.Rpc.pdb",
+        "lib/net6.0/Stl.Rpc.dll",
+        "lib/net6.0/Stl.Rpc.pdb",
+        "lib/net7.0/Stl.Rpc.dll",
+        "lib/net7.0/Stl.Rpc.pdb",
+        "lib/net8.0/Stl.Rpc.dll",
+        "lib/net8.0/Stl.Rpc.pdb",
+        "lib/netcoreapp3.1/Stl.Rpc.dll",
+        "lib/netcoreapp3.1/Stl.Rpc.pdb",
+        "lib/netstandard2.0/Stl.Rpc.dll",
+        "lib/netstandard2.0/Stl.Rpc.pdb",
+        "lib/netstandard2.1/Stl.Rpc.dll",
+        "lib/netstandard2.1/Stl.Rpc.pdb",
+        "stl.rpc.6.8.11.nupkg.sha512",
+        "stl.rpc.nuspec"
       ]
     },
     "Swashbuckle.AspNetCore/10.1.0": {
@@ -3208,6 +3841,62 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "System.Linq.Async/6.0.1": {
+      "sha512": "0YhHcaroWpQ9UCot3Pizah7ryAzQhNvobLMSxeDIGmnXfkQn8u5owvpOH0K6EVB+z9L7u6Cc4W17Br/+jyttEQ==",
+      "type": "package",
+      "path": "system.linq.async/6.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Logo.png",
+        "lib/net48/System.Linq.Async.dll",
+        "lib/net48/System.Linq.Async.xml",
+        "lib/net6.0/System.Linq.Async.dll",
+        "lib/net6.0/System.Linq.Async.xml",
+        "lib/netstandard2.0/System.Linq.Async.dll",
+        "lib/netstandard2.0/System.Linq.Async.xml",
+        "lib/netstandard2.1/System.Linq.Async.dll",
+        "lib/netstandard2.1/System.Linq.Async.xml",
+        "ref/net48/System.Linq.Async.dll",
+        "ref/net48/System.Linq.Async.xml",
+        "ref/net6.0/System.Linq.Async.dll",
+        "ref/net6.0/System.Linq.Async.xml",
+        "ref/netstandard2.0/System.Linq.Async.dll",
+        "ref/netstandard2.0/System.Linq.Async.xml",
+        "ref/netstandard2.1/System.Linq.Async.dll",
+        "ref/netstandard2.1/System.Linq.Async.xml",
+        "system.linq.async.6.0.1.nupkg.sha512",
+        "system.linq.async.nuspec"
+      ]
+    },
+    "System.Reactive/6.0.0": {
+      "sha512": "31kfaW4ZupZzPsI5PVe77VhnvFF55qgma7KZr/E0iFTs6fmdhhG8j0mgEx620iLTey1EynOkEfnyTjtNEpJzGw==",
+      "type": "package",
+      "path": "system.reactive/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/net6.0-windows10.0.19041/_._",
+        "build/net6.0/_._",
+        "buildTransitive/net6.0-windows10.0.19041/_._",
+        "buildTransitive/net6.0/_._",
+        "icon.png",
+        "lib/net472/System.Reactive.dll",
+        "lib/net472/System.Reactive.xml",
+        "lib/net6.0-windows10.0.19041/System.Reactive.dll",
+        "lib/net6.0-windows10.0.19041/System.Reactive.xml",
+        "lib/net6.0/System.Reactive.dll",
+        "lib/net6.0/System.Reactive.xml",
+        "lib/netstandard2.0/System.Reactive.dll",
+        "lib/netstandard2.0/System.Reactive.xml",
+        "lib/uap10.0.18362/System.Reactive.dll",
+        "lib/uap10.0.18362/System.Reactive.pri",
+        "lib/uap10.0.18362/System.Reactive.xml",
+        "readme.md",
+        "system.reactive.6.0.0.nupkg.sha512",
+        "system.reactive.nuspec"
+      ]
+    },
     "System.Security.Cryptography.ProtectedData/6.0.0": {
       "sha512": "rp1gMNEZpvx9vP0JW0oHLxlf8oSiQgtno77Y4PLUBjSiDYoD77Y8uXHr1Ea5XG4/pIKhqAdxZ8v8OTUtqo9PeQ==",
       "type": "package",
@@ -3294,6 +3983,48 @@
         "system.windows.extensions.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "Ulid/1.3.3": {
+      "sha512": "58eRa3gxKiTNXbGYUCy2T3biFAQehB+yBFKXoBGLjZbhBxbU1VUV5QnMgPNAU7gb2HZy3M6703pcUrC4p4IViA==",
+      "type": "package",
+      "path": "ulid/1.3.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net6.0/Ulid.dll",
+        "lib/net6.0/Ulid.xml",
+        "lib/net7.0/Ulid.dll",
+        "lib/net7.0/Ulid.xml",
+        "lib/net8.0/Ulid.dll",
+        "lib/net8.0/Ulid.xml",
+        "lib/netstandard2.0/Ulid.dll",
+        "lib/netstandard2.0/Ulid.xml",
+        "lib/netstandard2.1/Ulid.dll",
+        "lib/netstandard2.1/Ulid.xml",
+        "ulid.1.3.3.nupkg.sha512",
+        "ulid.nuspec"
+      ]
+    },
+    "ZString/2.5.1": {
+      "sha512": "hHZnrIZAgda8j9n2gR4M7GbETcjr6EBo4CUnMtK8o2MgkgzARg+Y7XI142nNOpRRuup1LJb12/gd/tMhzwdw8g==",
+      "type": "package",
+      "path": "zstring/2.5.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "lib/net6.0/ZString.dll",
+        "lib/net6.0/ZString.xml",
+        "lib/net7.0/ZString.dll",
+        "lib/net7.0/ZString.xml",
+        "lib/netstandard2.0/ZString.dll",
+        "lib/netstandard2.0/ZString.xml",
+        "lib/netstandard2.1/ZString.dll",
+        "lib/netstandard2.1/ZString.xml",
+        "zstring.2.5.1.nupkg.sha512",
+        "zstring.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -3303,27 +4034,29 @@
       "Microsoft.EntityFrameworkCore >= 10.0.2",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.2",
       "Microsoft.EntityFrameworkCore.Tools >= 10.0.2",
+      "Npgsql.EntityFrameworkCore.PostgreSQL >= 10.0.0",
+      "Stl.Fusion.EntityFramework.Npgsql >= 6.8.11",
       "Swashbuckle.AspNetCore >= 10.1.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\shora\\.nuget\\packages\\": {},
+    "C:\\Users\\falci\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\NKZAPI.csproj",
+      "projectUniqueName": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\NKZAPI.csproj",
       "projectName": "NKZAPI",
-      "projectPath": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\NKZAPI.csproj",
-      "packagesPath": "C:\\Users\\shora\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\obj\\",
+      "projectPath": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\NKZAPI.csproj",
+      "packagesPath": "C:\\Users\\falci\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\shora\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\falci\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3332,7 +4065,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3380,6 +4112,14 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[10.0.2, )"
+          },
+          "Npgsql.EntityFrameworkCore.PostgreSQL": {
+            "target": "Package",
+            "version": "[10.0.0, )"
+          },
+          "Stl.Fusion.EntityFramework.Npgsql": {
+            "target": "Package",
+            "version": "[6.8.11, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
@@ -3822,5 +4562,17 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "O pacote 'MessagePack' 2.5.140 tem uma moderado vulnerabilidade de gravidade conhecida, https://github.com/advisories/GHSA-4qm4-8hg2-g2xm",
+      "libraryId": "MessagePack",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

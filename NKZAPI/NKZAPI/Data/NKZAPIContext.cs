@@ -5,7 +5,7 @@ namespace NKZAPI.Data
 {
     public class NKZAPIContext : DbContext
     {
-        public NKZAPIContext(DbContextOptions options) : base(options)
+        public NKZAPIContext(DbContextOptions<NKZAPI> options) : base(options)
         {
 
         }
