@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NKZAPI.Data;
 using NKZAPI.Models;
-using System.Data.Entity;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 
@@ -20,7 +20,7 @@ namespace NKZAPI.Repositories
             return Return;
         }
 
-        public async Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(Guid id)
         {
             User? Return = await _context.Users.FindAsync(id);
             return Return;

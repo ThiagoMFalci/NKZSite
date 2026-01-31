@@ -1,14 +1,13 @@
-﻿using System.Data.Entity.Core.Metadata.Edm;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NKZAPI.Models
 {
     public class Team
     {
+        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
 
-        public Guid CaptainId { get; set; }
-        public Player Captain { get; set; } = null!;
-
-        public ICollection<Player> Members { get; set; } = new List<Player>();
+        // Navegação inversa necessária para que EF Core resolva o relacionamento many-to-many por convenção
+        public ICollection<Player> Players { get; set; } = new List<Player>();
     }
 }

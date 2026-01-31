@@ -5,7 +5,7 @@ namespace NKZAPI.Data
 {
     public class NKZAPIContext : DbContext
     {
-        public NKZAPIContext(DbContextOptions<NKZAPI> options) : base(options)
+        public NKZAPIContext(DbContextOptions<NKZAPIContext> options) : base(options)
         {
 
         }
@@ -21,7 +21,7 @@ namespace NKZAPI.Data
         public DbSet<Player> Players { get; set; }
         public DbSet<Game> Games { get; set; }
 
-        public void OnModelCreatin(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
         }

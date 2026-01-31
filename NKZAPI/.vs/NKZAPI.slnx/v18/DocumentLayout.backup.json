@@ -1,202 +1,84 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\",
+  "WorkspaceRootPath": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\data\\nkzapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\data\\nkzapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\data\\nkzapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\data\\nkzapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\services\\userservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260131204946_StartDb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Migrations\\20260131204946_StartDb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260131203522_StartDb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Migrations\\20260131203522_StartDb.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
-      "VerticalTabListWidth": 256,
+      "VerticalTabListWidth": 187,
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UserRepository.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\UserRepository.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Repositories\\UserRepository.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\UserRepository.cs",
-              "RelativeToolTip": "NKZAPI\\Repositories\\UserRepository.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAADwvxkAAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-29T18:43:34.864Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
-              "RelativeDocumentMoniker": "NKZAPI\\appsettings.json",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
-              "RelativeToolTip": "NKZAPI\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-28T17:15:50.684Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "NKZAPIContext.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Data\\NKZAPIContext.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs",
-              "RelativeToolTip": "NKZAPI\\Data\\NKZAPIContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA0AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T17:03:34.37Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Game.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Game.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Models\\Game.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Game.cs",
-              "RelativeToolTip": "NKZAPI\\Models\\Game.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T16:45:12.406Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Profiler.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Profiler.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Models\\Profiler.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Profiler.cs",
-              "RelativeToolTip": "NKZAPI\\Models\\Profiler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T16:38:59.985Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Team.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Models\\Team.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs",
-              "RelativeToolTip": "NKZAPI\\Models\\Team.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:30:08.333Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "BaseEntity.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Models\\BaseEntity.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs",
-              "RelativeToolTip": "NKZAPI\\Models\\BaseEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAABCAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:29:27.459Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Player.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Models\\Player.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
-              "RelativeToolTip": "NKZAPI\\Models\\Player.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAswCAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:20:28.759Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "User.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Models\\User.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs",
-              "RelativeToolTip": "NKZAPI\\Models\\User.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T15:18:07.325Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "NKZAPI\\Properties\\launchSettings.json",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Properties\\launchSettings.json",
-              "RelativeToolTip": "NKZAPI\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-27T11:20:39.416Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
-              "RelativeDocumentMoniker": "NKZAPI\\Program.cs",
-              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
-              "RelativeToolTip": "NKZAPI\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-27T11:17:13.207Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             },
             {
               "$type": "Bookmark",
@@ -205,6 +87,214 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "20260131204946_StartDb.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260131204946_StartDb.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Migrations\\20260131204946_StartDb.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260131204946_StartDb.cs",
+              "RelativeToolTip": "NKZAPI\\Migrations\\20260131204946_StartDb.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-31T20:49:46.725Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "20260131203522_StartDb.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260131203522_StartDb.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Migrations\\20260131203522_StartDb.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260131203522_StartDb.cs",
+              "RelativeToolTip": "NKZAPI\\Migrations\\20260131203522_StartDb.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-31T20:35:22.535Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserDto.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Dtos\\UserDto.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Dtos\\UserDto.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Dtos\\UserDto.cs",
+              "RelativeToolTip": "NKZAPI\\Dtos\\UserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-31T20:01:48.993Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "UserController.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Controllers\\UserController.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\UserController.cs",
+              "RelativeToolTip": "NKZAPI\\Controllers\\UserController.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAuwCEAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T19:52:17.248Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "UserServices.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\UserServices.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Services\\UserServices.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\UserServices.cs",
+              "RelativeToolTip": "NKZAPI\\Services\\UserServices.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA0AAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T19:44:58.204Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\UserRepository.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Repositories\\UserRepository.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\UserRepository.cs",
+              "RelativeToolTip": "NKZAPI\\Repositories\\UserRepository.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABAAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T18:43:34.864Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "NKZAPI\\appsettings.json",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
+              "RelativeToolTip": "NKZAPI\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-28T17:15:50.684Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "NKZAPIContext.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Data\\NKZAPIContext.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs",
+              "RelativeToolTip": "NKZAPI\\Data\\NKZAPIContext.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABQAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T17:03:34.37Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Game.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Game.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\Game.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Game.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\Game.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T16:45:12.406Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Profiler.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Profiler.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\Profiler.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Profiler.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\Profiler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T16:38:59.985Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Team.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\Team.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\Team.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T15:30:08.333Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "BaseEntity.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\BaseEntity.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\BaseEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T15:29:27.459Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Player.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\Player.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\Player.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAzwAUAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T15:20:28.759Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\User.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-28T15:18:07.325Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "NKZAPI\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Properties\\launchSettings.json",
+              "RelativeToolTip": "NKZAPI\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-27T11:20:39.416Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Program.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
+              "RelativeToolTip": "NKZAPI\\Program.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABYAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-27T11:17:13.207Z",
+              "EditorCaption": ""
             }
           ]
         }

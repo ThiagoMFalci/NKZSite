@@ -17,7 +17,7 @@ namespace NKZAPI.Services
             return Return;
         }
 
-        public async Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(Guid id)
         {
             User? Return = await _userRepository.GetUserByIdAsync(id);
             return Return;

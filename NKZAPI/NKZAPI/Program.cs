@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using NKZAPI.Controllers;
 using NKZAPI.Repositories;
 using NKZAPI.Services;
 
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<NKZAPI.Data.NKZAPIContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserServices>();
+builder.Services.AddScoped<UserController>();
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
