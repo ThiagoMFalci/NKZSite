@@ -3,44 +3,48 @@
   "WorkspaceRootPath": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\repositories\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Data\\NKZAPIContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Models\\Game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\data\\nkzapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\data\\nkzapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Models\\Profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Models\\Team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\profiler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Models\\BaseEntity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\team.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Models\\Player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Properties\\launchSettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:NKZAPI\\Properties\\launchSettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\falci\\documents\\starplugins\\nkzsite\\nkzapi\\nkzapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,11 +54,28 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 1,
           "Children": [
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
+            },
+            {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\UserRepository.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Repositories\\UserRepository.cs",
+              "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\UserRepository.cs",
+              "RelativeToolTip": "NKZAPI\\Repositories\\UserRepository.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAADwvxkAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-29T18:43:34.864Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
               "RelativeDocumentMoniker": "NKZAPI\\appsettings.json",
@@ -62,12 +83,11 @@
               "RelativeToolTip": "NKZAPI\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-01-28T17:15:50.684Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T17:15:50.684Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "NKZAPIContext.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Data\\NKZAPIContext.cs",
@@ -75,12 +95,11 @@
               "RelativeToolTip": "NKZAPI\\Data\\NKZAPIContext.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T17:03:34.37Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T17:03:34.37Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Game.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Game.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Game.cs",
@@ -88,12 +107,11 @@
               "RelativeToolTip": "NKZAPI\\Models\\Game.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-28T16:45:12.406Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-28T16:45:12.406Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Profiler.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Profiler.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Profiler.cs",
@@ -105,7 +123,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "Team.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Team.cs",
@@ -117,7 +135,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "BaseEntity.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\BaseEntity.cs",
@@ -129,7 +147,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "Player.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Player.cs",
@@ -141,7 +159,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\User.cs",
@@ -153,7 +171,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "NKZAPI\\Properties\\launchSettings.json",
@@ -165,13 +183,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Program.cs",
               "ToolTip": "C:\\Users\\falci\\Documents\\StarPlugins\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
               "RelativeToolTip": "NKZAPI\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-27T11:17:13.207Z",
               "EditorCaption": ""
@@ -179,10 +197,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
             },
             {
               "$type": "Bookmark",
