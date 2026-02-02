@@ -2,9 +2,9 @@
 
 namespace NKZAPI.Models
 {
-    public class Player : User
+    public class Player : BaseEntity
     {
-
+        public User User { get; set; } = null!;
         public List<Profiler> Role { get; set; } = new List<Profiler>();
 
         // Riot
