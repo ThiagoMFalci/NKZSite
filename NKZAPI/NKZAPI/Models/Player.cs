@@ -4,7 +4,6 @@ namespace NKZAPI.Models
 {
     public class Player : BaseEntity
     {
-        public User User { get; set; } = null!;
         public List<Profiler> Role { get; set; } = new List<Profiler>();
 
         // Riot
@@ -27,6 +26,6 @@ namespace NKZAPI.Models
         public bool IsActive { get; set; } = true;
 
         // Navegação many-to-many — requer que Team tenha ICollection<Player> Players
-        public ICollection<Team> Teams { get; set; } = new List<Team>();
+        public ICollection<Team>? Teams { get; set; } = new List<Team>();
     }
 }

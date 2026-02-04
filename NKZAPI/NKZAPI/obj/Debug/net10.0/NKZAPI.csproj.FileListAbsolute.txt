@@ -170,3 +170,6 @@ C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\obj\Debug\net10.0\s
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\obj\Debug\net10.0\NKZAPI.csproj.Up2Date
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\obj\Debug\net10.0\NKZAPI.genruntimeconfig.cache
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\obj\Debug\net10.0\ref\NKZAPI.dll
+C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Debug\net10.0\Scrutor.dll
+C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Debug\net10.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Debug\net10.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

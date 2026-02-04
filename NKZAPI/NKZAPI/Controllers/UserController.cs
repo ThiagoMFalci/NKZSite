@@ -1,20 +1,24 @@
 ﻿
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services;
+using NKZAPI.Services.AuthServices;
 
 namespace NKZAPI.Controllers
 {
     [ApiController]
     [Route("api/auth/[controller]")]
-    public class UserController
+    public class UserController : ControllerBase
     {
         private readonly UserServices _userServices;
-        public UserController(UserServices userServices)
+        private readonly IAuthInterface _authInterface;
+        public UserController(UserServices userServices, IAuthInterface authInterface)
         {
             _userServices = userServices;
+            _authInterface = authInterface;
         }
 
         [HttpGet("ListUsers")]
@@ -26,26 +30,14 @@ namespace NKZAPI.Controllers
         [HttpPost("CreateUsers")]
         public async Task<ActionResult<User>> CreateUserAsync([FromBody] UserDto user)
         {
-            try
-            {
-                // Mapeia manualmente UserDto para User
-                var userModel = new User
-                {
-                    Id = user.Id,
-                    CreatedAt = user.CreatedAt,
-                    Email = user.Email,
-                    PasswordHash = user.PasswordHash,
-                    Player = user.Player
-                };
-
-                User createdUser = await _userServices.AddUserAsync(userModel);
-                return createdUser;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception (not shown here for brevity)
-                return new BadRequestObjectResult(new { message = ex.Message });
-            }
+            var response = await _authInterface.UserAddAsync(user);
+            return Ok(response);
+        }
+        [HttpPost("Login")]
+        public async Task<ActionResult<User>> Login(UserLoginDto userLogin)
+        {
+            var response = await _authInterface.Login(userLogin);
+            return Ok(response);
         }
 
     }

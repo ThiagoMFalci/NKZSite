@@ -91,6 +91,54 @@
         }
       }
     },
+    "/api/auth/User/Login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/WeatherForecast": {
       "get": {
         "tags": [
@@ -143,17 +191,6 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "passwordHash": {
-            "type": "string",
-            "nullable": true
-          },
-          "player": {
-            "$ref": "#/components/schemas/Player"
           },
           "role": {
             "type": "array",
@@ -242,13 +279,6 @@
           "name": {
             "type": "string",
             "nullable": true
-          },
-          "players": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Player"
-            },
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -270,32 +300,33 @@
           },
           "passwordHash": {
             "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "passwordSalt": {
+            "type": "string",
+            "format": "byte",
             "nullable": true
           },
           "player": {
-            "$ref": "#/components/schemas/Player"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Player"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "UserDto": {
         "required": [
-          "createdAt",
           "email",
-          "id",
           "passwordHash",
+          "passwordSalt",
           "player"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
           "email": {
             "minLength": 1,
             "type": "string",
@@ -305,8 +336,38 @@
             "minLength": 1,
             "type": "string"
           },
+          "passwordSalt": {
+            "minLength": 1,
+            "type": "string"
+          },
           "player": {
-            "$ref": "#/components/schemas/Player"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Player"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserLoginDto": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "passwordSalt": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -333,6 +394,14 @@
           }
         },
         "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "oauth2": {
+        "type": "apiKey",
+        "description": "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        "name": "Authorization",
+        "in": "header"
       }
     }
   },
