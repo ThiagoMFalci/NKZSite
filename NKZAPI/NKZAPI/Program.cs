@@ -5,8 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using NKZAPI.Controllers;
 using NKZAPI.Repositories;
-using NKZAPI.Services;
+using NKZAPI.Services.TeamServices;
+using NKZAPI.Services.UserServices;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +23,11 @@ if (connectionString is null)
 {
     throw new InvalidOperationException("Connection string 'ConnectionString' not found.");
 }
+
 builder.Services.AddDbContext<NKZAPI.Data.NKZAPIContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString),
+    contextLifetime: ServiceLifetime.Scoped,
+    optionsLifetime: ServiceLifetime.Scoped);
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -49,14 +54,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-
-
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserServices>();
 
-builder.Services.AddScoped<NKZAPI.Services.AuthServices.IAuthInterface, NKZAPI.Services.AuthServices.AuthService>();
-builder.Services.AddScoped<NKZAPI.Services.PassService.IPassInterface, NKZAPI.Services.PassService.PassService>();
+builder.Services.AddScoped<TeamRepository>();
+builder.Services.AddScoped<TeamServices>();
 
+builder.Services.AddScoped<NKZAPI.Services.AuthServices.IAuthInterface, NKZAPI.Services.AuthServices.AuthService>();
+builder.Services.AddScoped<NKZAPI.Services.PassService.IPasswordInterface, NKZAPI.Services.PassService.PasswordService>();
+builder.Services.AddScoped<NKZAPI.Services.UserServices.IUserInterface, NKZAPI.Services.UserServices.UserServices>();
+builder.Services.AddScoped<NKZAPI.Services.TeamServices.ITeamInterface, NKZAPI.Services.TeamServices.TeamServices>();
 
 builder.Services.AddOpenApi();
 

@@ -1,0 +1,201 @@
+﻿using Microsoft.EntityFrameworkCore;
+using NKZAPI.Data;
+using NKZAPI.Dtos;
+using NKZAPI.Models;
+using NKZAPI.Repositories;
+
+namespace NKZAPI.Services.TeamServices
+{
+    public class TeamServices : ITeamInterface
+    {
+        private readonly TeamRepository _teamRepository;
+        private readonly NKZAPIContext _context;
+        public TeamServices(TeamRepository teamRepository, NKZAPIContext context)
+        {
+            _teamRepository = teamRepository;
+            _context = context;
+        }
+        public async Task<List<Team>> GetAllTeamsAsync()
+        {
+            return await _teamRepository.GetAllTeamsAsync();
+        }
+        public async Task<Team?> GetTeamByIdAsync(Guid id)
+        {
+            return await _teamRepository.GetTeamByIdAsync(id);
+        }
+        public async Task<Response<string>> AddTeamAsync(TeamDto team, Guid id)
+        {
+            var response = new Response<string>();
+
+            try
+            {
+                var teamToCheck = new Team
+                {
+                    Name = team.Name
+                };
+
+                if (await VerifyIfTeamExistsAsync(teamToCheck))
+                {
+                    response.Success = false;
+                    response.Message = "Team already exists.";
+                    return response;
+                }
+                Team team1 = new Team
+                {
+                    Id = Guid.NewGuid(),
+                    Name = team.Name,
+                    OwnerId = id,
+                };
+                var added = await _teamRepository.AddTeamAsync(team1);
+                response.Success = true;
+                response.Message = "Team created.";
+                response.Data = added.Id.ToString();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred while adding the team: {ex.Message}";
+                return response;
+            }
+
+            return response;
+        }
+        public async Task<Response<string>> UpdateTeamAsync(TeamDto team)
+        {
+            var response = new Response<string>();
+
+            try
+            {
+                if (team.Id == Guid.Empty)
+                {
+                    response.Success = false;
+                    response.Message = "Team Id is required.";
+                    return response;
+                }
+
+                // Carrega a entidade rastreada com coleções
+                var existing = await _teamRepository.GetTeamByIdAsync(team.Id);
+                if (existing == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team doesn't exist.";
+                    return response;
+                }
+
+                // Atualiza campos escalares
+                existing.Name = string.IsNullOrWhiteSpace(team.Name) ? existing.Name : team.Name;
+                if (team.OwnerId != null) existing.OwnerId = team.OwnerId;
+
+                // Helper para atualizar campos escalares de Player
+                void UpdatePlayerScalars(Player target, Player source)
+                {
+                    if (source == null || target == null) return;
+                    target.SummonerName = source.SummonerName;
+                    target.RiotPuuid = source.RiotPuuid;
+                    target.SummonerLevel = source.SummonerLevel;
+                    target.SoloQueueTier = source.SoloQueueTier;
+                    target.SoloQueueRank = source.SoloQueueRank;
+                    target.SoloQueueLP = source.SoloQueueLP;
+                    target.TotalMatches = source.TotalMatches;
+                    target.Wins = source.Wins;
+                    target.Losses = source.Losses;
+                    target.LastStatsUpdate = source.LastStatsUpdate;
+                    target.IsVerified = source.IsVerified;
+                    target.IsActive = source.IsActive;
+                }
+
+                existing.Players ??= new List<Player>();
+
+                // Dicionário global das instâncias rastreadas do time (captains + players)
+                var trackedById = existing.Captains
+                    .Concat(existing.Players)
+                    .Where(p => p != null && p.Id != Guid.Empty)
+                    .GroupBy(p => p.Id)
+                    .ToDictionary(g => g.Key, g => g.First());
+
+                // --- Processar Captains de entrada ---
+                var incomingCaptains = team.Captains ?? new List<Player>();
+                var incomingCaptainIds = new HashSet<Guid>(incomingCaptains.Where(p => p.Id != Guid.Empty).Select(p => p.Id));
+
+                // Atualiza ou adiciona captains
+                foreach (var p in incomingCaptains)
+                {
+                    if (p.Id != Guid.Empty && trackedById.TryGetValue(p.Id, out var tracked))
+                    {
+                        // já está rastreado: atualiza campos em tracked e garante que esteja na coleção Captains
+                        UpdatePlayerScalars(tracked, p);
+                        if (!existing.Captains.Any(x => x.Id == tracked.Id))
+                        {
+                            existing.Captains.Add(tracked);
+                        }
+                    }
+                    else
+                    {
+                        // novo jogador: gerar Id se necessário, definir TeamId e adicionar
+                        if (p.Id == Guid.Empty) p.Id = Guid.NewGuid();
+                        p.TeamId = existing.Id;
+                        existing.Captains.Add(p);
+                        // também adiciona ao dicionário para evitar duplicação ao processar players
+                        trackedById[p.Id] = p;
+                    }
+                }
+
+                // Remove captains que não aparecem no payload
+                var toRemoveCaps = existing.Captains.Where(x => !incomingCaptainIds.Contains(x.Id)).ToList();
+                foreach (var r in toRemoveCaps) existing.Captains.Remove(r);
+
+                // --- Processar Players de entrada ---
+                var incomingPlayers = team.Players ?? new List<Player>();
+                var incomingPlayerIds = new HashSet<Guid>(incomingPlayers.Where(p => p.Id != Guid.Empty).Select(p => p.Id));
+
+                foreach (var p in incomingPlayers)
+                {
+                    if (p.Id != Guid.Empty && trackedById.TryGetValue(p.Id, out var tracked))
+                    {
+                        // atualização em instância rastreada; garante que esteja na coleção Players
+                        UpdatePlayerScalars(tracked, p);
+                        if (!existing.Players.Any(x => x.Id == tracked.Id))
+                        {
+                            existing.Players.Add(tracked);
+                        }
+                    }
+                    else
+                    {
+                        // novo jogador
+                        if (p.Id == Guid.Empty) p.Id = Guid.NewGuid();
+                        p.TeamId = existing.Id;
+                        existing.Players.Add(p);
+                        trackedById[p.Id] = p;
+                    }
+                }
+
+                // Remove players que não aparecem no payload
+                var toRemovePlayers = existing.Players.Where(x => !incomingPlayerIds.Contains(x.Id)).ToList();
+                foreach (var r in toRemovePlayers) existing.Players.Remove(r);
+
+                // Persiste: repositório salva alterações no contexto que já rastreia `existing`
+                var updated = await _teamRepository.UpdateTeamAsync(existing);
+
+                response.Success = true;
+                response.Message = "Team updated.";
+                response.Data = updated.Id.ToString();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred while updating the team: {ex.Message}";
+                return response;
+            }
+        }
+        public async Task DeleteTeamAsync(Team team)
+        {
+
+            await _teamRepository.DeleteTeamAsync(team);
+        }
+        public async Task<bool> VerifyIfTeamExistsAsync(Team team)
+        {
+            return await _context.Teams.AnyAsync(u => u.Id == team.Id);
+        }
+    }
+}

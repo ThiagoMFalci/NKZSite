@@ -1,0 +1,16 @@
+﻿using System.ComponentModel.DataAnnotations;
+using NKZAPI.Models;
+
+namespace NKZAPI.Dtos
+{
+    public class TeamDto
+    {
+        public Guid Id { get; set; }
+
+        [Required(ErrorMessage = "O Campo nome é obrigatorio")]
+        public string Name { get; set; } = null!;
+        public Guid? OwnerId { get; set; }
+        public ICollection<Player>? Players { get; set; } = new List<Player>();
+        public ICollection<Player>? Captains { get; set; } = new List<Player>();
+    }
+}

@@ -6,6 +6,7 @@ namespace NKZAPI.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
-
+        public Guid? OwnerId { get; set; }
+        public ICollection<Player>? Players { get; set; }
     }
 }

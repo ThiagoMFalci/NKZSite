@@ -2,7 +2,7 @@
 
 namespace NKZAPI.Services.PassService
 {
-    public interface IPassInterface
+    public interface IPasswordInterface
     {
         void CreatePassHash(string Pass, out byte[] PassHash, out byte[] PassSalt);
         bool VerifyPassHash(string Pass, byte[] PassHash, byte[] PassSalt);

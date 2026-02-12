@@ -1,0 +1,168 @@
+﻿using Microsoft.EntityFrameworkCore;
+using NKZAPI.Dtos;
+using NKZAPI.Models;
+using NKZAPI.Repositories;
+
+namespace NKZAPI.Services.TeamServices
+{
+    public class TeamServices : ITeamInterface
+    {
+        private readonly TeamRepository _teamRepository;
+        public TeamServices(TeamRepository teamRepository)
+        {
+            _teamRepository = teamRepository;
+        }
+
+        public async Task<List<Team>> GetAllTeamsAsync()
+        {
+            return await _teamRepository.GetAllTeamsAsync();
+        }
+
+        public async Task<Team?> GetTeamByIdAsync(Guid id)
+        {
+            return await _teamRepository.GetTeamByIdAsync(id);
+        }
+
+        public async Task<Response<string>> AddTeamAsync(TeamDto team, Guid id)
+        {
+            var response = new Response<string>();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(team.Name))
+                {
+                    response.Success = false;
+                    response.Message = "Team name is required.";
+                    return response;
+                }
+
+                var existingByName = (await _teamRepository.GetAllTeamsAsync()).FirstOrDefault(t => t.Name == team.Name);
+                if (existingByName != null)
+                {
+                    response.Success = false;
+                    response.Message = "Team already exists.";
+                    return response;
+                }
+
+                var teamEntity = new Team
+                {
+                    Id = Guid.NewGuid(),
+                    Name = team.Name,
+                    OwnerId = id
+                };
+
+                var added = await _teamRepository.AddTeamAsync(teamEntity);
+
+                response.Success = true;
+                response.Message = "Team created.";
+                response.Data = added.Id.ToString();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred while adding the team: {ex.Message}";
+            }
+            return response;
+        }
+
+        public async Task<Response<string>> UpdateTeamAsync(TeamDto team)
+        {
+            var response = new Response<string>();
+            try
+            {
+                if (team.Id == Guid.Empty)
+                {
+                    response.Success = false;
+                    response.Message = "Team Id is required.";
+                    return response;
+                }
+
+                var existing = await _teamRepository.GetTeamByIdAsync(team.Id);
+                if (existing == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                existing.Name = team.Name;
+                existing.OwnerId = team.OwnerId;
+
+                try
+                {
+                    await _teamRepository.UpdateTeamAsync(existing);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    response.Success = false;
+                    response.Message = "Concurrency conflict: the team was modified or deleted by another process.";
+                    return response;
+                }
+
+                response.Success = true;
+                response.Message = "Team updated.";
+                response.Data = existing.Id.ToString();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"An error occurred while updating the team: {ex.Message}";
+            }
+            return response;
+        }
+
+        public async Task DeleteTeamAsync(Team team)
+        {
+            await _teamRepository.DeleteTeamAsync(team);
+        }
+
+        public async Task<Player> AddPlayerToTeamAsync(Guid teamId, Player player)
+        {
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null) throw new InvalidOperationException("Team not found.");
+
+            if (player.Id != Guid.Empty)
+            {
+                var existing = await _teamRepository.GetPlayerByIdAsync(player.Id);
+                if (existing != null)
+                {
+                    if (existing.TeamId != null && existing.TeamId != teamId)
+                        throw new InvalidOperationException("Player is already in another team.");
+
+                    existing.TeamId = teamId;
+                    await _teamRepository.UpdatePlayerAsync(existing);
+                    return existing;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(player.SummonerName))
+                throw new InvalidOperationException("Player SummonerName is required.");
+
+            player.IsCaptain = false;
+
+            player.TeamId = teamId;
+            var added = await _teamRepository.AddPlayerAsync(player);
+            return added;
+        }
+
+        public async Task RemovePlayerFromTeamAsync(Guid teamId, Guid playerId)
+        {
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null) throw new InvalidOperationException("Team not found.");
+
+            var player = await _teamRepository.GetPlayerByIdAsync(playerId);
+            if (player == null) throw new InvalidOperationException("Player not found.");
+
+            if (player.TeamId != teamId)
+                throw new InvalidOperationException("Player is not a member of this team.");
+
+            player.TeamId = null;
+            await _teamRepository.UpdatePlayerAsync(player);
+        }
+
+        private async Task<bool> VerifyIfTeamExistsAsync(Guid id)
+        {
+            var existing = await _teamRepository.GetTeamByIdAsync(id);
+            return existing != null;
+        }
+    }
+}

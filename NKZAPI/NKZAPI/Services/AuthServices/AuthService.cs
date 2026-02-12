@@ -9,8 +9,8 @@ namespace NKZAPI.Services.AuthServices
     public class AuthService : IAuthInterface
     {
         private readonly NKZAPIContext _context;
-        private readonly IPassInterface _passInterface;
-        public AuthService(NKZAPIContext context, IPassInterface passInterface)
+        private readonly IPasswordInterface _passInterface;
+        public AuthService(NKZAPIContext context, IPasswordInterface passInterface)
         {
             _context = context;
             _passInterface = passInterface;

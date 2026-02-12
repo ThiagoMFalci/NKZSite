@@ -55,6 +55,9 @@ namespace NKZAPI.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsCaptain")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
@@ -86,6 +89,9 @@ namespace NKZAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("TeamId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("TotalMatches")
                         .HasColumnType("integer");
 
@@ -96,6 +102,8 @@ namespace NKZAPI.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
 
                     b.HasIndex("UserId");
 
@@ -132,12 +140,10 @@ namespace NKZAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("PlayerId")
+                    b.Property<Guid?>("OwnerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PlayerId");
 
                     b.ToTable("Teams");
                 });
@@ -170,6 +176,10 @@ namespace NKZAPI.Migrations
 
             modelBuilder.Entity("NKZAPI.Models.Player", b =>
                 {
+                    b.HasOne("NKZAPI.Models.Team", null)
+                        .WithMany("Players")
+                        .HasForeignKey("TeamId");
+
                     b.HasOne("NKZAPI.Models.User", null)
                         .WithMany("Player")
                         .HasForeignKey("UserId");
@@ -182,18 +192,14 @@ namespace NKZAPI.Migrations
                         .HasForeignKey("PlayerId");
                 });
 
-            modelBuilder.Entity("NKZAPI.Models.Team", b =>
-                {
-                    b.HasOne("NKZAPI.Models.Player", null)
-                        .WithMany("Teams")
-                        .HasForeignKey("PlayerId");
-                });
-
             modelBuilder.Entity("NKZAPI.Models.Player", b =>
                 {
                     b.Navigation("Role");
+                });
 
-                    b.Navigation("Teams");
+            modelBuilder.Entity("NKZAPI.Models.Team", b =>
+                {
+                    b.Navigation("Players");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.User", b =>

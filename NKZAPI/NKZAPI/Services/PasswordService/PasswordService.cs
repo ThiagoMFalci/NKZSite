@@ -7,10 +7,10 @@ using NKZAPI.Models;
 
 namespace NKZAPI.Services.PassService
 {
-    public class PassService : IPassInterface
+    public class PasswordService : IPasswordInterface
     {
         private readonly IConfiguration _configuration;
-        public PassService(IConfiguration configuration)
+        public PasswordService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
