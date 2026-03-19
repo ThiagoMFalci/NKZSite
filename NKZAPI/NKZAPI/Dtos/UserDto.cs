@@ -14,6 +14,8 @@ namespace NKZAPI.Dtos
         [Required(ErrorMessage = "O Player é obrigatorio")]
         public List<Player> Player { get; set; } = null!;
 
+        public string Role { get; set; } = "User";
+
 
     }
 }

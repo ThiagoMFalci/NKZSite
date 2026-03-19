@@ -8,8 +8,6 @@ namespace NKZAPI.Models
     {
         // Adicione esta propriedade para corrigir o erro CS1061
 
-        public List<Profiler> Role { get; set; } = new List<Profiler>();
-
         public Guid? TeamId { get; set; }
 
         public bool IsCaptain { get; set; } = false;

@@ -1,0 +1,89 @@
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using NKZAPI.Controllers;
+using NKZAPI.Repositories;
+using NKZAPI.Services.TeamServices;
+using NKZAPI.Services.UserServices;
+using Swashbuckle.AspNetCore.Filters;
+using Microsoft.Extensions.DependencyInjection;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
+string? connectionString = builder.Configuration.GetConnectionString("ConnectionString");
+
+if (connectionString is null)
+{
+    throw new InvalidOperationException("Connection string 'ConnectionString' not found.");
+}
+
+builder.Services.AddDbContext<NKZAPI.Data.NKZAPIContext>(options =>
+    options.UseNpgsql(connectionString),
+    contextLifetime: ServiceLifetime.Scoped,
+    optionsLifetime: ServiceLifetime.Scoped);
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+        ValidateAudience = false,
+        ValidateIssuer = false
+    };
+});
+
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserServices>();
+builder.Services.AddScoped<TeamRepository>();
+builder.Services.AddScoped<TeamServices>();
+builder.Services.AddScoped<LeagueRepository>();
+builder.Services.AddScoped<TournamentRepository>();
+
+builder.Services.AddScoped<NKZAPI.Services.AuthServices.IAuthInterface, NKZAPI.Services.AuthServices.AuthService>();
+builder.Services.AddScoped<NKZAPI.Services.PassService.IPasswordInterface, NKZAPI.Services.PassService.PasswordService>();
+builder.Services.AddScoped<NKZAPI.Services.UserServices.IUserInterface, NKZAPI.Services.UserServices.UserServices>();
+builder.Services.AddScoped<NKZAPI.Services.TeamServices.ITeamInterface, NKZAPI.Services.TeamServices.TeamServices>();
+builder.Services.AddScoped<NKZAPI.Services.LeagueServices.ILeagueInterface, NKZAPI.Services.LeagueServices.LeagueServices>();
+builder.Services.AddScoped<NKZAPI.Services.TournamentServices.ITournamentInterface, NKZAPI.Services.TournamentServices.TournamentServices>();
+
+builder.Services.AddOpenApi();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c => {
+        c.DocumentTitle = "API NKZ - V1";
+        c.SwaggerEndpoint("/swagger/v1/swagger.json","API NKZ - V1");
+    });
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();

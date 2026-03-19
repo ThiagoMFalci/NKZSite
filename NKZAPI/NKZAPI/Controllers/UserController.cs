@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NKZAPI.Dtos;
@@ -21,7 +22,6 @@ namespace NKZAPI.Controllers
             _authInterface = authInterface;
             _userInterface = userInterface;
         }
-
         [HttpGet("ListUsers")]
         public async Task<ActionResult<List<User>>> ListUsersAsync()
         {
@@ -40,12 +40,14 @@ namespace NKZAPI.Controllers
             var response = await _authInterface.Login(userLogin);
             return Ok(response);
         }
+        [Authorize]
         [HttpPut("UpdateUsers")]
         public async Task<ActionResult<UserDto>> UpdateUsers([FromBody] UserDto user, Guid id)
         {
             var response = await _userInterface.UpdateUserAsync(user, id);
             return Ok(response);
         }
+        [Authorize]
         [HttpDelete("DeleteUsers")]
         public async Task<ActionResult> DeleteUsers(Guid id)
         {
@@ -57,7 +59,14 @@ namespace NKZAPI.Controllers
             var i = await _userServices.DeleteUserAsync(id);
             return Ok(i);
         }
-
+        [Authorize]
+        [HttpPost("players/{userId:guid}/sync/{summonerName}")]
+        public async Task<ActionResult> SyncPlayerFromRiot(Guid userId, string summonerName, [FromQuery] string region = "br1")
+        {
+            var response = await _userInterface.UpdatePlayerFromRiotAsync(userId, summonerName, region);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
 
     }
 }

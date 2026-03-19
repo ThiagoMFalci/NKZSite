@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+
+namespace NKZAPI.Models
+{
+    public class Tournament
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public int MaxTeams { get; set; }
+        public double Prize { get; set; }
+        public double EntryFee { get; set; }
+        public List<Team> Teams { get; set; } = new List<Team>();
+    }
+}

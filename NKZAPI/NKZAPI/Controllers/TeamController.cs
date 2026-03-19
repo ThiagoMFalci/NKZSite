@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
@@ -8,6 +9,7 @@ namespace NKZAPI.Controllers
 {        
     [ApiController]
     [Route("api/team")]
+    [Authorize]
     public class TeamController : ControllerBase
     {
         private readonly ITeamInterface _teamServices;
@@ -22,7 +24,7 @@ namespace NKZAPI.Controllers
             var teams = await _teamServices.GetAllTeamsAsync();
             return Ok(teams);
         }
-
+        [Authorize]
         [HttpPost("{id:guid}")]
         public async Task<ActionResult> CreateTeamAsync([FromBody] TeamDto team, Guid PlayerId)
         {
@@ -38,7 +40,7 @@ namespace NKZAPI.Controllers
             if (team == null) return NotFound();
             return Ok(team);
         }
-
+        [Authorize]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateTeamAsync(Guid id, [FromBody] TeamDto team)
         {
@@ -47,7 +49,7 @@ namespace NKZAPI.Controllers
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
-
+        [Authorize]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteTeamAsync(Guid id)
         {
@@ -59,7 +61,7 @@ namespace NKZAPI.Controllers
             await _teamServices.DeleteTeamAsync(team);
             return Ok("Team deleted successfully");
         }
-
+        [Authorize]
         [HttpPost("{teamId:guid}/players")]
         public async Task<ActionResult<Player>> AddPlayerToTeamAsync(Guid teamId, [FromBody] Player player)
         {
@@ -73,7 +75,7 @@ namespace NKZAPI.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        [Authorize]
         [HttpDelete("{teamId:guid}/players/{playerId:guid}")]
         public async Task<ActionResult> RemovePlayerFromTeamAsync(Guid teamId, Guid playerId)
         {

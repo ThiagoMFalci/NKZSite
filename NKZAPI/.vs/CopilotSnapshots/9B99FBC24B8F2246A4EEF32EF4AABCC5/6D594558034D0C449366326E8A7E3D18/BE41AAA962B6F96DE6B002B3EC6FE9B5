@@ -1,0 +1,4 @@
+﻿# Copilot Instructions
+
+## General Guidelines
+- All new Players created must have `IsCaptain = false` by default.

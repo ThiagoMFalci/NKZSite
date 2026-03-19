@@ -9,6 +9,7 @@ using NKZAPI.Services.TeamServices;
 using NKZAPI.Services.UserServices;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using NKZAPI.Services.RiotService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,14 +57,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserServices>();
-
 builder.Services.AddScoped<TeamRepository>();
 builder.Services.AddScoped<TeamServices>();
+builder.Services.AddScoped<LeagueRepository>();
+builder.Services.AddScoped<TournamentRepository>();
 
 builder.Services.AddScoped<NKZAPI.Services.AuthServices.IAuthInterface, NKZAPI.Services.AuthServices.AuthService>();
 builder.Services.AddScoped<NKZAPI.Services.PassService.IPasswordInterface, NKZAPI.Services.PassService.PasswordService>();
 builder.Services.AddScoped<NKZAPI.Services.UserServices.IUserInterface, NKZAPI.Services.UserServices.UserServices>();
 builder.Services.AddScoped<NKZAPI.Services.TeamServices.ITeamInterface, NKZAPI.Services.TeamServices.TeamServices>();
+builder.Services.AddScoped<NKZAPI.Services.LeagueServices.ILeagueInterface, NKZAPI.Services.LeagueServices.LeagueServices>();
+builder.Services.AddScoped<NKZAPI.Services.TournamentServices.ITournamentInterface, NKZAPI.Services.TournamentServices.TournamentServices>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IRiotService, RiotService>();
 
 builder.Services.AddOpenApi();
 

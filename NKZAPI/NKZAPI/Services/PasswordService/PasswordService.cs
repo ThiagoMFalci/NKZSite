@@ -30,17 +30,23 @@ namespace NKZAPI.Services.PassService
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(Pass));
                 return computedHash.SequenceEqual(PassHash);
             }
-
-
         }
         public string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>()
             {
                 new Claim("Email", user.Email),
-                new Claim("Player", System.Text.Json.JsonSerializer.Serialize(user.Player))
-
+                new Claim("Player", System.Text.Json.JsonSerializer.Serialize(user.Player ?? new List<Player>()))
             };
+
+           
+            if (!string.IsNullOrWhiteSpace(user.Role))
+            {
+               
+                claims.Add(new Claim(ClaimTypes.Role, user.Role));
+                claims.Add(new Claim("role", user.Role));
+            }
+
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 

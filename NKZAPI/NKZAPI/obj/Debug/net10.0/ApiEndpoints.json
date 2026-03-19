@@ -89,6 +89,32 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "SyncPlayerFromRiot",
+    "RelativePath": "api/auth/User/players/{userId}/sync/{summonerName}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "summonerName",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "region",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
     "Method": "UpdateUsers",
     "RelativePath": "api/auth/User/UpdateUsers",
     "HttpMethod": "PUT",
@@ -109,6 +135,225 @@
     "ReturnTypes": [
       {
         "Type": "NKZAPI.Dtos.UserDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "CreateLeagueAsync",
+    "RelativePath": "api/league",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "league",
+        "Type": "NKZAPI.Models.League",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "GetLeagueByIdAsync",
+    "RelativePath": "api/league/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "NKZAPI.Models.League",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "UpdateLeagueAsync",
+    "RelativePath": "api/league/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "league",
+        "Type": "NKZAPI.Models.League",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "DeleteLeagueAsync",
+    "RelativePath": "api/league/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "GetTeamsInLeagueAsync",
+    "RelativePath": "api/league/{leagueId}/teams",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "leagueId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.Team, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "AddTeamToLeagueAsync",
+    "RelativePath": "api/league/{leagueId}/teams/{teamId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "leagueId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "RemoveTeamFromLeagueAsync",
+    "RelativePath": "api/league/{leagueId}/teams/{teamId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "leagueId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "GetLeaguesByTeamIdAsync",
+    "RelativePath": "api/league/byTeam/{teamId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.League, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "ListLeaguesAsync",
+    "RelativePath": "api/league/ListLeagues",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.League, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.RiotController",
+    "Method": "ValidateKey",
+    "RelativePath": "api/riot/validate-key",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "region",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.String",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -278,5 +523,126 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "GetAll",
+    "RelativePath": "api/Tournament",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "Create",
+    "RelativePath": "api/Tournament",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tournament",
+        "Type": "NKZAPI.Models.Tournament",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "Get",
+    "RelativePath": "api/Tournament/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "Update",
+    "RelativePath": "api/Tournament/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "tournament",
+        "Type": "NKZAPI.Models.Tournament",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "Delete",
+    "RelativePath": "api/Tournament/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "AddTeamToTournament",
+    "RelativePath": "api/Tournament/{tournamentId}/teams/{teamId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tournamentId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TournamentController",
+    "Method": "RemoveTeamFromTournament",
+    "RelativePath": "api/Tournament/{tournamentId}/teams/{teamId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "tournamentId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

@@ -43,6 +43,33 @@ namespace NKZAPI.Migrations
                     b.ToTable("Games");
                 });
 
+            modelBuilder.Entity("NKZAPI.Models.League", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Award")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<float>("EntryFee")
+                        .HasColumnType("real");
+
+                    b.Property<int>("MaxTeams")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Leagues");
+                });
+
             modelBuilder.Entity("NKZAPI.Models.Player", b =>
                 {
                     b.Property<Guid>("Id")
@@ -110,30 +137,13 @@ namespace NKZAPI.Migrations
                     b.ToTable("Players");
                 });
 
-            modelBuilder.Entity("NKZAPI.Models.Profiler", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("PlayerId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlayerId");
-
-                    b.ToTable("Profilers");
-                });
-
             modelBuilder.Entity("NKZAPI.Models.Team", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LeagueId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -143,9 +153,40 @@ namespace NKZAPI.Migrations
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("TournamentId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("LeagueId");
+
+                    b.HasIndex("TournamentId");
+
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.Tournament", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<double>("EntryFee")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("MaxTeams")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("Prize")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tournaments");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.User", b =>
@@ -169,6 +210,10 @@ namespace NKZAPI.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -185,21 +230,30 @@ namespace NKZAPI.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("NKZAPI.Models.Profiler", b =>
+            modelBuilder.Entity("NKZAPI.Models.Team", b =>
                 {
-                    b.HasOne("NKZAPI.Models.Player", null)
-                        .WithMany("Role")
-                        .HasForeignKey("PlayerId");
+                    b.HasOne("NKZAPI.Models.League", null)
+                        .WithMany("Teams")
+                        .HasForeignKey("LeagueId");
+
+                    b.HasOne("NKZAPI.Models.Tournament", null)
+                        .WithMany("Teams")
+                        .HasForeignKey("TournamentId");
                 });
 
-            modelBuilder.Entity("NKZAPI.Models.Player", b =>
+            modelBuilder.Entity("NKZAPI.Models.League", b =>
                 {
-                    b.Navigation("Role");
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.Team", b =>
                 {
                     b.Navigation("Players");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.Tournament", b =>
+                {
+                    b.Navigation("Teams");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.User", b =>
