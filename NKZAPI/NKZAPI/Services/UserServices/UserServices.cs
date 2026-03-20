@@ -25,12 +25,21 @@ namespace NKZAPI.Services.UserServices
 
         public async Task<List<User>> GetAllUsersAsync()
         {
-            return await _userRepository.GetAllUsersAsync();
+            var user2 = await _userRepository.GetAllUsersAsync();
+            user2.ForEach(u =>
+            {
+                u.PasswordSalt = null;
+                u.PasswordHash = null;
+            });
+            return user2;
         }
 
         public async Task<UserDto?> GetUserByIdAsync(Guid id)
         {
-            return await _userRepository.GetUserByIdAsync(id);
+            var user2 = await _userRepository.GetUserByIdAsync(id);
+            user2.PasswordSalt = null;
+            user2.PasswordHash = null;
+            return user2;
         }
 
         public async Task<User> AddUserAsync(User user)
