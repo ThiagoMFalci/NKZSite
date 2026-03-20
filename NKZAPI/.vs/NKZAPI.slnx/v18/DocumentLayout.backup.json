@@ -3,8 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\controllers\\teamcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\controllers\\teamcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\controllers\\tournamentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\controllers\\tournamentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\repositories\\teamrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\repositories\\teamrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\services\\passwordservice\\passwordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\services\\passwordservice\\passwordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\services\\playerservices\\playerservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\services\\playerservices\\playerservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -39,10 +59,6 @@
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\services\\userservices\\iuserinterface.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\services\\passwordservice\\passwordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\services\\passwordservice\\passwordservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\dtos\\summonerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\dtos\\summonerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -51,20 +67,8 @@
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\dtos\\leagueentrydto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\services\\playerservices\\playerservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\services\\playerservices\\playerservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\player.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\controllers\\teamcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\controllers\\teamcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\controllers\\tournamentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\controllers\\tournamentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -123,10 +127,6 @@
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\models\\tournament.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\repositories\\teamrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\repositories\\teamrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\dtos\\teamdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\dtos\\teamdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -174,7 +174,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 40,
+          "SelectedChildIndex": 13,
           "Children": [
             {
               "$type": "Bookmark",
@@ -190,7 +190,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 13,
               "Title": "IUserInterface.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\UserServices\\IUserInterface.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\UserServices\\IUserInterface.cs",
@@ -202,7 +202,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 10,
               "Title": "IRiotService.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\RiotService\\IRiotService.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\RiotService\\IRiotService.cs",
@@ -214,7 +214,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "RiotService.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\RiotService\\RiotService.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\RiotService\\RiotService.cs",
@@ -222,12 +222,11 @@
               "RelativeToolTip": "NKZAPI\\Services\\RiotService\\RiotService.cs",
               "ViewState": "AgIAAAsAAAAAAAAAAAAAwAQAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T23:20:20.017Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-07T23:20:20.017Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 14,
               "Title": "SummonerDto.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Dtos\\SummonerDto.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Dtos\\SummonerDto.cs",
@@ -239,7 +238,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 15,
               "Title": "LeagueEntryDto.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Dtos\\LeagueEntryDto.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Dtos\\LeagueEntryDto.cs",
@@ -251,7 +250,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 5,
               "Title": "PlayerServices.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
@@ -259,11 +258,12 @@
               "RelativeToolTip": "NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T23:16:57.776Z"
+              "WhenOpened": "2026-03-07T23:16:57.776Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
               "RelativeDocumentMoniker": "NKZAPI\\appsettings.json",
@@ -271,8 +271,7 @@
               "RelativeToolTip": "NKZAPI\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-03-07T23:16:30.937Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-07T23:16:30.937Z"
             },
             {
               "$type": "Document",
@@ -288,7 +287,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "User.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\User.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\User.cs",
@@ -296,8 +295,7 @@
               "RelativeToolTip": "NKZAPI\\Models\\User.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T22:20:09.54Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-07T22:20:09.54Z"
             },
             {
               "$type": "Document",
@@ -313,15 +311,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 0,
               "Title": "TeamController.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\TeamController.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Controllers\\TeamController.cs",
               "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\TeamController.cs",
               "RelativeToolTip": "NKZAPI\\Controllers\\TeamController.cs",
-              "ViewState": "AgIAAEYAAAAAAAAAAAAwwFYAAAAgAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABUAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-09T21:28:12.952Z"
+              "WhenOpened": "2026-02-09T21:28:12.952Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -337,19 +336,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 2,
               "Title": "TeamRepository.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\TeamRepository.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Repositories\\TeamRepository.cs",
               "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\TeamRepository.cs",
               "RelativeToolTip": "NKZAPI\\Repositories\\TeamRepository.cs",
-              "ViewState": "AgIAAEkAAAAAAAAAAADwvxYAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAEkAAAAAAAAAAAAwwBYAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-09T21:21:24.434Z"
+              "WhenOpened": "2026-02-09T21:21:24.434Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 27,
               "Title": "TeamServices.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\TeamServices\\TeamServices.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\TeamServices\\TeamServices.cs",
@@ -361,19 +361,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 1,
               "Title": "TournamentController.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\TournamentController.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Controllers\\TournamentController.cs",
               "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\TournamentController.cs",
               "RelativeToolTip": "NKZAPI\\Controllers\\TournamentController.cs",
-              "ViewState": "AgIAADIAAAAAAAAAAAAIwEYAAAATAAAAAAAAAA==",
+              "ViewState": "AgIAAGUAAAAAAAAAAAAowHMAAABCAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-07T20:36:51.409Z"
+              "WhenOpened": "2026-03-07T20:36:51.409Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 25,
               "Title": "TournamentServices.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\TournamentServices\\TournamentServices.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\TournamentServices\\TournamentServices.cs",
@@ -385,7 +386,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 26,
               "Title": "ITournamentInterface.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\TournamentServices\\ITournamentInterface.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\TournamentServices\\ITournamentInterface.cs",
@@ -397,7 +398,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 28,
               "Title": "TournamentRepository.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\TournamentRepository.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Repositories\\TournamentRepository.cs",
@@ -409,7 +410,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "Tournament.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Tournament.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Tournament.cs",
@@ -421,7 +422,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 29,
               "Title": ".placeholder",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\.placeholder",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\.placeholder",
@@ -433,7 +434,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "LeagueRepository.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\LeagueRepository.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Repositories\\LeagueRepository.cs",
@@ -457,7 +458,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "League.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\League.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\League.cs",
@@ -469,7 +470,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 24,
               "Title": "BaseEntity.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\BaseEntity.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\BaseEntity.cs",
@@ -516,7 +517,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 11,
               "Title": "UserServices.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\UserServices\\UserServices.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\UserServices\\UserServices.cs",
@@ -540,7 +541,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "AuthService.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\AuthServices\\AuthService.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\AuthServices\\AuthService.cs",
@@ -552,7 +553,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "IAuthInterface.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\AuthServices\\IAuthInterface.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\AuthServices\\IAuthInterface.cs",
@@ -564,7 +565,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 12,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Program.cs",
@@ -588,7 +589,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "Team.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Team.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Team.cs",
@@ -596,12 +597,11 @@
               "RelativeToolTip": "NKZAPI\\Models\\Team.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-09T21:20:13.168Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-02-09T21:20:13.168Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 16,
               "Title": "Player.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Models\\Player.cs",
@@ -613,19 +613,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 4,
               "Title": "PasswordService.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\PasswordService\\PasswordService.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\PasswordService\\PasswordService.cs",
               "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\PasswordService\\PasswordService.cs",
               "RelativeToolTip": "NKZAPI\\Services\\PasswordService\\PasswordService.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAlwCwAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAABkAAAAAAAAAAAAawCcAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-02-09T21:15:24.132Z"
+              "WhenOpened": "2026-02-09T21:15:24.132Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "IPasswordInterface.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\PasswordService\\IPasswordInterface.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Services\\PasswordService\\IPasswordInterface.cs",
@@ -637,20 +638,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "UserController.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\UserController.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Controllers\\UserController.cs",
               "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\UserController.cs",
               "RelativeToolTip": "NKZAPI\\Controllers\\UserController.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAAowEQAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAEoAAAAAAAAAAAAswEUAAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-02-09T21:12:44.654Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "NKZAPIContext.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Data\\NKZAPIContext.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Data\\NKZAPIContext.cs",
@@ -674,7 +675,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "UserDto.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Dtos\\UserDto.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Dtos\\UserDto.cs",

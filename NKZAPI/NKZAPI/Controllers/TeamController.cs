@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.TeamServices;
+using System.Security.Claims;
 
 namespace NKZAPI.Controllers
 {        
@@ -28,6 +29,15 @@ namespace NKZAPI.Controllers
         [HttpPost("{id:guid}")]
         public async Task<ActionResult> CreateTeamAsync([FromBody] TeamDto team, Guid PlayerId)
         {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized();
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+
+            if (callerId != PlayerId && !isAdmin)
+                return Forbid();
+
             var response = await _teamServices.AddTeamAsync(team, PlayerId);
             if (!response.Success) return BadRequest(response);
             return Ok(response);
@@ -44,7 +54,27 @@ namespace NKZAPI.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateTeamAsync(Guid id, [FromBody] TeamDto team)
         {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized();
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+
+            var existing = await _teamServices.GetTeamByIdAsync(id);
+            if (existing == null) return NotFound("Team not found");
+
+            if (existing.OwnerId != callerId && !isAdmin)
+                return Forbid();
+
+            // Forçar consistência da rota/objeto
             team.Id = id;
+
+            // Apenas Admin pode alterar OwnerId via update; caso contrário mantém o Owner atual
+            if (!isAdmin)
+            {
+                team.OwnerId = existing.OwnerId;
+            }
+
             var response = await _teamServices.UpdateTeamAsync(team);
             if (!response.Success) return BadRequest(response);
             return Ok(response);
@@ -53,18 +83,40 @@ namespace NKZAPI.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteTeamAsync(Guid id)
         {
-            var team = await _teamServices.GetTeamByIdAsync(id);
-            if (team == null)
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized();
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+
+            var existing = await _teamServices.GetTeamByIdAsync(id);
+            if (existing == null)
             {
                 return NotFound("Team not found");
             }
-            await _teamServices.DeleteTeamAsync(team);
+
+            if (existing.OwnerId != callerId && !isAdmin)
+                return Forbid();
+
+            await _teamServices.DeleteTeamAsync(existing);
             return Ok("Team deleted successfully");
         }
         [Authorize]
         [HttpPost("{teamId:guid}/players")]
         public async Task<ActionResult<Player>> AddPlayerToTeamAsync(Guid teamId, [FromBody] Player player)
         {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized();
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+
+            var team = await _teamServices.GetTeamByIdAsync(teamId);
+            if (team == null) return NotFound("Team not found");
+
+            if (team.OwnerId != callerId && !isAdmin)
+                return Forbid();
+
             try
             {
                 var added = await _teamServices.AddPlayerToTeamAsync(teamId, player);
@@ -79,6 +131,18 @@ namespace NKZAPI.Controllers
         [HttpDelete("{teamId:guid}/players/{playerId:guid}")]
         public async Task<ActionResult> RemovePlayerFromTeamAsync(Guid teamId, Guid playerId)
         {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized();
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+
+            var team = await _teamServices.GetTeamByIdAsync(teamId);
+            if (team == null) return NotFound("Team not found");
+
+            if (team.OwnerId != callerId && !isAdmin)
+                return Forbid();
+
             try
             {
                 await _teamServices.RemovePlayerFromTeamAsync(teamId, playerId);
