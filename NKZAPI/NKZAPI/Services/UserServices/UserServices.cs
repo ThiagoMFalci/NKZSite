@@ -4,7 +4,10 @@ using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Repositories;
 using NKZAPI.Services.PassService;
+using NKZAPI.Services.PlayerServices;
 using NKZAPI.Services.RiotService;
+using NKZAPI.Services.TeamServices;
+using NKZAPI.Services.TournamentServices;
 
 namespace NKZAPI.Services.UserServices
 {
@@ -13,14 +16,20 @@ namespace NKZAPI.Services.UserServices
         private readonly NKZAPIContext _context;
         private readonly UserRepository _userRepository;
         private readonly IPasswordInterface _passInterface;
+        private readonly IPlayerInterface _playerInterface;
+        private readonly ITournamentInterface _TournamentInterface;
+        private readonly ITeamInterface _TeamInterface;
         private readonly IRiotService _riotService;
 
-        public UserServices(UserRepository userRepository, NKZAPIContext NKZAPI, IPasswordInterface passInterface, IRiotService riotService)
+        public UserServices(UserRepository userRepository, NKZAPIContext NKZAPI, IPasswordInterface passInterface, IRiotService riotService, IPlayerInterface playerInterface, ITournamentInterface tournamentInterface, ITeamInterface teamInterface)
         {
             _userRepository = userRepository;
             _context = NKZAPI;
             _passInterface = passInterface;
             _riotService = riotService;
+            _playerInterface = playerInterface;
+            _TeamInterface = teamInterface;
+            _TournamentInterface = tournamentInterface;
         }
 
         public async Task<List<User>> GetAllUsersAsync()
@@ -42,9 +51,25 @@ namespace NKZAPI.Services.UserServices
             return user2;
         }
 
-        public async Task<User> AddUserAsync(User user)
+        public async Task<Response<User>> AddUserAsync(User user)
         {
-            return await _userRepository.AddUserAsync(user);
+            var response = new Response<User>();
+            try
+            {
+                response.Data = await _userRepository.AddUserAsync(user);
+                response.Message = "User added successfully";
+                response.Success = true;
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                response.Data = null;
+                response.Message = $"Error adding user: {ex.Message}";
+                response.Success = false;
+                return response;
+            }
+
         }
 
         public async Task<Response<string>> UpdateUserAsync(UserDto user, Guid id)
@@ -67,10 +92,6 @@ namespace NKZAPI.Services.UserServices
             existingUser.PasswordHash = passwordHash;
             existingUser.PasswordSalt = passwordSalt;
             existingUser.Role = user.Role;
-            if (dto?.Player != null)
-            {
-                existingUser.Player = dto.Player;
-            }
 
             await _userRepository.UpdateUserAsync(existingUser);
 
@@ -79,25 +100,77 @@ namespace NKZAPI.Services.UserServices
             response.Success = true;
             return response;
         }
-        public async Task<Response<string>> DeleteUserAsync(Guid id)
+        public async Task<Response<User>> DeleteUserAsync(Guid id)
         {
-            var response = new Response<string>();
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (existingUser == null)
+            var response = new Response<User>();
+            try
+            {
+                var existingUser = await _context.Users
+                    .Include(u => u.Player)
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                if (existingUser == null)
+                {
+                    response.Data = null;
+                    response.Message = "User not found";
+                    response.Success = false;
+                    return response;
+                }
+
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                if (existingUser.Player != null && existingUser.Player.Any())
+                {
+                    _context.Players.RemoveRange(existingUser.Player);
+                }
+
+                var teams = await _context.Teams
+                    .Include(t => t.Players)
+                    .Where(t => t.OwnerId == id)
+                    .ToListAsync();
+
+                foreach (var team in teams)
+                {
+                    if (team.Players != null)
+                    {
+                        foreach (var p in team.Players)
+                        {
+                            // if the player belongs to another user, just dissociate from team
+                            if (p.UserId != id)
+                            {
+                                p.TeamId = null;
+                            }
+                        }
+                    }
+                }
+                if (teams.Any()) _context.Teams.RemoveRange(teams);
+
+                // Delete tournaments created by this user
+                var tournaments = await _context.Set<Tournament>()
+                    .Where(t => t.OwnerId == id)
+                    .ToListAsync();
+                if (tournaments.Any()) _context.Set<Tournament>().RemoveRange(tournaments);
+
+                // Finally remove the user
+                _context.Users.Remove(existingUser);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                response.Data = existingUser;
+                response.Message = "User deleted successfully";
+                response.Success = true;
+                return response;
+            }
+            catch (Exception ex)
             {
                 response.Data = null;
-                response.Message = "User not found";
+                response.Message = $"Error deleting user: {ex.Message}";
                 response.Success = false;
                 return response;
             }
-            await _userRepository.DeleteUserAsync(existingUser);
-            response.Data = id.ToString();
-            response.Message = "User deleted successfully";
-            response.Success = true;
-            return response;
         }
 
-        // novo: sincroniza (ou cria) Player do usuário usando a Riot API
         public async Task<Response<string>> UpdatePlayerFromRiotAsync(Guid userId, string summonerName, string region = "br1")
         {
             var response = new Response<string>();
@@ -114,7 +187,6 @@ namespace NKZAPI.Services.UserServices
                     return response;
                 }
 
-                // procura player existente pelo summoner name (case-insensitive)
                 var player = user.Player?.FirstOrDefault(p => p.SummonerName.Equals(summonerName, StringComparison.OrdinalIgnoreCase));
 
                 if (player == null)
@@ -139,7 +211,6 @@ namespace NKZAPI.Services.UserServices
                     return response;
                 }
 
-                // atualiza dados básicos
                 player.RiotPuuid = summoner.Puuid;
                 player.SummonerLevel = (int)summoner.SummonerLevel;
                 player.SummonerName = summoner.Name;

@@ -1,0 +1,78 @@
+﻿using NKZAPI.Data;
+using NKZAPI.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace NKZAPI.Repositories
+
+{
+    public class PlayerRepository
+    {
+        private readonly NKZAPIContext _playerRepository;
+        public PlayerRepository(NKZAPIContext context)
+        {
+            _playerRepository = context;
+        }
+
+
+        public async Task<List<Player>> GetAllPlayersAsync()
+        {
+            return await _playerRepository.Players.ToListAsync();
+        }
+
+        public async Task<Player?> GetPlayerByIdAsync(Guid id)
+        {
+            return await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+
+        public async Task DeletePlayerAsync(Guid playerid)
+        {
+            var player = await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == playerid);
+            if (player == null) return;
+            if (player.UserId != null) return;
+            _playerRepository.Players.Remove(player);
+            await _playerRepository.SaveChangesAsync();
+        }
+
+        public async Task<User?> GetUserWithPlayersAsync(Guid id)
+        {
+            return await _playerRepository.Users
+                .Include(u => u.Player)
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+        public async Task SaveChangesAsync()
+        {
+            await _playerRepository.SaveChangesAsync();
+        }
+        public async Task<Player> AddPlayerAsync(Guid UserId,Player player)
+        {
+            User? user = await _playerRepository.Users.FirstOrDefaultAsync(u => u.Id == UserId);
+            if (user == null) throw new InvalidOperationException("User not found");
+            player.UserId = UserId;
+            if (player.Id == Guid.Empty) player.Id = Guid.NewGuid();
+            player.IsCaptain = false;
+            if (player.TeamId.HasValue)
+            {
+                var teamExists = await _playerRepository.Teams.AnyAsync(t => t.Id == player.TeamId.Value);
+                if (!teamExists)
+                {
+                    throw new InvalidOperationException("Team not found");
+                }
+            }
+
+            var entry = await _playerRepository.Players.AddAsync(player);
+            await _playerRepository.SaveChangesAsync();
+            return entry.Entity;
+        }
+        public async Task<Player> IsCaptain(Guid id,bool i)
+        {
+            Player? player = await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == id);
+            if (player != null)
+            {
+                player.IsCaptain = i;
+                await _playerRepository.SaveChangesAsync();
+            }
+            return player!;
+        }
+    }
+}

@@ -1,0 +1,6 @@
+﻿namespace NKZAPI.Services.PlayerServices
+{
+    public interface IPlayerInterface
+    {
+    }
+}

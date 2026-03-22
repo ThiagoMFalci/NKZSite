@@ -1,0 +1,83 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NKZAPI.Models;
+using NKZAPI.Services.PlayerServices;
+
+namespace NKZAPI.Controllers
+{
+    [ApiController]
+    [Route("api/player")]
+    public class PlayerController : ControllerBase
+    {
+        private readonly IPlayerInterface _playerInterface;
+        public PlayerController( IPlayerInterface playerInterface)
+        {
+            _playerInterface = playerInterface;
+        }
+
+        [Authorize]
+        [HttpPut("{userId:guid}/sync/{summonerName}")]
+        public async Task<ActionResult> SyncPlayerFromRiot(Guid userId, string summonerName, [FromQuery] string region = "br1")
+        {
+            var response = await _playerInterface.UpdatePlayerFromRiotAsync(userId, summonerName, region);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [Authorize]
+        [HttpPost("{userId:guid}")]
+        public async Task<ActionResult> AddPlayer(Guid userId, Player player)
+        {
+            var response = await _playerInterface.AddPlayerAsync(userId, player);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpGet("{playerId:guid}")]
+        public async Task<ActionResult> GetPlayerById(Guid playerId)
+        {
+            var response = await _playerInterface.GetPlayerByIdAsync(playerId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpGet]
+        public async Task<ActionResult> GetAllPlayers()
+        {
+            var response = await _playerInterface.GetAllPlayersAsync();
+            if (!response.Success) return BadRequest(response);
+            return Ok(response.Data);
+        }
+        [Authorize]
+        [HttpDelete("{playerId:guid}")]
+        public async Task<ActionResult> DeletePlayer(Guid playerId)
+        {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized();
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+
+
+            var getResponse = await _playerInterface.GetPlayerByIdAsync(playerId);
+            if (!getResponse.Success || getResponse.Data == null)
+                return BadRequest(getResponse);
+
+            var player = getResponse.Data;
+            if (player.UserId != callerId && !isAdmin)
+                return Forbid();
+
+            var response = await _playerInterface.DeletePlayerAsync(playerId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpGet("user/{userId:guid}")]
+        public async Task<ActionResult> GetPlayerByUserId(Guid userId)
+        {
+            var response = await _playerInterface.GetPlayerByUserIdAsync(userId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+
+
+        }
+}

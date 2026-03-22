@@ -78,23 +78,7 @@ namespace NKZAPI.Controllers
             var i = await _userServices.DeleteUserAsync(id);
             return Ok(i);
         }
-        [Authorize]
-        [HttpPost("players/{userId:guid}/sync/{summonerName}")]
-        public async Task<ActionResult> SyncPlayerFromRiot(Guid userId, string summonerName, [FromQuery] string region = "br1")
-        {
-            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
-            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
-                return Unauthorized();
 
-            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
-
-            if (callerId != userId && !isAdmin)
-                return Forbid();
-
-            var response = await _userInterface.UpdatePlayerFromRiotAsync(userId, summonerName, region);
-            if (!response.Success) return BadRequest(response);
-            return Ok(response);
-        }
 
     }
 }
