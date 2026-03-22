@@ -6,6 +6,8 @@ namespace NKZAPI.Models
 {
     public class Player : BaseEntity
     {
+        // Owner
+        public Guid? UserId { get; set; }
         // Adicione esta propriedade para corrigir o erro CS1061
 
         public Guid? TeamId { get; set; }

@@ -1,0 +1,15 @@
+﻿using NKZAPI.Models;
+using System.Threading.Tasks;
+
+namespace NKZAPI.Services.PlayerServices
+{
+    public interface IPlayerInterface
+    {
+        Task<Response<string>> UpdatePlayerFromRiotAsync(Guid userId, string summonerName, string region = "br1");
+        Task<Response<string>> AddPlayerAsync(Guid UserId, Player player);
+        Task<Response<string>> DeletePlayerAsync(Guid playerid);
+        Task<Response<string>> GetPlayerByIdAsync(Guid id);
+        Task<Response<string>> GetAllPlayersAsync();
+        Task<Response<string>> GetPlayerByUserIdAsync(Guid userId);
+    }
+}

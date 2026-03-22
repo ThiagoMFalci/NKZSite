@@ -1,0 +1,19 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NKZAPI.Models;
+using NKZAPI.Services.PlayerServices;
+using NKZAPI.Services.UserServices;
+
+namespace NKZAPI.Controllers
+{
+    public class PlayerController : ControllerBase
+    {
+        private readonly PlayerServices _playerServices;
+        public PlayerController(PlayerServices playerServices)
+        {
+            _playerServices = playerServices;
+        }
+
+    }
+}

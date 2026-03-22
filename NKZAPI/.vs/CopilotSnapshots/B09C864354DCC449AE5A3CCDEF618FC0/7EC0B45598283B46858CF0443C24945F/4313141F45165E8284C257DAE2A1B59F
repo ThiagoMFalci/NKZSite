@@ -1,0 +1,22 @@
+﻿using NKZAPI.Data;
+using NKZAPI.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace NKZAPI.Repositories
+
+{
+    public class PlayerRepository
+    {
+        private readonly NKZAPIContext _playerRepository;
+        public PlayerRepository(NKZAPIContext context)
+        {
+            _playerRepository = context;
+        }
+
+
+        public async Task<List<Player>> GetAllPlayersAsync()
+        {
+            return await _playerRepository.Players.ToListAsync();
+        }
+    }
+}

@@ -1,0 +1,65 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NKZAPI.Models;
+using NKZAPI.Services.PlayerServices;
+
+namespace NKZAPI.Controllers
+{
+    public class PlayerController : ControllerBase
+    {
+        private readonly IPlayerInterface _playerInterface;
+        public PlayerController( IPlayerInterface playerInterface)
+        {
+            _playerInterface = playerInterface;
+        }
+
+        [Authorize]
+        [HttpPost("players/{userId:guid}/sync/{summonerName}")]
+        public async Task<ActionResult> SyncPlayerFromRiot(Guid userId, string summonerName, [FromQuery] string region = "br1")
+        {
+            var response = await _playerInterface.UpdatePlayerFromRiotAsync(userId, summonerName, region);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost("players/{userId:guid}")]
+        public async Task<ActionResult> AddPlayer(Guid userId, Player player)
+        {
+            var response = await _playerInterface.AddPlayerAsync(userId, player);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpGet("players/{playerId:guid}")]
+        public async Task<ActionResult> GetPlayerById(Guid playerId)
+        {
+            var response = await _playerInterface.GetPlayerByIdAsync(playerId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpGet("players/")]
+        public async Task<ActionResult> GetAllPlayers()
+        {
+            var response = await _playerInterface.GetAllPlayersAsync();
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpDelete("players/{PlayerId:guid}")]
+        public ActionResult DeletePlayer(Guid id)
+        {
+            var response = _playerInterface.DeletePlayerAsync(id);
+            if (!response.Result.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpGet("players/{userId:guid}")]
+        public async Task<ActionResult> GetPlayerByUserId(Guid userId)
+        {
+            var response = await _playerInterface.GetPlayerByUserIdAsync(userId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+
+
+        }
+}

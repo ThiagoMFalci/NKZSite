@@ -1,0 +1,111 @@
+﻿using Microsoft.EntityFrameworkCore;
+using NKZAPI.Data;
+using NKZAPI.Models;
+using NKZAPI.Repositories;
+using NKZAPI.Services.RiotService;
+
+namespace NKZAPI.Services.PlayerServices
+{
+    public class PlayerServices : IPlayerInterface
+    {
+        private readonly PlayerRepository _context;
+        private readonly IRiotService _riotService;
+
+        public PlayerServices(PlayerRepository context, IRiotService riotService)
+        {
+            _context = context;
+            _riotService = riotService;
+        }
+
+        public async Task<Response<string>> UpdatePlayerFromRiotAsync(Guid userId, string summonerName, string region = "br1")
+        {
+            var response = new Response<string>();
+            try
+            {
+                var user = await _context.GetUserWithPlayersAsync(userId);
+
+                if (user == null)
+                {
+                    response.Success = false;
+                    response.Message = "User not found.";
+                    return response;
+                }
+
+                var player = user.Player?.FirstOrDefault(p => p.SummonerName.Equals(summonerName, StringComparison.OrdinalIgnoreCase));
+
+                if (player == null)
+                {
+                    player = new Player
+                    {
+                        Id = Guid.NewGuid(),
+                        SummonerName = summonerName,
+                        IsCaptain = false,
+                        IsActive = true,
+                        LastStatsUpdate = DateTime.UtcNow
+                    };
+                    if (user.Player == null) user.Player = new List<Player>();
+                    user.Player.Add(player);
+                }
+
+                var summoner = await _riotService.GetSummonerByNameAsync(region, summonerName);
+                if (summoner == null)
+                {
+                    response.Success = false;
+                    response.Message = "Summoner not found on Riot.";
+                    return response;
+                }
+
+                player.RiotPuuid = summoner.Puuid;
+                player.SummonerLevel = (int)summoner.SummonerLevel;
+                player.SummonerName = summoner.Name;
+
+                var leagueEntry = await _riotService.GetSoloQueueEntryAsync(region, summoner.Id);
+                if (leagueEntry != null)
+                {
+                    player.SoloQueueTier = leagueEntry.Tier ?? "UNRANKED";
+                    player.SoloQueueRank = leagueEntry.Rank ?? "";
+                    player.SoloQueueLP = leagueEntry.LeaguePoints;
+                    player.Wins = leagueEntry.Wins;
+                    player.Losses = leagueEntry.Losses;
+                    player.TotalMatches = leagueEntry.Wins + leagueEntry.Losses;
+                    player.IsVerified = true;
+                }
+
+                player.LastStatsUpdate = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                response.Success = true;
+                response.Message = "Player updated from Riot.";
+                response.Data = player.Id.ToString();
+            }
+            catch (HttpRequestException ex)
+            {
+                response.Success = false;
+                response.Message = $"Riot API error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<List<Player>> GetAllPlayersAsync()
+        {
+            return await _context.GetAllPlayersAsync();
+        }
+
+        public async Task<Player?> GetPlayerByIdAsync(Guid id)
+        {
+            return await _context.GetPlayerByIdAsync(id);
+        }
+        public async Task DeletePlayerAsync(Player player)
+        {
+            await _context.DeletePlayerAsync(player);
+        }
+
+
+    }
+}

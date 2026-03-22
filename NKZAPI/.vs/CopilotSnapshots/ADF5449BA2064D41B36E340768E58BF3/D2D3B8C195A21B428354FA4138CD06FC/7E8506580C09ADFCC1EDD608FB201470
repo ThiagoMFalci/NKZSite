@@ -1,0 +1,34 @@
+﻿using NKZAPI.Data;
+using NKZAPI.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace NKZAPI.Repositories
+
+{
+    public class PlayerRepository
+    {
+        private readonly NKZAPIContext _playerRepository;
+        public PlayerRepository(NKZAPIContext context)
+        {
+            _playerRepository = context;
+        }
+
+
+        public async Task<List<Player>> GetAllPlayersAsync()
+        {
+            return await _playerRepository.Players.ToListAsync();
+        }
+
+        public async Task<Player?> GetPlayerByIdAsync(Guid id)
+        {
+            return await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+
+        public async Task DeletePlayerAsync(Player player)
+        {
+            _playerRepository.Players.Remove(player);
+            await _playerRepository.SaveChangesAsync();
+        }
+    }
+}
