@@ -5,6 +5,7 @@ import "./style.css";
 
 const navLinks = [
     { label: "Home", href: "/"},
+    { label: "Dashboard", href: "/dashboard"},
     { label: "Times", href: "/teams" },
     { label: "Campeonatos", href: "/tournaments" },
     { label: "Ligas", href: "/leagues" },
