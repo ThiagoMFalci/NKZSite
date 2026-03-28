@@ -2,6 +2,7 @@ import {Routes, Route, Router} from "react-router-dom";
 import Index from './Pages/Index'
 import NotFound from './Pages/NotFound'
 import Navbar from './Components/Navbar'
+import Footer from './Components/Footer'
 
 function App() {
     return (
@@ -13,6 +14,8 @@ function App() {
                 <Route path="/"  element={<Index/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
+
+            <Footer />
         </>
     )
 
