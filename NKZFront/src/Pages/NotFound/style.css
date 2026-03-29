@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Exo+2:wght@400;600&display=swap');
+
+.notfound-page {
+    min-height: 100vh;
+    background: #07070d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Exo 2', sans-serif;
+}
+
+/* ─── Fundo decorativo ──────────────────────────────── */
+
+.notfound-page::before {
+    content: '404';
+    position: absolute;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(200px, 40vw, 400px);
+    font-weight: 700;
+    color: rgba(123, 47, 190, 0.04);
+    letter-spacing: -0.05em;
+    user-select: none;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+}
+
+.notfound-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+            linear-gradient(rgba(123, 47, 190, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(123, 47, 190, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+/* ─── Conteúdo ──────────────────────────────────────── */
+
+.notfound-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    animation: nf-fade-up 0.7s ease both;
+}
+
+@keyframes nf-fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Badge ─────────────────────────────────────────── */
+
+.notfound-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #F97316;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    background: rgba(249, 115, 22, 0.08);
+    padding: 0.35rem 0.9rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    animation: nf-fade-up 0.7s ease 0.1s both;
+}
+
+.notfound-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #F97316;
+    animation: nf-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes nf-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.7); }
+}
+
+/* ─── Número 404 ────────────────────────────────────── */
+
+.notfound-code {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(5rem, 16vw, 10rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+    animation: nf-fade-up 0.7s ease 0.15s both;
+
+    /* Split color: 4 roxo, 0 laranja, 4 azul */
+    background: linear-gradient(90deg, #7B2FBE 0%, #7B2FBE 30%, #F97316 45%, #F97316 55%, #2F86BE 70%, #2F86BE 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ─── Título e descrição ────────────────────────────── */
+
+.notfound-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    font-weight: 700;
+    color: #F5F5F5;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    animation: nf-fade-up 0.7s ease 0.2s both;
+}
+
+.notfound-desc {
+    font-size: 0.9rem;
+    color: rgba(245, 245, 245, 0.45);
+    max-width: 380px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: nf-fade-up 0.7s ease 0.25s both;
+}
+
+/* ─── Ações ─────────────────────────────────────────── */
+
+.notfound-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: nf-fade-up 0.7s ease 0.3s both;
+}
+
+.btn-nf-primary {
+    background: linear-gradient(135deg, #7B2FBE, #9b3fe8);
+    border: none;
+    color: white;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.7rem 1.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 0 20px rgba(123, 47, 190, 0.4);
+}
+
+.btn-nf-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(123, 47, 190, 0.6);
+}
+
+.btn-nf-ghost {
+    background: transparent;
+    border: 1px solid rgba(245, 245, 245, 0.15);
+    color: rgba(245, 245, 245, 0.6);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.7rem 1.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-nf-ghost:hover {
+    border-color: rgba(245, 245, 245, 0.4);
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ─── Linha decorativa ──────────────────────────────── */
+
+.notfound-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--roxo, #7B2FBE), var(--azul, #2F86BE), var(--laranja, #F97316));
+}
+
+/* ─── Responsividade ────────────────────────────────── */
+
+@media (max-width: 480px) {
+    .notfound-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .btn-nf-primary,
+    .btn-nf-ghost {
+        text-align: center;
+    }
+}
