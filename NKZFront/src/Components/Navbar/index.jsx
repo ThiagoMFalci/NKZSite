@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from "/logo.png"
 import "./style.css";
 
@@ -15,7 +15,7 @@ const navLinks = [
 export default function Index() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const location = useLocation();
-
+    const navigate = useNavigate();
     return (
         <nav className="lol-navbar">
             <div className="nav-inner">
@@ -43,8 +43,12 @@ export default function Index() {
 
                 {/* DIREITA — Ações */}
                 <div className="nav-actions">
-                    <button className="btn-ghost">Entrar</button>
-                    <button className="btn-primary-lol">Criar Conta</button>
+                    <button className="btn-ghost" onClick={() => navigate("/login")}>
+                        Entrar
+                    </button>
+                    <button className="btn-primary-lol" onClick={() => navigate("/register")}>
+                        Criar Conta
+                    </button>
                 </div>
 
                 {/* Mobile toggle */}
@@ -62,8 +66,12 @@ export default function Index() {
                     <a key={link.label} href={link.href}>{link.label}</a>
                 ))}
                 <div className="mobile-actions">
-                    <button className="btn-ghost">Entrar</button>
-                    <button className="btn-primary-lol">Criar Conta</button>
+                    <button className="btn-ghost" onClick={() => navigate("/login")}>
+                        Entrar
+                    </button>
+                    <button className="btn-primary-lol" onClick={() => navigate("/login")}>
+                        Criar Conta
+                    </button>
                 </div>
             </div>
         </nav>
