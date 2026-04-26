@@ -9,6 +9,7 @@ namespace NKZAPI.Dtos
 
         [Required(ErrorMessage = "O Campo nome é obrigatorio")]
         public string Name { get; set; } = null!;
+        public string? Tag { get; set; }
         public Guid? OwnerId { get; set; }
         public ICollection<Player>? Players { get; set; } = new List<Player>();
         public ICollection<Player>? Captains { get; set; } = new List<Player>();

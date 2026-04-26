@@ -23,11 +23,18 @@ namespace NKZAPI.Controllers
             _authInterface = authInterface;
             _userInterface = userInterface;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("ListUsers")]
-        public async Task<ActionResult<List<User>>> ListUsersAsync()
+        public async Task<ActionResult<List<UserPublicDto>>> ListUsersAsync()
         {
             List<User> users = await _userServices.GetAllUsersAsync();
-            return users;
+            return users.Select(user => new UserPublicDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt
+            }).ToList();
         }
         [HttpPost("CreateUsers")]
         public async Task<ActionResult<User>> CreateUserAsync([FromBody] UserDto user)

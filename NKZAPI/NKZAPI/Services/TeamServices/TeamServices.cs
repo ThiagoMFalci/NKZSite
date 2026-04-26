@@ -4,6 +4,8 @@ using NKZAPI.Models;
 using NKZAPI.Repositories;
 using System.Linq;
 using System;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace NKZAPI.Services.TeamServices
 {
@@ -11,17 +13,96 @@ namespace NKZAPI.Services.TeamServices
     {
         private readonly TeamRepository _teamRepository;
         private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor;
-        public TeamServices(TeamRepository teamRepository, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor)
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
+        public TeamServices(TeamRepository teamRepository, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _teamRepository = teamRepository;
             _httpContextAccessor = httpContextAccessor;
+            _env = env;
         }
 
         private async Task<bool> IsCallerTeamCaptainAsync(Guid teamId, Guid callerId)
         {
             var players = (await _teamRepository.GetTeamByIdAsync(teamId))?.Players;
             if (players == null) return false;
-            return players.Any(p => p.Id == callerId && p.IsCaptain);
+            return players.Any(p => p.UserId == callerId && p.IsCaptain);
+        }
+
+        public async Task<Response<Team>> UploadTeamImageAsync(Guid teamId, IFormFile image)
+        {
+            var response = new Response<Team>();
+            try
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                var user = _httpContextAccessor.HttpContext?.User;
+                var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+                if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                {
+                    response.Success = false;
+                    response.Message = "Unauthorized";
+                    return response;
+                }
+
+                var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+                if (team.OwnerId != callerId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+
+                if (image == null || image.Length == 0)
+                {
+                    response.Success = false;
+                    response.Message = "No file uploaded.";
+                    return response;
+                }
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+                var maxFileSize = 5 * 1024 * 1024; // 5 MB
+                var fileExt = Path.GetExtension(image.FileName).ToLowerInvariant();
+                if (!image.ContentType.StartsWith("image/") || !allowedExtensions.Contains(fileExt))
+                {
+                    response.Success = false;
+                    response.Message = "Invalid file type. Only image files are allowed.";
+                    return response;
+                }
+                if (image.Length > maxFileSize)
+                {
+                    response.Success = false;
+                    response.Message = "File too large. Maximum allowed size is 5 MB.";
+                    return response;
+                }
+
+                var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "teams");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                var fileName = $"{teamId}{Path.GetExtension(image.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+
+                var relativePath = Path.Combine("images", "teams", fileName).Replace("\\", "/");
+                var updated = await _teamRepository.UploadTeamImageAsync(teamId, relativePath);
+                response.Success = true;
+                response.Message = "Team image uploaded successfully.";
+                response.Data = updated;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
         }
 
         public async Task<Response<string>> ExpelPlayerAsync(Guid teamId, Guid playerId)
@@ -46,9 +127,8 @@ namespace NKZAPI.Services.TeamServices
             }
 
             var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
-            var callerIsCaptain = await IsCallerTeamCaptainAsync(teamId, callerId);
 
-            if (team.OwnerId != callerId && !isAdmin && !callerIsCaptain)
+            if (team.OwnerId != callerId && !isAdmin)
             {
                 response.Success = false;
                 response.Message = "Forbidden";
@@ -71,7 +151,7 @@ namespace NKZAPI.Services.TeamServices
             }
 
             // prevent owner from being expelled by captain
-            if (player.Id == team.OwnerId)
+            if (player.UserId == team.OwnerId)
             {
                 response.Success = false;
                 response.Message = "Cannot expel the team owner.";
@@ -79,6 +159,7 @@ namespace NKZAPI.Services.TeamServices
             }
 
             player.TeamId = null;
+            player.IsCaptain = false;
             await _teamRepository.UpdatePlayerAsync(player);
 
             response.Success = true;
@@ -130,6 +211,21 @@ namespace NKZAPI.Services.TeamServices
                     response.Message = "Forbidden";
                     return response;
                 }
+
+                var team = await _teamRepository.GetTeamByIdAsync(invitation.TeamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                if (team.OwnerId == callerId)
+                {
+                    response.Success = false;
+                    response.Message = "Team owners cannot request to join their own team.";
+                    return response;
+                }
             }
 
             // prevent duplicate pending
@@ -179,7 +275,15 @@ namespace NKZAPI.Services.TeamServices
             // Determine who can respond: if it's an Invite, the player must accept/decline; if it's a Request, the team owner or captain must accept/decline
             if (invitation.Type == "Invite")
             {
-                if (invitation.PlayerId != callerId && !isAdmin)
+                var invitedPlayer = await _teamRepository.GetPlayerByIdAsync(invitation.PlayerId);
+                if (invitedPlayer == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    return response;
+                }
+
+                if (invitedPlayer.UserId != callerId && !isAdmin)
                 {
                     response.Success = false;
                     response.Message = "Forbidden";
@@ -322,6 +426,14 @@ namespace NKZAPI.Services.TeamServices
                     return response;
                 }
 
+                var normalizedTag = NormalizeTeamTag(team.Tag);
+                if (normalizedTag == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team tag must have 3 to 5 letters.";
+                    return response;
+                }
+
                 var existingByName = (await _teamRepository.GetAllTeamsAsync()).FirstOrDefault(t => t.Name == team.Name);
                 if (existingByName != null)
                 {
@@ -334,6 +446,7 @@ namespace NKZAPI.Services.TeamServices
                 {
                     Id = Guid.NewGuid(),
                     Name = team.Name,
+                    Tag = normalizedTag,
                     OwnerId = id
                 };
 
@@ -382,6 +495,14 @@ namespace NKZAPI.Services.TeamServices
                     return response;
                 }
 
+                var normalizedTag = NormalizeTeamTag(team.Tag);
+                if (normalizedTag == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team tag must have 3 to 5 letters.";
+                    return response;
+                }
+
                 // Only admin can change OwnerId
                 if (!isAdmin)
                 {
@@ -389,6 +510,7 @@ namespace NKZAPI.Services.TeamServices
                 }
 
                 existing.Name = team.Name;
+                existing.Tag = normalizedTag;
                 existing.OwnerId = team.OwnerId;
 
                 if (existing.OwnerId != callerId && !isAdmin)
@@ -437,6 +559,7 @@ namespace NKZAPI.Services.TeamServices
 
             var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
 
+            // Authorization: only team owner or admin can delete a team
             if (team.OwnerId != callerId && !isAdmin)
             {
                 response.Success = false;
@@ -475,19 +598,19 @@ namespace NKZAPI.Services.TeamServices
 
             var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
 
-            if (team.OwnerId != callerId && !isAdmin)
-            {
-                response.Success = false;
-                response.Message = "Forbidden";
-                return response;
-            }
-
             // Find existing player by id
             var player = await _teamRepository.GetPlayerByIdAsync(playerId);
             if (player == null)
             {
                 response.Success = false;
                 response.Message = "Player not found.";
+                return response;
+            }
+
+            if (team.OwnerId != callerId && !isAdmin && player.UserId != callerId)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
                 return response;
             }
 
@@ -532,18 +655,18 @@ namespace NKZAPI.Services.TeamServices
 
             var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
 
-            if (team.OwnerId != callerId && !isAdmin)
-            {
-                response.Success = false;
-                response.Message = "Forbidden";
-                return response;
-            }
-
             var player = await _teamRepository.GetPlayerByIdAsync(playerId);
             if (player == null)
             {
                 response.Success = false;
                 response.Message = "Player not found.";
+                return response;
+            }
+
+            if (team.OwnerId != callerId && !isAdmin && player.UserId != callerId)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
                 return response;
             }
 
@@ -555,6 +678,7 @@ namespace NKZAPI.Services.TeamServices
             }
 
             player.TeamId = null;
+            player.IsCaptain = false;
             await _teamRepository.UpdatePlayerAsync(player);
 
             response.Success = true;
@@ -613,6 +737,32 @@ namespace NKZAPI.Services.TeamServices
         {
             var existing = await _teamRepository.GetTeamByIdAsync(id);
             return existing != null;
+        }
+
+        private static string? NormalizeTeamTag(string? tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag)) return null;
+
+            // Trim and uppercase
+            var trimmed = tag.Trim().ToUpperInvariant();
+
+            // Remove diacritics (accents) so letters like Á -> A
+            var normalizedForm = trimmed.Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new System.Text.StringBuilder();
+            foreach (var ch in normalizedForm)
+            {
+                var cat = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (cat != System.Globalization.UnicodeCategory.NonSpacingMark)
+                    sb.Append(ch);
+            }
+
+            // Keep only letters
+            var lettersOnly = new string(sb.ToString().Where(char.IsLetter).ToArray());
+
+            // Must be between 3 and 5 letters
+            if (lettersOnly.Length < 3 || lettersOnly.Length > 5) return null;
+
+            return lettersOnly;
         }
     }
 }

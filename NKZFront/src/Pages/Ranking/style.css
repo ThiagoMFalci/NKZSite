@@ -1,0 +1,335 @@
+.ranking-page {
+    --ranking-bg: #07070d;
+    --ranking-bg2: #0d0d18;
+    --ranking-border: rgba(123, 47, 190, 0.25);
+    --ranking-muted: rgba(245, 245, 245, 0.48);
+
+    min-height: calc(100vh - 64px);
+    background: var(--ranking-bg);
+    color: var(--neutro);
+    font-family: 'Exo 2', sans-serif;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.ranking-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(123,47,190,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,47,190,0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 20%, black 15%, transparent 85%);
+    pointer-events: none;
+}
+
+.ranking-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.ranking-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.ranking-heading h1 {
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.ranking-heading span,
+.ranking-row small {
+    color: var(--ranking-muted);
+    font-size: 0.85rem;
+}
+
+.ranking-eyebrow {
+    color: var(--laranja);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    margin: 0 0 0.55rem;
+    text-transform: uppercase;
+}
+
+.ranking-filter {
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--ranking-border);
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 1.2fr) 180px;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.ranking-tabs {
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--ranking-border);
+    border-radius: 4px;
+    display: inline-flex;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+    padding: 0.35rem;
+}
+
+.ranking-tabs button {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    color: rgba(245,245,245,0.62);
+    cursor: pointer;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    min-height: 40px;
+    padding: 0 0.9rem;
+    text-transform: uppercase;
+}
+
+.ranking-tabs button.active {
+    background: rgba(249, 115, 22, 0.12);
+    border-color: rgba(249, 115, 22, 0.34);
+    color: white;
+}
+
+.ranking-filter label,
+.filter-group {
+    color: rgba(245,245,245,0.7);
+    display: grid;
+    font-size: 0.76rem;
+    font-weight: 600;
+    gap: 0.45rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.ranking-filter input,
+.ranking-filter select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    color: white;
+    font: inherit;
+    letter-spacing: 0;
+    outline: none;
+    padding: 0.85rem 0.9rem;
+}
+
+.elo-chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.elo-chip {
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex !important;
+    gap: 0.35rem !important;
+    padding: 0.45rem 0.55rem;
+}
+
+.elo-chip input {
+    accent-color: var(--laranja);
+    padding: 0;
+}
+
+.ranking-filter select option {
+    background: #0d0d18;
+}
+
+.ranking-table-card,
+.ranking-state {
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--ranking-border);
+    border-radius: 4px;
+    box-shadow: 0 0 28px rgba(123, 47, 190, 0.08);
+}
+
+.ranking-table-card {
+    overflow-x: auto;
+}
+
+.ranking-table {
+    min-width: 780px;
+}
+
+.ranking-table.tournament-wins {
+    min-width: 700px;
+}
+
+.ranking-row {
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 70px 1.5fr 1fr 0.8fr 0.8fr 0.8fr;
+    padding: 1rem;
+}
+
+.ranking-table.tournament-wins .ranking-row {
+    grid-template-columns: 70px 1.5fr 0.8fr 1fr 1.2fr;
+}
+
+.ranking-cell {
+    min-width: 0;
+}
+
+.ranking-row:last-child {
+    border-bottom: none;
+}
+
+.ranking-head {
+    color: rgba(245,245,245,0.42);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.ranking-row strong {
+    color: white;
+    display: block;
+}
+
+.rank-position {
+    align-items: center;
+    color: var(--laranja);
+    display: flex;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.ranking-points {
+    color: var(--laranja);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.ranking-state {
+    color: rgba(245, 245, 245, 0.72);
+    padding: 2rem;
+    text-align: center;
+}
+
+.ranking-state-error {
+    border-color: rgba(249, 115, 22, 0.4);
+    color: var(--laranja);
+}
+
+.ranking-filter.filter-shell {
+    align-items: stretch;
+    grid-template-columns: minmax(220px, 1fr) minmax(360px, 1.35fr) minmax(180px, 0.55fr);
+    padding: 1.25rem;
+}
+
+.ranking-filter.compact-filter {
+    grid-template-columns: minmax(220px, 420px);
+}
+
+.filter-control input,
+.filter-control select {
+    min-height: 56px;
+}
+
+.elo-selector {
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    display: grid;
+    gap: 0.8rem;
+    margin: 0;
+    min-width: 0;
+    padding: 0.9rem;
+}
+
+.elo-selector legend {
+    align-items: center;
+    color: rgba(245,245,245,0.7);
+    display: flex;
+    float: none;
+    font-size: 0.76rem;
+    font-weight: 600;
+    justify-content: space-between;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    margin: 0;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.elo-selector legend strong {
+    color: var(--laranja);
+    font-size: 0.68rem;
+}
+
+.elo-selector-grid {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.elo-selector-chip {
+    align-items: center;
+    background: rgba(10, 10, 18, 0.72);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: rgba(245,245,245,0.72);
+    cursor: pointer;
+    display: flex !important;
+    font-size: 0.72rem !important;
+    gap: 0 !important;
+    justify-content: center;
+    letter-spacing: 0.08em !important;
+    min-height: 38px;
+    padding: 0.5rem 0.65rem;
+    text-align: center;
+}
+
+.elo-selector-chip input {
+    display: none;
+}
+
+.elo-selector-chip.active {
+    background: rgba(249, 115, 22, 0.12);
+    border-color: rgba(249, 115, 22, 0.42);
+    color: white;
+}
+
+@media (max-width: 680px) {
+    .ranking-page {
+        padding: 2.5rem 1rem;
+    }
+
+    .ranking-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ranking-filter {
+        grid-template-columns: 1fr;
+    }
+
+    .elo-selector-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

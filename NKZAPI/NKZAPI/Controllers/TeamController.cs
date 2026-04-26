@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NKZAPI.Dtos;
@@ -11,7 +12,7 @@ namespace NKZAPI.Controllers
 {        
     [ApiController]
     [Route("api/team")]
-    [Authorize]
+
     public class TeamController : ControllerBase
     {
         private readonly ITeamInterface _teamServices;
@@ -42,7 +43,28 @@ namespace NKZAPI.Controllers
 
             return Ok(response);
         }
+        [Authorize]
+        [HttpPost("{teamId:guid}/image")]
+        public async Task<ActionResult> UploadTeamImageAsync(Guid teamId, IFormFile image)
+        {
+            var existing = await _teamServices.GetTeamByIdAsync(teamId);
+            if (existing == null) return NotFound("Team not found");
 
+            var response = await _teamServices.UploadTeamImageAsync(teamId, image);
+
+            if (!response.Success && response.Message == "Unauthorized")
+                return Unauthorized(new { message = response.Message });
+
+            if (!response.Success && response.Message == "Forbidden")
+                return Forbid();
+
+            if (!response.Success && response.Message != null && response.Message.Contains("not found"))
+                return NotFound(new { message = response.Message });
+
+            if (!response.Success) return BadRequest(response);
+
+            return Ok(response);
+        }
         [HttpGet("ListTeams")]
         public async Task<ActionResult<List<Team>>> ListTeamsAsync()
         {
@@ -77,7 +99,6 @@ namespace NKZAPI.Controllers
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateTeamAsync(Guid id, [FromBody] TeamDto team)
         {
-            // Ensure route and body id match
             team.Id = id;
 
             var response = await _teamServices.UpdateTeamAsync(team);
@@ -171,15 +192,31 @@ namespace NKZAPI.Controllers
         }
         [Authorize]
         [HttpPost("invitations/{invitationId:guid}/respond")]
-        public async Task<ActionResult> RespondToInvitationAsync(Guid invitationId, [FromBody] bool accept)
+        public async Task<ActionResult> RespondToInvitationAsync(Guid invitationId, [FromBody] JsonElement body)
         {
+            bool accept;
+            if (body.ValueKind == JsonValueKind.True || body.ValueKind == JsonValueKind.False)
+            {
+                accept = body.GetBoolean();
+            }
+            else if (body.ValueKind == JsonValueKind.Object &&
+                     body.TryGetProperty("accept", out var acceptProperty) &&
+                     (acceptProperty.ValueKind == JsonValueKind.True || acceptProperty.ValueKind == JsonValueKind.False))
+            {
+                accept = acceptProperty.GetBoolean();
+            }
+            else
+            {
+                return BadRequest(new { message = "Informe accept como true ou false." });
+            }
+
             var response = await _teamServices.RespondToInvitationAsync(invitationId, accept);
 
             if (!response.Success && response.Message == "Unauthorized")
                 return Unauthorized(new { message = response.Message });
 
             if (!response.Success && response.Message == "Forbidden")
-                return Forbid();
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para responder esta solicitacao." });
 
             if (!response.Success && response.Message != null && response.Message.Contains("not found"))
                 return NotFound(new { message = response.Message });
@@ -207,6 +244,7 @@ namespace NKZAPI.Controllers
 
             return Ok(removeResponse);
         }
+        [Authorize]
         [HttpPost("{teamId:guid}/players/{playerId:guid}/IsCaptain/{i:bool}")]
         public async Task<ActionResult> IsCaptain(Guid teamId, Guid playerId, bool i)
         {

@@ -16,12 +16,20 @@ namespace NKZAPI.Repositories
 
         public async Task<List<Player>> GetAllPlayersAsync()
         {
-            return await _playerRepository.Players.ToListAsync();
+            return await _playerRepository.Players
+                .Include(p => p.ChampionStats)
+                .Include(p => p.RoleStats)
+                .Include(p => p.MatchHistory)
+                .ToListAsync();
         }
 
         public async Task<Player?> GetPlayerByIdAsync(Guid id)
         {
-            return await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == id);
+            return await _playerRepository.Players
+                .Include(p => p.ChampionStats)
+                .Include(p => p.RoleStats)
+                .Include(p => p.MatchHistory)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
 
@@ -29,7 +37,6 @@ namespace NKZAPI.Repositories
         {
             var player = await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == playerid);
             if (player == null) return;
-            if (player.UserId != null) return;
             _playerRepository.Players.Remove(player);
             await _playerRepository.SaveChangesAsync();
         }
@@ -38,13 +45,18 @@ namespace NKZAPI.Repositories
         {
             return await _playerRepository.Users
                 .Include(u => u.Player)
+                    .ThenInclude(p => p.ChampionStats)
+                .Include(u => u.Player)
+                    .ThenInclude(p => p.RoleStats)
+                .Include(u => u.Player)
+                    .ThenInclude(p => p.MatchHistory)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
         public async Task SaveChangesAsync()
         {
             await _playerRepository.SaveChangesAsync();
         }
-        public async Task<Player> AddPlayerAsync(Guid UserId,Player player)
+        public async Task<Player> AddPlayerAsync(Guid UserId, Player player)
         {
             User? user = await _playerRepository.Users.FirstOrDefaultAsync(u => u.Id == UserId);
             if (user == null) throw new InvalidOperationException("User not found");
@@ -64,7 +76,7 @@ namespace NKZAPI.Repositories
             await _playerRepository.SaveChangesAsync();
             return entry.Entity;
         }
-        public async Task<Player> IsCaptain(Guid id,bool i)
+        public async Task<Player> IsCaptain(Guid id, bool i)
         {
             Player? player = await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == id);
             if (player != null)
@@ -74,5 +86,22 @@ namespace NKZAPI.Repositories
             }
             return player!;
         }
+
+        public async Task<Player> UploadProfileImage(Guid playerId, string profileImagePath)
+        {
+            var player = await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == playerId);
+            if (player == null) return null!;
+            player.ProfileImageUrl = profileImagePath;
+            await _playerRepository.SaveChangesAsync();
+            return player;
+        }
+
+        public async Task<Player> UpdateCompetitiveProfileAsync(Player player)
+        {
+            _playerRepository.Players.Update(player);
+            await _playerRepository.SaveChangesAsync();
+            return player;
+        }
+
     }
 }

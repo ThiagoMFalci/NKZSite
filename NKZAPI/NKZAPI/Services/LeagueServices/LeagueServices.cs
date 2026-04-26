@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NKZAPI.Models;
 using NKZAPI.Repositories;
+using System.Security.Claims;
 
 namespace NKZAPI.Services.LeagueServices
 {
@@ -9,11 +10,13 @@ namespace NKZAPI.Services.LeagueServices
     {
         private readonly LeagueRepository _leagueRepository;
         private readonly TeamRepository _teamRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LeagueServices(LeagueRepository leagueRepository, TeamRepository teamRepository)
+        public LeagueServices(LeagueRepository leagueRepository, TeamRepository teamRepository, IHttpContextAccessor httpContextAccessor)
         {
             _leagueRepository = leagueRepository;
             _teamRepository = teamRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<League>> GetAllLeaguesAsync()
@@ -135,6 +138,13 @@ namespace NKZAPI.Services.LeagueServices
                     return response;
                 }
 
+                if (!CanManageTeam(team, out var authMessage))
+                {
+                    response.Success = false;
+                    response.Message = authMessage;
+                    return response;
+                }
+
                 if (league.Teams.Any(t => t.Id == teamId))
                 {
                     response.Success = false;
@@ -175,6 +185,21 @@ namespace NKZAPI.Services.LeagueServices
                     return response;
                 }
 
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                if (!CanManageTeam(team, out var authMessage))
+                {
+                    response.Success = false;
+                    response.Message = authMessage;
+                    return response;
+                }
+
                 if (!league.Teams.Any(t => t.Id == teamId))
                 {
                     response.Success = false;
@@ -203,6 +228,31 @@ namespace NKZAPI.Services.LeagueServices
         public async Task<List<League>> GetLeaguesByTeamIdAsync(Guid teamId)
         {
             return await _leagueRepository.GetLeaguesByTeamIdAsync(teamId);
+        }
+
+        private bool CanManageTeam(Team team, out string message)
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                message = "Unauthorized";
+                return false;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+            var isOwner = team.OwnerId == callerId;
+            var isCaptain = team.Players?.Any(player => player.UserId == callerId && player.IsCaptain) == true;
+
+            if (!isAdmin && !isOwner && !isCaptain)
+            {
+                message = "Forbidden";
+                return false;
+            }
+
+            message = string.Empty;
+            return true;
         }
     }
 }

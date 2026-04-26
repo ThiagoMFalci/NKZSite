@@ -1,0 +1,454 @@
+.players-page {
+    --players-bg: #07070d;
+    --players-border: rgba(123, 47, 190, 0.25);
+    --players-muted: rgba(245, 245, 245, 0.48);
+
+    background: var(--players-bg);
+    color: var(--neutro);
+    font-family: 'Exo 2', sans-serif;
+    min-height: calc(100vh - 64px);
+    overflow: hidden;
+    padding: 4rem 2rem;
+    position: relative;
+}
+
+.players-bg-grid {
+    background-image:
+        linear-gradient(rgba(123,47,190,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(123,47,190,0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+    inset: 0;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 20%, black 15%, transparent 85%);
+    pointer-events: none;
+    position: absolute;
+}
+
+.players-container {
+    margin: 0 auto;
+    max-width: 1200px;
+    position: relative;
+    z-index: 1;
+}
+
+.players-heading {
+    align-items: flex-end;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.players-heading h1,
+.player-card h2 {
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.players-heading h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.players-heading span,
+.player-card-top span,
+.player-champions small {
+    color: var(--players-muted);
+}
+
+.players-eyebrow {
+    color: var(--laranja);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    margin: 0 0 0.55rem;
+    text-transform: uppercase;
+}
+
+.players-filter {
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--players-border);
+    border-radius: 4px;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(200px, 1fr) minmax(320px, 1.25fr) repeat(3, minmax(140px, 0.5fr));
+    margin-bottom: 1rem;
+    padding: 1.25rem;
+}
+
+.players-filter label,
+.filter-control {
+    color: rgba(245,245,245,0.7);
+    display: grid;
+    font-size: 0.76rem;
+    font-weight: 600;
+    gap: 0.45rem;
+    letter-spacing: 0.1em;
+    min-width: 0;
+    text-transform: uppercase;
+}
+
+.players-filter input,
+.players-filter select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: white;
+    font: inherit;
+    letter-spacing: 0;
+    min-height: 56px;
+    outline: none;
+    padding: 0.85rem 0.9rem;
+    width: 100%;
+}
+
+.players-filter select option {
+    background: #0d0d18;
+}
+
+.players-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.player-card,
+.players-state,
+.players-feedback,
+.players-team-note {
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--players-border);
+    border-radius: 4px;
+    box-shadow: 0 0 28px rgba(123, 47, 190, 0.08);
+}
+
+.player-card {
+    cursor: pointer;
+    display: grid;
+    gap: 1rem;
+    min-height: 320px;
+    padding: 1.1rem;
+}
+
+.player-card:hover {
+    border-color: rgba(249, 115, 22, 0.34);
+}
+
+.player-card-top {
+    align-items: center;
+    display: flex;
+    gap: 0.9rem;
+    min-width: 0;
+    position: relative;
+}
+
+.player-avatar {
+    align-items: center;
+    background: rgba(123, 47, 190, 0.14);
+    border: 1px solid rgba(123, 47, 190, 0.35);
+    border-radius: 4px;
+    color: white;
+    display: flex;
+    flex: 0 0 auto;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    height: 58px;
+    justify-content: center;
+    width: 58px;
+}
+
+.player-avatar.large {
+    height: 86px;
+    width: 86px;
+    font-size: 1.6rem;
+}
+
+.player-card h2 {
+    font-size: 1.35rem;
+    overflow-wrap: anywhere;
+}
+
+.player-looking-badge {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: rgba(245,245,245,0.48);
+    font-size: 0.65rem;
+    font-style: normal;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    margin-left: auto;
+    padding: 0.35rem 0.45rem;
+    text-transform: uppercase;
+}
+
+.player-looking-badge.active {
+    background: rgba(47, 134, 190, 0.12);
+    border-color: rgba(47, 134, 190, 0.3);
+    color: #8fcaf0;
+}
+
+.player-card-stats {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.player-card-stats span {
+    align-items: center;
+    color: var(--players-muted);
+    display: flex;
+    gap: 0.55rem;
+}
+
+.player-card-stats svg {
+    color: var(--laranja);
+}
+
+.player-champions {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    display: grid;
+    gap: 0.65rem;
+    padding: 0.85rem;
+}
+
+.player-champions strong {
+    color: white;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.player-champion-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.player-champion-list span {
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    border-radius: 4px;
+    color: rgba(245,245,245,0.86);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.35rem 0.5rem;
+}
+
+.player-invite-button {
+    align-items: center;
+    align-self: end;
+    background: linear-gradient(135deg, var(--roxo), #9b3df0);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    gap: 0.5rem;
+    justify-content: center;
+    letter-spacing: 0.08em;
+    min-height: 44px;
+    padding: 0 0.9rem;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.player-invite-button:disabled {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.08);
+    color: rgba(245,245,245,0.42);
+    cursor: not-allowed;
+}
+
+.players-state,
+.players-feedback,
+.players-team-note {
+    color: rgba(245,245,245,0.72);
+    padding: 1rem;
+    text-align: center;
+}
+
+.players-state {
+    grid-column: 1 / -1;
+    padding: 2rem;
+}
+
+.players-state-error,
+.players-feedback.error {
+    border-color: rgba(249, 115, 22, 0.4);
+    color: var(--laranja);
+}
+
+.players-feedback.success {
+    border-color: rgba(47, 134, 190, 0.28);
+    color: #8fcaf0;
+}
+
+.players-team-note {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    text-align: left;
+}
+
+.players-team-note svg {
+    color: var(--laranja);
+}
+
+.player-profile-back {
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: rgba(245,245,245,0.78);
+    cursor: pointer;
+    display: inline-flex;
+    gap: 0.45rem;
+    min-height: 40px;
+    padding: 0 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.player-profile-hero {
+    align-items: center;
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--players-border);
+    border-radius: 4px;
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+    padding: 1.4rem;
+}
+
+.player-profile-hero h1 {
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.player-profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.7rem 0;
+}
+
+.player-profile-meta span {
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    color: var(--players-muted);
+    display: inline-flex;
+    gap: 0.4rem;
+    min-height: 32px;
+    padding: 0 0.6rem;
+}
+
+.player-profile-meta svg {
+    color: var(--laranja);
+}
+
+.player-profile-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 0.8fr) repeat(2, minmax(0, 1fr));
+}
+
+.player-profile-card {
+    background: rgba(13, 13, 24, 0.96);
+    border: 1px solid var(--players-border);
+    border-radius: 4px;
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.1rem;
+}
+
+.player-profile-card.wide {
+    grid-column: 1 / -1;
+}
+
+.player-profile-card h2 {
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.06em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.profile-row {
+    align-items: center;
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 0.75rem;
+}
+
+.profile-row.match {
+    grid-template-columns: minmax(0, 1fr) 0.7fr auto auto;
+}
+
+.profile-row strong {
+    color: white;
+}
+
+.profile-row span,
+.profile-row small,
+.players-empty {
+    color: var(--players-muted);
+}
+
+.profile-row em {
+    color: #8fcaf0;
+    font-style: normal;
+    font-weight: 800;
+}
+
+@media (max-width: 1080px) {
+    .players-filter,
+    .players-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .players-page {
+        padding: 2.5rem 1rem;
+    }
+
+    .players-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .players-filter,
+    .players-grid,
+    .player-profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .player-profile-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .profile-row,
+    .profile-row.match {
+        grid-template-columns: 1fr;
+    }
+}

@@ -46,7 +46,8 @@ namespace NKZAPI.Controllers
                 return Unauthorized();
 
             var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
-            if (!isAdmin) return Forbid();
+            if (!isAdmin || tournament.OwnerId == null)
+                tournament.OwnerId = callerId;
 
             var result = await _tournamentService.AddTournamentAsync(tournament);
             if (!result.Success) return BadRequest(result.Message);
@@ -61,7 +62,9 @@ namespace NKZAPI.Controllers
                 return Unauthorized();
 
             var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
-            if (!isAdmin) return Forbid();
+            var existing = await _tournamentService.GetTournamentByIdAsync(id);
+            if (!existing.Success || existing.Data == null) return NotFound(existing.Message);
+            if (existing.Data.OwnerId != callerId && !isAdmin) return Forbid();
 
             // Garantir que o id da rota e o objeto sejam consistentes
             tournament.Id = id;
@@ -78,7 +81,9 @@ namespace NKZAPI.Controllers
                 return Unauthorized();
 
             var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
-            if (!isAdmin) return Forbid();
+            var existing = await _tournamentService.GetTournamentByIdAsync(id);
+            if (!existing.Success || existing.Data == null) return NotFound(existing.Message);
+            if (existing.Data.OwnerId != callerId && !isAdmin) return Forbid();
 
             var tournament = new Tournament { Id = id };
             var result = await _tournamentService.DeleteTournamentAsync(tournament);
@@ -94,6 +99,8 @@ namespace NKZAPI.Controllers
                 return Unauthorized();
 
             var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+            var tournament = await _tournamentService.GetTournamentByIdAsync(tournamentId);
+            if (!tournament.Success || tournament.Data == null) return NotFound(tournament.Message);
 
             var team = await _teamService.GetTeamByIdAsync(teamId);
             if (team == null) return NotFound("Team not found");
@@ -114,11 +121,13 @@ namespace NKZAPI.Controllers
                 return Unauthorized();
 
             var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+            var tournament = await _tournamentService.GetTournamentByIdAsync(tournamentId);
+            if (!tournament.Success || tournament.Data == null) return NotFound(tournament.Message);
 
             var team = await _teamService.GetTeamByIdAsync(teamId);
             if (team == null) return NotFound("Team not found");
 
-            if (team.OwnerId != callerId && !isAdmin)
+            if (team.OwnerId != callerId && tournament.Data.OwnerId != callerId && !isAdmin)
                 return Forbid();
 
             var result = await _tournamentService.RemoveTeamFromTournamentAsync(tournamentId, teamId);
