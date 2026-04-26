@@ -2,8 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NKZAPI.Data;
+using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Repositories;
 using NKZAPI.Services.RiotService;
@@ -17,12 +20,14 @@ namespace NKZAPI.Services.PlayerServices
         private readonly IRiotService _riotService;
         private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor;
         private readonly ITeamInterface _teamService;
-        public PlayerServices(PlayerRepository context, IRiotService riotService, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, ITeamInterface teamServices)
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
+        public PlayerServices(PlayerRepository context, IRiotService riotService, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, ITeamInterface teamServices, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _context = context;
             _riotService = riotService;
             _httpContextAccessor = httpContextAccessor;
             _teamService = teamServices;
+            _env = env;
         }
 
         public async Task<Response<Player>> UpdatePlayerFromRiotAsync(Guid userId, string summonerName, string region = "br1")
@@ -180,9 +185,9 @@ namespace NKZAPI.Services.PlayerServices
                 response.Data = null;
                 return response;
             }
-            
+
         }
-        public async Task<Response<Player>> AddPlayerAsync(Guid UserId,Player player)
+        public async Task<Response<Player>> AddPlayerAsync(Guid UserId, Player player)
         {
             var response = new Response<Player>();
 
@@ -203,10 +208,20 @@ namespace NKZAPI.Services.PlayerServices
                     response.Data = null;
                     return response;
                 }
+                if (string.IsNullOrWhiteSpace(player.SummonerName))
+                {
+                    response.Success = false;
+                    response.Message = "SummonerName is required.";
+                    response.Data = null;
+                    return response;
+                }
                 player.Id = Guid.NewGuid();
                 player.UserId = UserId;
                 player.TeamId = null;
                 player.IsCaptain = false;
+                player.RiotPuuid ??= "";
+                player.MainRole = NormalizeRole(player.MainRole);
+                player.Tags ??= "";
                 await _context.AddPlayerAsync(UserId, player);
                 response.Success = true;
                 response.Message = "Player added successfully.";
@@ -252,5 +267,138 @@ namespace NKZAPI.Services.PlayerServices
         }
 
 
-    }
+        public async Task<Response<Player>> UploadProfileImage(Guid playerId, IFormFile profileImageUrl)
+        {
+            var response = new Response<Player>();
+            try
+            {
+                var player = await _context.GetPlayerByIdAsync(playerId);
+                if (player == null)
+                {
+                    var user = await _context.GetUserWithPlayersAsync(playerId);
+                    player = user?.Player?.FirstOrDefault();
+                }
+
+                if (player == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    response.Data = null;
+                    return response;
+                }
+                if (profileImageUrl == null || profileImageUrl.Length == 0)
+                {
+                    response.Success = false;
+                    response.Message = "No file uploaded.";
+                    response.Data = null;
+                    return response;
+                }
+                // Validate content type (should be image/*) and extension
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+                var maxFileSize = 5 * 1024 * 1024; // 5 MB
+                var fileExt = Path.GetExtension(profileImageUrl.FileName).ToLowerInvariant();
+                if (!profileImageUrl.ContentType.StartsWith("image/") || !allowedExtensions.Contains(fileExt))
+                {
+                    response.Success = false;
+                    response.Message = "Invalid file type. Only image files are allowed (jpg, jpeg, png, gif, bmp, webp).";
+                    response.Data = null;
+                    return response;
+                }
+                if (profileImageUrl.Length > maxFileSize)
+                {
+                    response.Success = false;
+                    response.Message = "File too large. Maximum allowed size is 5 MB.";
+                    response.Data = null;
+                    return response;
+                }
+                var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "profiles");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                var fileName = $"{player.Id}{Path.GetExtension(profileImageUrl.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await profileImageUrl.CopyToAsync(stream);
+                }
+
+                var relativePath = Path.Combine("images", "profiles", fileName).Replace("\\", "/");
+                await _context.UploadProfileImage(player.Id, relativePath);
+                response.Success = true;
+                response.Message = "Profile image uploaded successfully.";
+                response.Data = await _context.GetPlayerByIdAsync(player.Id);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+        }
+
+        public async Task<Response<Player>> UpdateCompetitiveProfileAsync(Guid userId, PlayerCompetitiveProfileDto profile)
+        {
+            var response = new Response<Player>();
+            try
+            {
+                var user = _httpContextAccessor.HttpContext?.User;
+                var callerIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+                if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                {
+                    response.Success = false;
+                    response.Message = "Unauthorized";
+                    return response;
+                }
+
+                var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+                if (callerId != userId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+
+                var playerResponse = await GetPlayerByUserIdAsync(userId);
+                if (!playerResponse.Success || playerResponse.Data == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    return response;
+                }
+
+                var player = playerResponse.Data;
+                var nextRole = NormalizeRole(profile.MainRole);
+                var normalizedTags = (profile.Tags ?? new List<string>())
+                    .Select(tag => tag.Trim())
+                    .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .Take(5)
+                    .ToList();
+
+                player.MainRole = nextRole;
+                player.LookingForTeam = profile.LookingForTeam;
+                player.Tags = string.Join(",", normalizedTags);
+
+                await _context.UpdateCompetitiveProfileAsync(player);
+
+                response.Success = true;
+                response.Message = "Competitive profile updated.";
+                response.Data = player;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
+        }
+
+        private static string NormalizeRole(string? role)
+        {
+            var allowedRoles = new[] { "Top", "Jungle", "Mid", "ADC", "Support", "Flex" };
+            return allowedRoles.FirstOrDefault(item => item.Equals(role, StringComparison.OrdinalIgnoreCase)) ?? "Flex";
+        }
+
+        }
 }

@@ -1,7 +1,5 @@
-﻿using NKZAPI.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using NKZAPI.Dtos;
+using NKZAPI.Models;
 
 namespace NKZAPI.Services.PlayerServices
 {
@@ -13,5 +11,7 @@ namespace NKZAPI.Services.PlayerServices
         Task<Response<Player>> GetPlayerByIdAsync(Guid id);
         Task<Response<List<Player>>> GetAllPlayersAsync();
         Task<Response<Player>> GetPlayerByUserIdAsync(Guid userId);
+        Task<Response<Player>> UploadProfileImage(Guid playerId, IFormFile profileImageUrl);
+        Task<Response<Player>> UpdateCompetitiveProfileAsync(Guid userId, PlayerCompetitiveProfileDto profile);
     }
 }

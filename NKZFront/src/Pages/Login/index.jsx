@@ -21,7 +21,7 @@ function sanitize(value) {
 }
 
 function sanitizeEmail(value) {
-    return value.replace(/[^a-zA-Z0-9@._+\-]/g, "");
+    return value.replace(/[^a-zA-Z0-9@._+-]/g, "");
 }
 
 function sanitizeGameName(value) {

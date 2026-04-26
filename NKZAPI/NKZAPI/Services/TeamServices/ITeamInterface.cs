@@ -25,5 +25,6 @@ namespace NKZAPI.Services.TeamServices
         Task<Response<string>> RemovePlayerFromTeamAsync(Guid teamId, Guid playerId);
 
         Task<Response<string>> AssignCaptainAsync(Guid teamId, Guid playerId, bool i);
+        Task<Response<Team>> UploadTeamImageAsync(Guid teamId, IFormFile image);
     }
 }

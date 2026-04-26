@@ -40,6 +40,15 @@ namespace NKZAPI.Repositories
             return entry.Entity;
         }
 
+        public async Task<Team?> UploadTeamImageAsync(Guid teamId, string imagePath)
+        {
+            var team = await _context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
+            if (team == null) return null;
+            team.ProfileImageUrl = imagePath;
+            await _context.SaveChangesAsync();
+            return team;
+        }
+
         public async Task<Team> UpdateTeamAsync(Team team)
         {
             // Atualiza apenas a entidade existente carregada pelo contexto
@@ -53,6 +62,7 @@ namespace NKZAPI.Repositories
             }
 
             dbTeam.Name = team.Name;
+            dbTeam.Tag = team.Tag;
             dbTeam.OwnerId = team.OwnerId;
 
             await _context.SaveChangesAsync();
