@@ -144,6 +144,62 @@
           "SelectedChildIndex": 3,
           "Children": [
             {
+<<<<<<< HEAD
+=======
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\PlayerController.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Controllers\\PlayerController.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Controllers\\PlayerController.cs",
+              "RelativeToolTip": "NKZAPI\\Controllers\\PlayerController.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T16:55:06.991Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "PlayerRepository.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\PlayerRepository.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Repositories\\PlayerRepository.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Repositories\\PlayerRepository.cs",
+              "RelativeToolTip": "NKZAPI\\Repositories\\PlayerRepository.cs",
+              "ViewState": "AgIAADgAAAAAAAAAAAD4vz4AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T17:10:55.807Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlayerServices.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
+              "RelativeToolTip": "NKZAPI\\Services\\PlayerServices\\PlayerServices.cs",
+              "ViewState": "AgIAAKwAAAAAAAAAAAAMwL0AAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T17:10:29.711Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Player.cs",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
+              "RelativeDocumentMoniker": "NKZAPI\\Models\\Player.cs",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Models\\Player.cs",
+              "RelativeToolTip": "NKZAPI\\Models\\Player.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-25T16:56:25.059Z",
+              "IsPinned": true
+            },
+            {
+>>>>>>> parent of c097d6f (Merge pull request #7 from ThiagoMFalci/feat/loginPage)
               "$type": "Bookmark",
               "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
             },
