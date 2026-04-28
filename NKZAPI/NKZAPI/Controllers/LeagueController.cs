@@ -61,6 +61,8 @@ namespace NKZAPI.Controllers
         public async Task<ActionResult> AddTeamToLeagueAsync(Guid leagueId, Guid teamId)
         {
             var response = await _leagueServices.AddTeamToLeagueAsync(leagueId, teamId);
+            if (!response.Success && response.Message == "Unauthorized") return Unauthorized(new { message = response.Message });
+            if (!response.Success && response.Message == "Forbidden") return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para usar este time." });
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
@@ -69,6 +71,8 @@ namespace NKZAPI.Controllers
         public async Task<ActionResult> RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId)
         {
             var response = await _leagueServices.RemoveTeamFromLeagueAsync(leagueId, teamId);
+            if (!response.Success && response.Message == "Unauthorized") return Unauthorized(new { message = response.Message });
+            if (!response.Success && response.Message == "Forbidden") return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para usar este time." });
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }

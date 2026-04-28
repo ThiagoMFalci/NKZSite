@@ -9,9 +9,22 @@ namespace NKZAPI.Services.TeamServices
         Task<Team?> GetTeamByIdAsync(Guid id);
         Task<Response<string>> AddTeamAsync(TeamDto team, Guid id);
         Task<Response<string>> UpdateTeamAsync(TeamDto team);
-        Task DeleteTeamAsync(Team team);
+        Task<Response<string>> DeleteTeamAsync(Team team);
 
-        Task<Player> AddPlayerToTeamAsync(Guid teamId, Player player);
-        Task RemovePlayerFromTeamAsync(Guid teamId, Guid playerId);
+        // Invitation/request flow
+        Task<Response<Invitation>> CreateInvitationAsync(Invitation invitation);
+        Task<Response<string>> RespondToInvitationAsync(Guid invitationId, bool accept);
+        Task<List<Invitation>> GetInvitationsForPlayerAsync(Guid playerId);
+        Task<List<Invitation>> GetInvitationsForTeamAsync(Guid teamId);
+
+        Task<Response<Player>> AddPlayerToTeamAsync(Guid teamId, Guid playerId);
+
+        Task<Response<string>> ExpelPlayerAsync(Guid teamId, Guid playerId);
+
+        // legacy direct remove
+        Task<Response<string>> RemovePlayerFromTeamAsync(Guid teamId, Guid playerId);
+
+        Task<Response<string>> AssignCaptainAsync(Guid teamId, Guid playerId, bool i);
+        Task<Response<Team>> UploadTeamImageAsync(Guid teamId, IFormFile image);
     }
 }

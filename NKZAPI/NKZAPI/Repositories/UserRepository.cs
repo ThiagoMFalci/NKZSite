@@ -32,7 +32,6 @@ namespace NKZAPI.Repositories
                 Email = user.Email,
                 PasswordHash = Convert.ToBase64String(user.PasswordHash),
                 PasswordSalt = Convert.ToBase64String(user.PasswordSalt),
-                Player = user.Player
             };
             return dto;
         }
@@ -54,10 +53,11 @@ namespace NKZAPI.Repositories
             await _context.SaveChangesAsync();
             return Return.Entity;
         }
-        public async Task DeleteUserAsync(User user)
+        public async Task<User> DeleteUserAsync(User user)
         {
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
+            return user;
         }
 
     }

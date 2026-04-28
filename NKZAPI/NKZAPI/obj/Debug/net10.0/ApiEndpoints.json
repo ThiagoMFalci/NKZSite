@@ -51,7 +51,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.User, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Dtos.UserPublicDto, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -86,32 +86,6 @@
         "StatusCode": 200
       }
     ]
-  },
-  {
-    "ContainingType": "NKZAPI.Controllers.UserController",
-    "Method": "SyncPlayerFromRiot",
-    "RelativePath": "api/auth/User/players/{userId}/sync/{summonerName}",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "userId",
-        "Type": "System.Guid",
-        "IsRequired": true
-      },
-      {
-        "Name": "summonerName",
-        "Type": "System.String",
-        "IsRequired": true
-      },
-      {
-        "Name": "region",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
   },
   {
     "ContainingType": "NKZAPI.Controllers.UserController",
@@ -338,6 +312,153 @@
     ]
   },
   {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "GetAllPlayers",
+    "RelativePath": "api/player",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "GetPlayerById",
+    "RelativePath": "api/player/{playerId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "DeletePlayer",
+    "RelativePath": "api/player/{playerId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "AddPlayer",
+    "RelativePath": "api/player/{userId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "player",
+        "Type": "NKZAPI.Dtos.CreatePlayerDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "UpdateCompetitiveProfile",
+    "RelativePath": "api/player/{userId}/competitive-profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "profile",
+        "Type": "NKZAPI.Dtos.PlayerCompetitiveProfileDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "UploadProfileImage",
+    "RelativePath": "api/player/{userId}/profile-image",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "image",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "SyncPlayerFromRiot",
+    "RelativePath": "api/player/{userId}/sync/{summonerName}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "summonerName",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "region",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "GetPlayerByUserId",
+    "RelativePath": "api/player/user/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "NKZAPI.Controllers.RiotController",
     "Method": "ValidateKey",
     "RelativePath": "api/riot/validate-key",
@@ -454,6 +575,74 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "UploadTeamImageAsync",
+    "RelativePath": "api/team/{teamId}/image",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "image",
+        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "CreateInvitationAsync",
+    "RelativePath": "api/team/{teamId}/invitations",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "invitation",
+        "Type": "NKZAPI.Models.Invitation",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "GetTeamInvitationsAsync",
+    "RelativePath": "api/team/{teamId}/invitations",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.Invitation, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
     "Method": "AddPlayerToTeamAsync",
     "RelativePath": "api/team/{teamId}/players",
     "HttpMethod": "POST",
@@ -466,8 +655,8 @@
         "IsRequired": true
       },
       {
-        "Name": "player",
-        "Type": "NKZAPI.Models.Player",
+        "Name": "playerId",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],
@@ -506,6 +695,74 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "ExpelPlayerAsync",
+    "RelativePath": "api/team/{teamId}/players/{playerId}/expel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "playerId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "IsCaptain",
+    "RelativePath": "api/team/{teamId}/players/{playerId}/IsCaptain/{i}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "playerId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "i",
+        "Type": "System.Boolean",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "RespondToInvitationAsync",
+    "RelativePath": "api/team/invitations/{invitationId}/respond",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "invitationId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "body",
+        "Type": "System.Text.Json.JsonElement",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
     "Method": "ListTeamsAsync",
     "RelativePath": "api/team/ListTeams",
     "HttpMethod": "GET",
@@ -515,6 +772,32 @@
     "ReturnTypes": [
       {
         "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.Team, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "GetPlayerInvitationsAsync",
+    "RelativePath": "api/team/players/{playerId}/invitations",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "playerId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.Invitation, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

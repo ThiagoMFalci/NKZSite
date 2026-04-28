@@ -1,0 +1,75 @@
+.elo-dropdown {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
+    position: relative;
+}
+
+.elo-dropdown-label {
+    color: rgba(245,245,245,0.7);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.elo-dropdown-trigger {
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 3px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    font-weight: 700;
+    justify-content: space-between;
+    min-height: 56px;
+    outline: none;
+    padding: 0.85rem 0.9rem;
+    text-align: left;
+    width: 100%;
+}
+
+.elo-dropdown-trigger.open,
+.elo-dropdown-trigger:hover {
+    border-color: rgba(249, 115, 22, 0.36);
+}
+
+.elo-dropdown-chevron {
+    color: rgba(245,245,245,0.7);
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.elo-dropdown-menu {
+    background: #14141f;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 3px;
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+    display: grid;
+    left: 0;
+    max-height: 292px;
+    overflow: auto;
+    padding: 0.35rem 0;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.35rem);
+    z-index: 20;
+}
+
+.elo-dropdown-option {
+    background: transparent;
+    border: 0;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: 0.62rem 0.9rem;
+    text-align: left;
+}
+
+.elo-dropdown-option:hover,
+.elo-dropdown-option.active {
+    background: #1f6fd1;
+}

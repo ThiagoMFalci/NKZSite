@@ -1,0 +1,253 @@
+﻿using System.Security.Claims;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using NKZAPI.Data;
+using NKZAPI.Models;
+using NKZAPI.Repositories;
+using NKZAPI.Services.RiotService;
+using NKZAPI.Services.TeamServices;
+
+namespace NKZAPI.Services.PlayerServices
+{
+    public class PlayerServices : IPlayerInterface
+    {
+        private readonly PlayerRepository _context;
+        private readonly IRiotService _riotService;
+        private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor;
+        private readonly ITeamInterface _teamService;
+        public PlayerServices(PlayerRepository context, IRiotService riotService, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, ITeamInterface teamServices)
+        {
+            _context = context;
+            _riotService = riotService;
+            _httpContextAccessor = httpContextAccessor;
+            _teamService = teamServices;
+        }
+
+        public async Task<Response<Player>> UpdatePlayerFromRiotAsync(Guid userId, string summonerName, string region = "br1")
+        {
+            var response = new Response<Player>();
+            try
+            {
+                var user = await _context.GetUserWithPlayersAsync(userId);
+
+                if (user == null)
+                {
+                    response.Success = false;
+                    response.Message = "User not found.";
+                    return response;
+                }
+
+                var player = user.Player?.FirstOrDefault(p => p.SummonerName.Equals(summonerName, StringComparison.OrdinalIgnoreCase));
+
+                if (player == null)
+                {
+                    player = new Player
+                    {
+                        Id = Guid.NewGuid(),
+                        SummonerName = summonerName,
+                        IsCaptain = false,
+                        IsActive = true,
+                        LastStatsUpdate = DateTime.UtcNow
+                    };
+                    if (user.Player == null) user.Player = new List<Player>();
+                    user.Player.Add(player);
+                }
+
+                var summoner = await _riotService.GetSummonerByNameAsync(region, summonerName);
+                if (summoner == null)
+                {
+                    response.Success = false;
+                    response.Message = "Summoner not found on Riot.";
+                    return response;
+                }
+
+                player.RiotPuuid = summoner.Puuid;
+                player.SummonerLevel = (int)summoner.SummonerLevel;
+                player.SummonerName = summoner.Name;
+
+                var leagueEntry = await _riotService.GetSoloQueueEntryAsync(region, summoner.Id);
+                if (leagueEntry != null)
+                {
+                    player.SoloQueueTier = leagueEntry.Tier ?? "UNRANKED";
+                    player.SoloQueueRank = leagueEntry.Rank ?? "";
+                    player.SoloQueueLP = leagueEntry.LeaguePoints;
+                    player.Wins = leagueEntry.Wins;
+                    player.Losses = leagueEntry.Losses;
+                    player.TotalMatches = leagueEntry.Wins + leagueEntry.Losses;
+                    player.IsVerified = true;
+                }
+
+                player.LastStatsUpdate = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                response.Success = true;
+                response.Message = "Player updated from Riot.";
+                response.Data = player;
+            }
+            catch (HttpRequestException ex)
+            {
+                response.Success = false;
+                response.Message = $"Riot API error: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<Response<string>> GetAllPlayersAsync()
+        {
+            var response = new Response<string>();
+            try
+            {
+                var players = await _context.GetAllPlayersAsync();
+                if (players == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    response.Data = null;
+                    return response;
+                }
+                response.Success = true;
+                response.Message = "Players retrieved successfully.";
+                // return a simple comma-separated list of player ids as string to keep Response<string> signature
+                response.Data = string.Join(",", players.Select(p => p.Id.ToString()));
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+        }
+
+        public async Task<Response<string>> GetPlayerByIdAsync(Guid id)
+        {
+            var response = new Response<string>();
+            try
+            {
+                var player = await _context.GetPlayerByIdAsync(id);
+                if (player == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    response.Data = null;
+                    return response;
+                }
+                response.Success = true;
+                response.Message = "Player retrieved successfully.";
+                response.Data = player.Id.ToString();
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+
+        }
+        public async Task<Response<Player>> DeletePlayerAsync(Guid playerid)
+        {
+            var response = new Response<Player>();
+            try
+            {
+                var player = await _context.GetPlayerByIdAsync(playerid);
+                if (player == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    response.Data = null;
+                    return response;
+                }
+                await _context.DeletePlayerAsync(playerid);
+                response.Success = true;
+                response.Message = "Player deleted successfully.";
+                response.Data = player;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+            
+        }
+        public async Task<Response<Player>> AddPlayerAsync(Guid UserId,Player player)
+        {
+            var response = new Response<Player>();
+
+            try
+            {
+                var user = await _context.GetUserWithPlayersAsync(UserId);
+                if (user == null)
+                {
+                    response.Success = false;
+                    response.Message = "User not found.";
+                    response.Data = null;
+                    return response;
+                }
+                if (player == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player data is null.";
+                    response.Data = null;
+                    return response;
+                }
+                await _context.AddPlayerAsync(UserId, player);
+                response.Success = true;
+                response.Message = "Player added successfully.";
+                response.Data = player;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+
+
+        }
+        public async Task<Response<Player>> GetPlayerByUserIdAsync(Guid userId)
+        {
+            var response = new Response<Player>();
+            try
+            {
+                var user = await _context.GetUserWithPlayersAsync(userId);
+                if (user == null || user.Player == null || !user.Player.Any())
+                {
+                    response.Success = false;
+                    response.Message = "Player not found for the given user.";
+                    response.Data = null;
+                    return response;
+                }
+                var player = user.Player.First();
+                response.Success = true;
+                response.Message = "Player retrieved successfully.";
+                response.Data = player;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+        }
+
+
+    }
+}

@@ -1,0 +1,7 @@
+﻿namespace NKZAPI.Services.PlayerServices
+{
+    public interface IPlayerInterface
+    {
+        Task<Response<string>> UpdatePlayerFromRiotAsync(Guid userId, string summonerName, string region = "br1");
+    }
+}

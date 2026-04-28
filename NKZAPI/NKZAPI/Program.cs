@@ -57,10 +57,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserServices>();
+builder.Services.AddScoped<NKZAPI.Services.PlayerServices.IPlayerInterface, NKZAPI.Services.PlayerServices.PlayerServices>();
 builder.Services.AddScoped<TeamRepository>();
 builder.Services.AddScoped<TeamServices>();
 builder.Services.AddScoped<LeagueRepository>();
 builder.Services.AddScoped<TournamentRepository>();
+builder.Services.AddScoped<PlayerRepository>();
 
 builder.Services.AddScoped<NKZAPI.Services.AuthServices.IAuthInterface, NKZAPI.Services.AuthServices.AuthService>();
 builder.Services.AddScoped<NKZAPI.Services.PassService.IPasswordInterface, NKZAPI.Services.PassService.PasswordService>();
@@ -68,9 +70,13 @@ builder.Services.AddScoped<NKZAPI.Services.UserServices.IUserInterface, NKZAPI.S
 builder.Services.AddScoped<NKZAPI.Services.TeamServices.ITeamInterface, NKZAPI.Services.TeamServices.TeamServices>();
 builder.Services.AddScoped<NKZAPI.Services.LeagueServices.ILeagueInterface, NKZAPI.Services.LeagueServices.LeagueServices>();
 builder.Services.AddScoped<NKZAPI.Services.TournamentServices.ITournamentInterface, NKZAPI.Services.TournamentServices.TournamentServices>();
+builder.Services.AddScoped<NKZAPI.Services.PlayerServices.IPlayerInterface, NKZAPI.Services.PlayerServices.PlayerServices>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IRiotService, RiotService>();
+
+// Required for services that need access to the current HttpContext (e.g. authorization checks inside services)
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddOpenApi();
 
@@ -86,6 +92,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

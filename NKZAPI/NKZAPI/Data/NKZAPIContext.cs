@@ -18,6 +18,10 @@ namespace NKZAPI.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Player> Players { get; set; }
+        public DbSet<PlayerChampionStat> PlayerChampionStats { get; set; }
+        public DbSet<PlayerRoleStat> PlayerRoleStats { get; set; }
+        public DbSet<PlayerMatchHistory> PlayerMatchHistory { get; set; }
+        public DbSet<Invitation> Invitations { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<League> Leagues { get; set; }
         public DbSet<Tournament> Tournaments { get; set; }

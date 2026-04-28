@@ -6,6 +6,8 @@ namespace NKZAPI.Models
     public class Tournament
     {
         public Guid Id { get; set; }
+        // Owner of the tournament (user who created it)
+        public Guid? OwnerId { get; set; }
         public string Name { get; set; }
         public int MaxTeams { get; set; }
         public double Prize { get; set; }

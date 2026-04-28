@@ -2,15 +2,386 @@
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Repositories;
+using System.Linq;
+using System;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace NKZAPI.Services.TeamServices
 {
     public class TeamServices : ITeamInterface
     {
         private readonly TeamRepository _teamRepository;
-        public TeamServices(TeamRepository teamRepository)
+        private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor;
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
+        public TeamServices(TeamRepository teamRepository, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _teamRepository = teamRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _env = env;
+        }
+
+        private async Task<bool> IsCallerTeamCaptainAsync(Guid teamId, Guid callerId)
+        {
+            var players = (await _teamRepository.GetTeamByIdAsync(teamId))?.Players;
+            if (players == null) return false;
+            return players.Any(p => p.UserId == callerId && p.IsCaptain);
+        }
+
+        public async Task<Response<Team>> UploadTeamImageAsync(Guid teamId, IFormFile image)
+        {
+            var response = new Response<Team>();
+            try
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                var user = _httpContextAccessor.HttpContext?.User;
+                var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+                if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                {
+                    response.Success = false;
+                    response.Message = "Unauthorized";
+                    return response;
+                }
+
+                var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+                if (team.OwnerId != callerId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+
+                if (image == null || image.Length == 0)
+                {
+                    response.Success = false;
+                    response.Message = "No file uploaded.";
+                    return response;
+                }
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+                var maxFileSize = 5 * 1024 * 1024; // 5 MB
+                var fileExt = Path.GetExtension(image.FileName).ToLowerInvariant();
+                if (!image.ContentType.StartsWith("image/") || !allowedExtensions.Contains(fileExt))
+                {
+                    response.Success = false;
+                    response.Message = "Invalid file type. Only image files are allowed.";
+                    return response;
+                }
+                if (image.Length > maxFileSize)
+                {
+                    response.Success = false;
+                    response.Message = "File too large. Maximum allowed size is 5 MB.";
+                    return response;
+                }
+
+                var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "teams");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+                var fileName = $"{teamId}{Path.GetExtension(image.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+
+                var relativePath = Path.Combine("images", "teams", fileName).Replace("\\", "/");
+                var updated = await _teamRepository.UploadTeamImageAsync(teamId, relativePath);
+                response.Success = true;
+                response.Message = "Team image uploaded successfully.";
+                response.Data = updated;
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+                return response;
+            }
+        }
+
+        public async Task<Response<string>> ExpelPlayerAsync(Guid teamId, Guid playerId)
+        {
+            var response = new Response<string>();
+
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+
+            if (team.OwnerId != callerId && !isAdmin)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            var player = await _teamRepository.GetPlayerByIdAsync(playerId);
+            if (player == null)
+            {
+                response.Success = false;
+                response.Message = "Player not found.";
+                return response;
+            }
+
+            if (player.TeamId != teamId)
+            {
+                response.Success = false;
+                response.Message = "Player is not a member of this team.";
+                return response;
+            }
+
+            // prevent owner from being expelled by captain
+            if (player.UserId == team.OwnerId)
+            {
+                response.Success = false;
+                response.Message = "Cannot expel the team owner.";
+                return response;
+            }
+
+            player.TeamId = null;
+            player.IsCaptain = false;
+            await _teamRepository.UpdatePlayerAsync(player);
+
+            response.Success = true;
+            response.Message = "Player expelled from team.";
+            response.Data = player.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<Invitation>> CreateInvitationAsync(Invitation invitation)
+        {
+            var response = new Response<Invitation>();
+
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+
+            // If Type == "Invite" then only team owner or admin can create
+            if (invitation.Type == "Invite")
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(invitation.TeamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                if (team.OwnerId != callerId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+            }
+
+            // If Type == "Request" then only player themselves can create
+            if (invitation.Type == "Request")
+            {
+                if (invitation.SenderId != callerId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+
+                var team = await _teamRepository.GetTeamByIdAsync(invitation.TeamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                if (team.OwnerId == callerId)
+                {
+                    response.Success = false;
+                    response.Message = "Team owners cannot request to join their own team.";
+                    return response;
+                }
+            }
+
+            // prevent duplicate pending
+            var existing = (await _teamRepository.GetInvitationsForPlayerAsync(invitation.PlayerId))
+                .FirstOrDefault(i => i.TeamId == invitation.TeamId && i.Status == "Pending" && i.Type == invitation.Type);
+
+            if (existing != null)
+            {
+                response.Success = false;
+                response.Message = "An invitation/request is already pending.";
+                return response;
+            }
+
+            invitation.Id = Guid.NewGuid();
+            invitation.CreatedAt = DateTime.UtcNow;
+
+            var created = await _teamRepository.AddInvitationAsync(invitation);
+
+            response.Success = true;
+            response.Data = created;
+            response.Message = "Invitation created.";
+            return response;
+        }
+
+        public async Task<Response<string>> RespondToInvitationAsync(Guid invitationId, bool accept)
+        {
+            var response = new Response<string>();
+            var invitation = await _teamRepository.GetInvitationByIdAsync(invitationId);
+            if (invitation == null)
+            {
+                response.Success = false;
+                response.Message = "Invitation not found.";
+                return response;
+            }
+
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+
+            // Determine who can respond: if it's an Invite, the player must accept/decline; if it's a Request, the team owner or captain must accept/decline
+            if (invitation.Type == "Invite")
+            {
+                var invitedPlayer = await _teamRepository.GetPlayerByIdAsync(invitation.PlayerId);
+                if (invitedPlayer == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    return response;
+                }
+
+                if (invitedPlayer.UserId != callerId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+            }
+            else // Request
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(invitation.TeamId);
+                if (team == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team not found.";
+                    return response;
+                }
+
+                var callerIsCaptain = await IsCallerTeamCaptainAsync(team.Id, callerId);
+
+                if (team.OwnerId != callerId && !isAdmin && !callerIsCaptain)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+            }
+
+            if (invitation.Status != "Pending")
+            {
+                response.Success = false;
+                response.Message = "Invitation is no longer pending.";
+                return response;
+            }
+
+            if (accept)
+            {
+                // check player exists and not in other team
+                var player = await _teamRepository.GetPlayerByIdAsync(invitation.PlayerId);
+                if (player == null)
+                {
+                    response.Success = false;
+                    response.Message = "Player not found.";
+                    return response;
+                }
+
+                if (player.TeamId != null && player.TeamId != invitation.TeamId)
+                {
+                    response.Success = false;
+                    response.Message = "Player is already in another team.";
+                    return response;
+                }
+
+                player.TeamId = invitation.TeamId;
+                await _teamRepository.UpdatePlayerAsync(player);
+
+                invitation.Status = "Accepted";
+                await _teamRepository.UpdateInvitationAsync(invitation);
+
+                response.Success = true;
+                response.Message = "Invitation accepted and player associated with team.";
+                response.Data = player.Id.ToString();
+                return response;
+            }
+            else
+            {
+                invitation.Status = "Declined";
+                await _teamRepository.UpdateInvitationAsync(invitation);
+                response.Success = true;
+                response.Message = "Invitation declined.";
+                return response;
+            }
+        }
+
+        public async Task<List<Invitation>> GetInvitationsForPlayerAsync(Guid playerId)
+        {
+            return await _teamRepository.GetInvitationsForPlayerAsync(playerId);
+        }
+
+        public async Task<List<Invitation>> GetInvitationsForTeamAsync(Guid teamId)
+        {
+            // Only owner, captain or admin may view team invitations
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                return new List<Invitation>();
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null) return new List<Invitation>();
+
+            var callerIsCaptain = await IsCallerTeamCaptainAsync(team.Id, callerId);
+            if (team.OwnerId != callerId && !isAdmin && !callerIsCaptain)
+            {
+                return new List<Invitation>();
+            }
+
+            return await _teamRepository.GetInvitationsForTeamAsync(teamId);
         }
 
         public async Task<List<Team>> GetAllTeamsAsync()
@@ -28,10 +399,38 @@ namespace NKZAPI.Services.TeamServices
             var response = new Response<string>();
             try
             {
+
+                // Authorization/ownership check moved from controller to service
+                var user = _httpContextAccessor.HttpContext?.User;
+                var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+                if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                {
+                    response.Success = false;
+                    response.Message = "Unauthorized";
+                    return response;
+                }
+
+                var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+
+                if (callerId != id && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
+
                 if (string.IsNullOrWhiteSpace(team.Name))
                 {
                     response.Success = false;
                     response.Message = "Team name is required.";
+                    return response;
+                }
+
+                var normalizedTag = NormalizeTeamTag(team.Tag);
+                if (normalizedTag == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team tag must have 3 to 5 letters.";
                     return response;
                 }
 
@@ -47,6 +446,7 @@ namespace NKZAPI.Services.TeamServices
                 {
                     Id = Guid.NewGuid(),
                     Name = team.Name,
+                    Tag = normalizedTag,
                     OwnerId = id
                 };
 
@@ -69,6 +469,17 @@ namespace NKZAPI.Services.TeamServices
             var response = new Response<string>();
             try
             {
+                // Authorization: ensure caller is owner or admin
+                var user = _httpContextAccessor.HttpContext?.User;
+                var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+                if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                {
+                    response.Success = false;
+                    response.Message = "Unauthorized";
+                    return response;
+                }
+
+                var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
                 if (team.Id == Guid.Empty)
                 {
                     response.Success = false;
@@ -84,8 +495,30 @@ namespace NKZAPI.Services.TeamServices
                     return response;
                 }
 
+                var normalizedTag = NormalizeTeamTag(team.Tag);
+                if (normalizedTag == null)
+                {
+                    response.Success = false;
+                    response.Message = "Team tag must have 3 to 5 letters.";
+                    return response;
+                }
+
+                // Only admin can change OwnerId
+                if (!isAdmin)
+                {
+                    team.OwnerId = existing.OwnerId;
+                }
+
                 existing.Name = team.Name;
+                existing.Tag = normalizedTag;
                 existing.OwnerId = team.OwnerId;
+
+                if (existing.OwnerId != callerId && !isAdmin)
+                {
+                    response.Success = false;
+                    response.Message = "Forbidden";
+                    return response;
+                }
 
                 try
                 {
@@ -110,59 +543,226 @@ namespace NKZAPI.Services.TeamServices
             return response;
         }
 
-        public async Task DeleteTeamAsync(Team team)
+        public async Task<Response<string>> DeleteTeamAsync(Team team)
         {
-            await _teamRepository.DeleteTeamAsync(team);
-        }
+            var response = new Response<string>();
 
-        public async Task<Player> AddPlayerToTeamAsync(Guid teamId, Player player)
-        {
-            var team = await _teamRepository.GetTeamByIdAsync(teamId);
-            if (team == null) throw new InvalidOperationException("Team not found.");
-
-            if (player.Id != Guid.Empty)
+            // Authorization: ensure caller is owner or admin
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
             {
-                var existing = await _teamRepository.GetPlayerByIdAsync(player.Id);
-                if (existing != null)
-                {
-                    if (existing.TeamId != null && existing.TeamId != teamId)
-                        throw new InvalidOperationException("Player is already in another team.");
-
-                    existing.TeamId = teamId;
-                    await _teamRepository.UpdatePlayerAsync(existing);
-                    return existing;
-                }
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
             }
 
-            if (string.IsNullOrWhiteSpace(player.SummonerName))
-                throw new InvalidOperationException("Player SummonerName is required.");
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
 
-            player.IsCaptain = false;
+            // Authorization: only team owner or admin can delete a team
+            if (team.OwnerId != callerId && !isAdmin)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
 
-            player.TeamId = teamId;
-            var added = await _teamRepository.AddPlayerAsync(player);
-            return added;
+            await _teamRepository.DeleteTeamAsync(team);
+
+            response.Success = true;
+            response.Message = "Team deleted successfully";
+            response.Data = team.Id.ToString();
+            return response;
         }
 
-        public async Task RemovePlayerFromTeamAsync(Guid teamId, Guid playerId)
+        public async Task<Response<Player>> AddPlayerToTeamAsync(Guid teamId, Guid playerId)
         {
+            var response = new Response<Player>();
+
             var team = await _teamRepository.GetTeamByIdAsync(teamId);
-            if (team == null) throw new InvalidOperationException("Team not found.");
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+            // Authorization: ensure caller is owner or admin
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+
+            // Find existing player by id
+            var player = await _teamRepository.GetPlayerByIdAsync(playerId);
+            if (player == null)
+            {
+                response.Success = false;
+                response.Message = "Player not found.";
+                return response;
+            }
+
+            if (team.OwnerId != callerId && !isAdmin && player.UserId != callerId)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            if (player.TeamId != null && player.TeamId != teamId)
+            {
+                response.Success = false;
+                response.Message = "Player is already in another team.";
+                return response;
+            }
+
+            player.TeamId = teamId;
+            player.IsCaptain = false; // default to non-captain when adding to team
+            await _teamRepository.UpdatePlayerAsync(player);
+
+            response.Success = true;
+            response.Data = player;
+            response.Message = "Player associated with team.";
+            return response;
+        }
+
+        public async Task<Response<string>> RemovePlayerFromTeamAsync(Guid teamId, Guid playerId)
+        {
+            var response = new Response<string>();
+
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+
+            // Authorization: ensure caller is owner or admin
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
 
             var player = await _teamRepository.GetPlayerByIdAsync(playerId);
-            if (player == null) throw new InvalidOperationException("Player not found.");
+            if (player == null)
+            {
+                response.Success = false;
+                response.Message = "Player not found.";
+                return response;
+            }
+
+            if (team.OwnerId != callerId && !isAdmin && player.UserId != callerId)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
 
             if (player.TeamId != teamId)
-                throw new InvalidOperationException("Player is not a member of this team.");
+            {
+                response.Success = false;
+                response.Message = "Player is not a member of this team.";
+                return response;
+            }
 
             player.TeamId = null;
+            player.IsCaptain = false;
             await _teamRepository.UpdatePlayerAsync(player);
+
+            response.Success = true;
+            response.Message = "Player dissociated from team.";
+            response.Data = player.Id.ToString();
+            return response;
+        }
+        public async Task<Response<string>> AssignCaptainAsync(Guid teamId, Guid playerId, bool i)
+        {
+            var response = new Response<string>();
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+            // Authorization: ensure caller is owner or admin
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+            if (team.OwnerId != callerId && !isAdmin)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+            var player = await _teamRepository.GetPlayerByIdAsync(playerId);
+            if (player == null)
+            {
+                response.Success = false;
+                response.Message = "Player not found.";
+                return response;
+            }
+            if (player.TeamId != teamId)
+            {
+                response.Success = false;
+                response.Message = "Player is not a member of this team.";
+                return response;
+            }
+            player.IsCaptain = i;
+            await _teamRepository.UpdatePlayerAsync(player);
+            response.Success = true;
+            response.Message = "Player assigned as captain.";
+            response.Data = player.Id.ToString();
+            return response;
         }
 
         private async Task<bool> VerifyIfTeamExistsAsync(Guid id)
         {
             var existing = await _teamRepository.GetTeamByIdAsync(id);
             return existing != null;
+        }
+
+        private static string? NormalizeTeamTag(string? tag)
+        {
+            if (string.IsNullOrWhiteSpace(tag)) return null;
+
+            // Trim and uppercase
+            var trimmed = tag.Trim().ToUpperInvariant();
+
+            // Remove diacritics (accents) so letters like Á -> A
+            var normalizedForm = trimmed.Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new System.Text.StringBuilder();
+            foreach (var ch in normalizedForm)
+            {
+                var cat = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch);
+                if (cat != System.Globalization.UnicodeCategory.NonSpacingMark)
+                    sb.Append(ch);
+            }
+
+            // Keep only letters
+            var lettersOnly = new string(sb.ToString().Where(char.IsLetter).ToArray());
+
+            // Must be between 3 and 5 letters
+            if (lettersOnly.Length < 3 || lettersOnly.Length > 5) return null;
+
+            return lettersOnly;
         }
     }
 }

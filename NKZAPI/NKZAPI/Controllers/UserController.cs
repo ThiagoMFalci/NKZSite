@@ -23,11 +23,18 @@ namespace NKZAPI.Controllers
             _authInterface = authInterface;
             _userInterface = userInterface;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("ListUsers")]
-        public async Task<ActionResult<List<User>>> ListUsersAsync()
+        public async Task<ActionResult<List<UserPublicDto>>> ListUsersAsync()
         {
             List<User> users = await _userServices.GetAllUsersAsync();
-            return users;
+            return users.Select(user => new UserPublicDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt
+            }).ToList();
         }
         [HttpPost("CreateUsers")]
         public async Task<ActionResult<User>> CreateUserAsync([FromBody] UserDto user)
@@ -78,23 +85,7 @@ namespace NKZAPI.Controllers
             var i = await _userServices.DeleteUserAsync(id);
             return Ok(i);
         }
-        [Authorize]
-        [HttpPost("players/{userId:guid}/sync/{summonerName}")]
-        public async Task<ActionResult> SyncPlayerFromRiot(Guid userId, string summonerName, [FromQuery] string region = "br1")
-        {
-            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
-            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
-                return Unauthorized();
 
-            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
-
-            if (callerId != userId && !isAdmin)
-                return Forbid();
-
-            var response = await _userInterface.UpdatePlayerFromRiotAsync(userId, summonerName, region);
-            if (!response.Success) return BadRequest(response);
-            return Ok(response);
-        }
 
     }
 }
