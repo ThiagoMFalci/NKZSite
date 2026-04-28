@@ -1,0 +1,13 @@
+.vs/
+**/.vs/
+bin/
+obj/
+**/bin/
+**/obj/
+node_modules/
+dist/
+dist-ssr/
+*.user
+*.suo
+*.log
+*.local
