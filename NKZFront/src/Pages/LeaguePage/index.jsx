@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
     BsBarChartFill,
     BsCalendarEvent,
+    BsChevronDown,
     BsClockHistory,
     BsDiagram3Fill,
     BsImage,
@@ -140,6 +141,7 @@ export default function LeaguePage() {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState("");
     const [proofFiles, setProofFiles] = useState({});
+    const [expandedReports, setExpandedReports] = useState({});
     const [feedback, setFeedback] = useState({ type: "", message: "" });
     const currentUser = getCurrentUser();
     const isAdmin = String(currentUser?.role || "").includes("Admin");
@@ -429,6 +431,7 @@ export default function LeaguePage() {
         const isReady = match.teamAId && match.teamBId && match.status !== "Completed";
         const canReport = isReady && ownedTeam?.id && (ownedTeam.id === match.teamAId || ownedTeam.id === match.teamBId);
         const ownReport = match.reports.find((report) => report.teamId === ownedTeam?.id);
+        const reportOpen = expandedReports[match.id] ?? false;
         return (
             <article key={match.id} className={`league-match-card ${match.status === "Completed" ? "done" : ""}`}>
                 <div className="league-match-meta">
@@ -467,21 +470,33 @@ export default function LeaguePage() {
                     </div>
                 )}
                 {canReport && (
-                    <div className="league-report-box">
-                        <span>{ownReport ? "Voce ja enviou um resultado. Pode corrigir reenviando." : "Enviar resultado do seu time"}</span>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(event) => setProofFiles((current) => ({ ...current, [match.id]: event.target.files?.[0] || null }))}
-                        />
-                        <div className="league-match-actions">
-                            <button type="button" disabled={actionLoading === `report-${match.id}`} onClick={() => handleReportMatch(match, match.teamAId)}>
-                                Venceu A
-                            </button>
-                            <button type="button" disabled={actionLoading === `report-${match.id}`} onClick={() => handleReportMatch(match, match.teamBId)}>
-                                Venceu B
-                            </button>
-                        </div>
+                    <div className={`league-report-box ${reportOpen ? "open" : ""}`}>
+                        <button
+                            type="button"
+                            className="league-report-toggle"
+                            onClick={() => setExpandedReports((current) => ({ ...current, [match.id]: !reportOpen }))}
+                        >
+                            <span>{ownReport ? "Corrigir resultado enviado" : "Enviar resultado do seu time"}</span>
+                            <BsChevronDown />
+                        </button>
+                        {reportOpen && (
+                            <div className="league-report-content">
+                                <span>{ownReport ? "Voce ja enviou um resultado. Pode corrigir reenviando outro print." : "Anexe o print e escolha quem venceu."}</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(event) => setProofFiles((current) => ({ ...current, [match.id]: event.target.files?.[0] || null }))}
+                                />
+                                <div className="league-match-actions">
+                                    <button type="button" disabled={actionLoading === `report-${match.id}`} onClick={() => handleReportMatch(match, match.teamAId)}>
+                                        Venceu A
+                                    </button>
+                                    <button type="button" disabled={actionLoading === `report-${match.id}`} onClick={() => handleReportMatch(match, match.teamBId)}>
+                                        Venceu B
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </article>
@@ -694,7 +709,15 @@ export default function LeaguePage() {
                             {completedMatches.length ? completedMatches.map((match) => (
                                 <article key={match.id} className="history-row">
                                     <span>{formatDate(match.completedAt)}</span>
-                                    <strong>{renderTeamName(match.teamAId)} {match.teamAScore} x {match.teamBScore} {renderTeamName(match.teamBId)}</strong>
+                                    <div className="history-scoreline">
+                                        <strong className={match.winnerTeamId === match.teamAId ? "winner" : "loser"}>
+                                            {renderTeamName(match.teamAId)} {match.teamAScore}
+                                        </strong>
+                                        <span>x</span>
+                                        <strong className={match.winnerTeamId === match.teamBId ? "winner" : "loser"}>
+                                            {match.teamBScore} {renderTeamName(match.teamBId)}
+                                        </strong>
+                                    </div>
                                     <em>Vencedor: {renderTeamName(match.winnerTeamId)}</em>
                                 </article>
                             )) : <EmptyState text="Nenhuma partida finalizada ainda." />}

@@ -667,15 +667,48 @@
 
 .league-report-box {
     background: rgba(47, 134, 190, 0.07);
+    padding: 0;
 }
 
-.league-report-box span {
+.league-report-toggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #9bd2f6;
+    cursor: pointer;
+    display: flex;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    justify-content: space-between;
+    min-height: 42px;
+    padding: 0.65rem;
+    text-align: left;
+    width: 100%;
+}
+
+.league-report-toggle svg {
+    transition: transform 0.2s ease;
+}
+
+.league-report-box.open .league-report-toggle svg {
+    transform: rotate(180deg);
+}
+
+.league-report-content {
+    border-top: 1px solid var(--league-line);
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.65rem;
+}
+
+.league-report-content span {
     color: var(--league-muted);
     font-size: 0.76rem;
     line-height: 1.35;
 }
 
-.league-report-box input {
+.league-report-content input {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--league-line);
     border-radius: 4px;
@@ -684,6 +717,25 @@
     font-size: 0.76rem;
     padding: 0.5rem;
     width: 100%;
+}
+
+.history-scoreline {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.history-scoreline span {
+    color: var(--league-muted);
+}
+
+.history-scoreline .winner {
+    color: #21c66b;
+}
+
+.history-scoreline .loser {
+    color: rgba(245, 245, 245, 0.58);
 }
 
 .league-empty-state,

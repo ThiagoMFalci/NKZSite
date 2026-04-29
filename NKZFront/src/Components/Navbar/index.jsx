@@ -33,6 +33,7 @@ export default function Index() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [profileImageUrl, setProfileImageUrl] = useState("");
     const [profileDisplayName, setProfileDisplayName] = useState("");
+    const [pendingNotifications, setPendingNotifications] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
     const currentUser = getCurrentUser();
@@ -45,6 +46,7 @@ export default function Index() {
             if (!currentUser?.userId) {
                 setProfileImageUrl("");
                 setProfileDisplayName("");
+                setPendingNotifications(0);
                 return;
             }
 
@@ -55,14 +57,47 @@ export default function Index() {
                 const player = unwrapApiData(response.data);
                 const imageUrl = player?.profileImageUrl ?? player?.ProfileImageUrl ?? "";
                 const summonerName = player?.summonerName ?? player?.SummonerName ?? "";
+                let pendingCount = 0;
+
+                if (player?.id ?? player?.Id) {
+                    const invitationsResponse = await axios.get(`${API_BASE_URL}/api/team/players/${player.id ?? player.Id}/invitations`, {
+                        headers: getAuthHeaders(),
+                    }).catch(() => ({ data: [] }));
+                    pendingCount += (unwrapApiData(invitationsResponse.data) || [])
+                        .filter((invite) => (invite.status ?? invite.Status) === "Pending").length;
+                }
+
+                const teamsResponse = await axios.get(`${API_BASE_URL}/api/team/ListTeams`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => ({ data: [] }));
+                const manageableTeams = (unwrapApiData(teamsResponse.data) || []).filter((team) => (
+                    (team.ownerId ?? team.OwnerId) === currentUser.userId ||
+                    (team.players ?? team.Players ?? []).some((teamPlayer) => (
+                        (teamPlayer.userId ?? teamPlayer.UserId) === currentUser.userId &&
+                        (teamPlayer.isCaptain ?? teamPlayer.IsCaptain)
+                    ))
+                ));
+
+                const teamInvitationLists = await Promise.all(manageableTeams.map(async (team) => {
+                    const teamId = team.id ?? team.Id;
+                    const response = await axios.get(`${API_BASE_URL}/api/team/${teamId}/invitations`, {
+                        headers: getAuthHeaders(),
+                    }).catch(() => ({ data: [] }));
+                    return unwrapApiData(response.data) || [];
+                }));
+                pendingCount += teamInvitationLists.flat()
+                    .filter((invite) => (invite.status ?? invite.Status) === "Pending").length;
+
                 if (isMounted) {
                     setProfileImageUrl(resolveImageUrl(imageUrl));
                     setProfileDisplayName(summonerName);
+                    setPendingNotifications(pendingCount);
                 }
             } catch {
                 if (isMounted) {
                     setProfileImageUrl("");
                     setProfileDisplayName("");
+                    setPendingNotifications(0);
                 }
             }
         }
@@ -113,6 +148,11 @@ export default function Index() {
                         )}
                     </span>
                     <span className="user-menu-name">{userLabel}</span>
+                    {pendingNotifications > 0 && (
+                        <span className="notification-pulse" aria-label={`${pendingNotifications} notificacoes pendentes`}>
+                            {pendingNotifications > 9 ? "9+" : pendingNotifications}
+                        </span>
+                    )}
                     <FaChevronDown className={`user-menu-arrow ${userMenuOpen ? "open" : ""}`} />
                 </button>
 
