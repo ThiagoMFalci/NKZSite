@@ -1,6 +1,15 @@
 import EloSelector from "../../../Components/EloSelector";
 
-export default function TeamFilter({ search, selectedElos, eloSort, onSearchChange, onEloToggle, onEloSortChange }) {
+export default function TeamFilter({
+    search,
+    selectedElos,
+    recruitingFilter,
+    eloSort,
+    onSearchChange,
+    onEloToggle,
+    onRecruitingFilterChange,
+    onEloSortChange,
+}) {
     return (
         <section className="teams-filter filter-shell">
             <label className="filter-control filter-control-search">
@@ -14,6 +23,15 @@ export default function TeamFilter({ search, selectedElos, eloSort, onSearchChan
             </label>
 
             <EloSelector selectedElos={selectedElos} onToggle={onEloToggle} />
+
+            <label className="filter-control">
+                Recrutamento
+                <select value={recruitingFilter} onChange={(event) => onRecruitingFilterChange(event.target.value)}>
+                    <option value="all">Todos</option>
+                    <option value="recruiting">Recrutando</option>
+                    <option value="closed">Nao recrutando</option>
+                </select>
+            </label>
 
             <label className="filter-control">
                 Ordem de elo

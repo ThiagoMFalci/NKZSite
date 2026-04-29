@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { BsArrowLeft, BsController, BsShieldFillCheck, BsStars } from "react-icons/bs";
 import { normalizeEloLabel } from "../../utils/elo";
 import { getAuthHeaders } from "../../utils/auth";
+import { getPlayerImageUrl } from "../../utils/images";
 import "../Players/style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -25,6 +26,7 @@ function normalizePlayer(player) {
     return {
         id: player?.id ?? player?.Id,
         nick: player?.summonerName ?? player?.SummonerName ?? "Invocador",
+        profileImageUrl: getPlayerImageUrl(player),
         rank: `${normalizeEloLabel(tier)} ${rank}`.trim(),
         mainRole: player?.mainRole ?? player?.MainRole ?? "Flex",
         lookingForTeam: player?.lookingForTeam ?? player?.LookingForTeam ?? true,
@@ -94,7 +96,18 @@ export default function PlayerProfilePage() {
                 {player && !loading && !error && (
                     <>
                         <section className="player-profile-hero">
-                            <div className="player-avatar large">{player.nick.slice(0, 2).toUpperCase()}</div>
+                            <div className="player-avatar large">
+                                <span>{player.nick.slice(0, 2).toUpperCase()}</span>
+                                {player.profileImageUrl && (
+                                    <img
+                                        src={player.profileImageUrl}
+                                        alt={player.nick}
+                                        onError={(event) => {
+                                            event.currentTarget.style.display = "none";
+                                        }}
+                                    />
+                                )}
+                            </div>
                             <div>
                                 <p className="players-eyebrow">{player.mainRole}</p>
                                 <h1>{player.nick}</h1>

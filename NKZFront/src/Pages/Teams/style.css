@@ -481,7 +481,7 @@
 
 .teams-filter.filter-shell {
     align-items: stretch;
-    grid-template-columns: minmax(220px, 1fr) minmax(360px, 1.35fr) minmax(180px, 0.55fr);
+    grid-template-columns: minmax(220px, 1fr) minmax(320px, 1.25fr) minmax(170px, 0.55fr) minmax(170px, 0.55fr);
     padding: 1.25rem;
 }
 
@@ -904,6 +904,41 @@
     text-transform: uppercase;
 }
 
+.team-recruiting-toggle {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 0.9rem;
+}
+
+.team-recruiting-toggle span {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.team-recruiting-toggle strong {
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.team-recruiting-toggle small {
+    color: var(--teams-muted);
+}
+
+.team-recruiting-toggle input {
+    accent-color: var(--laranja);
+    height: 18px;
+    width: 18px;
+}
+
 .team-requests-panel {
     display: grid;
     gap: 0.75rem;
@@ -1009,6 +1044,13 @@
     object-fit: cover;
     position: absolute;
     width: 100%;
+    z-index: 1;
+}
+
+.player-row-avatar.compact {
+    flex: 0 0 38px;
+    height: 38px;
+    width: 38px;
 }
 
 .player-main {

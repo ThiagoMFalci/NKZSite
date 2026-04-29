@@ -40,6 +40,32 @@ namespace NKZAPI.Repositories
             return entry.Entity;
         }
 
+        public async Task<Team> AddTeamWithOwnerPlayerAsync(Team team, Guid ownerUserId)
+        {
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var ownerPlayer = await _context.Players.FirstOrDefaultAsync(p => p.UserId == ownerUserId);
+            if (ownerPlayer == null)
+            {
+                throw new InvalidOperationException("Owner player not found. Link a player before creating a team.");
+            }
+
+            if (ownerPlayer.TeamId != null)
+            {
+                throw new InvalidOperationException("Owner player is already in a team.");
+            }
+
+            var entry = await _context.Teams.AddAsync(team);
+            await _context.SaveChangesAsync();
+
+            ownerPlayer.TeamId = entry.Entity.Id;
+            ownerPlayer.IsCaptain = false;
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+            return entry.Entity;
+        }
+
         public async Task<Team?> UploadTeamImageAsync(Guid teamId, string imagePath)
         {
             var team = await _context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
@@ -64,6 +90,7 @@ namespace NKZAPI.Repositories
             dbTeam.Name = team.Name;
             dbTeam.Tag = team.Tag;
             dbTeam.OwnerId = team.OwnerId;
+            dbTeam.IsRecruiting = team.IsRecruiting;
 
             await _context.SaveChangesAsync();
             return dbTeam;
@@ -137,6 +164,16 @@ namespace NKZAPI.Repositories
             }
             entry.State = EntityState.Modified;
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Team?> UpdateRecruitingAsync(Guid teamId, bool isRecruiting)
+        {
+            var team = await _context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
+            if (team == null) return null;
+
+            team.IsRecruiting = isRecruiting;
+            await _context.SaveChangesAsync();
+            return team;
         }
 
         public async Task RemovePlayerAsync(Player player)

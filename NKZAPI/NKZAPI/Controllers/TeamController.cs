@@ -73,9 +73,9 @@ namespace NKZAPI.Controllers
         }
         [Authorize]
         [HttpPost("{id:guid}")]
-        public async Task<ActionResult> CreateTeamAsync([FromBody] TeamDto team, Guid PlayerId)
+        public async Task<ActionResult> CreateTeamAsync(Guid id, [FromBody] TeamDto team)
         {
-            var response = await _teamServices.AddTeamAsync(team, PlayerId);
+            var response = await _teamServices.AddTeamAsync(team, id);
 
             if (!response.Success && response.Message == "Unauthorized")
                 return Unauthorized(new { message = response.Message });
@@ -244,6 +244,26 @@ namespace NKZAPI.Controllers
 
             return Ok(removeResponse);
         }
+        [Authorize]
+        [HttpPatch("{teamId:guid}/recruiting/{isRecruiting:bool}")]
+        public async Task<ActionResult> UpdateRecruitingAsync(Guid teamId, bool isRecruiting)
+        {
+            var response = await _teamServices.UpdateRecruitingAsync(teamId, isRecruiting);
+
+            if (!response.Success && response.Message == "Unauthorized")
+                return Unauthorized(new { message = response.Message });
+
+            if (!response.Success && response.Message == "Forbidden")
+                return Forbid();
+
+            if (!response.Success && response.Message != null && response.Message.Contains("not found"))
+                return NotFound(new { message = response.Message });
+
+            if (!response.Success) return BadRequest(response);
+
+            return Ok(response);
+        }
+
         [Authorize]
         [HttpPost("{teamId:guid}/players/{playerId:guid}/IsCaptain/{i:bool}")]
         public async Task<ActionResult> IsCaptain(Guid teamId, Guid playerId, bool i)

@@ -32,10 +32,11 @@ export default function Index() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [profileImageUrl, setProfileImageUrl] = useState("");
+    const [profileDisplayName, setProfileDisplayName] = useState("");
     const location = useLocation();
     const navigate = useNavigate();
     const currentUser = getCurrentUser();
-    const userLabel = currentUser?.summonerName || currentUser?.email || "Usuario";
+    const userLabel = profileDisplayName || currentUser?.email || "Usuario";
 
     useEffect(() => {
         let isMounted = true;
@@ -43,6 +44,7 @@ export default function Index() {
         async function loadProfileImage() {
             if (!currentUser?.userId) {
                 setProfileImageUrl("");
+                setProfileDisplayName("");
                 return;
             }
 
@@ -52,18 +54,27 @@ export default function Index() {
                 });
                 const player = unwrapApiData(response.data);
                 const imageUrl = player?.profileImageUrl ?? player?.ProfileImageUrl ?? "";
-                if (isMounted) setProfileImageUrl(resolveImageUrl(imageUrl));
+                const summonerName = player?.summonerName ?? player?.SummonerName ?? "";
+                if (isMounted) {
+                    setProfileImageUrl(resolveImageUrl(imageUrl));
+                    setProfileDisplayName(summonerName);
+                }
             } catch {
-                if (isMounted) setProfileImageUrl("");
+                if (isMounted) {
+                    setProfileImageUrl("");
+                    setProfileDisplayName("");
+                }
             }
         }
 
         loadProfileImage();
         window.addEventListener("nkz-profile-image-updated", loadProfileImage);
+        window.addEventListener("nkz-player-synced", loadProfileImage);
 
         return () => {
             isMounted = false;
             window.removeEventListener("nkz-profile-image-updated", loadProfileImage);
+            window.removeEventListener("nkz-player-synced", loadProfileImage);
         };
     }, [currentUser?.userId]);
 

@@ -17,7 +17,21 @@ export default function RankingTable({ rows, type = "players" }) {
             head: ["#", "Invocador", "Elo", "Partidas", "Win rate", "Pontos"],
             row: (player, index) => [
                 <span className="rank-position">{index < 3 ? <BsTrophyFill /> : index + 1}</span>,
-                <span><strong>{player.summonerName}</strong><small>Nivel {player.summonerLevel}</small></span>,
+                <span className="ranking-player-cell">
+                    <span className="ranking-player-avatar">
+                        <span>{String(player.summonerName || "JG").slice(0, 2).toUpperCase()}</span>
+                        {player.profileImageUrl && (
+                            <img
+                                src={player.profileImageUrl}
+                                alt={player.summonerName}
+                                onError={(event) => {
+                                    event.currentTarget.style.display = "none";
+                                }}
+                            />
+                        )}
+                    </span>
+                    <span><strong>{player.summonerName}</strong><small>Nivel {player.summonerLevel}</small></span>
+                </span>,
                 <span>{player.elo}</span>,
                 <span>{player.totalMatches}</span>,
                 <span>{player.winRate}%</span>,

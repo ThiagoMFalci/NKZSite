@@ -5,6 +5,7 @@ import { BsController, BsEnvelopePlus, BsPeopleFill, BsShieldFillCheck, BsStars 
 import EloSelector from "../../Components/EloSelector";
 import { getAuthHeaders, getCurrentUser } from "../../utils/auth";
 import { matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
+import { getPlayerImageUrl } from "../../utils/images";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -52,6 +53,7 @@ function normalizePlayer(player) {
         userId: player.userId ?? player.UserId,
         teamId: player.teamId ?? player.TeamId,
         nick: player.summonerName ?? player.SummonerName ?? "Invocador",
+        profileImageUrl: getPlayerImageUrl(player),
         rank: `${normalizeEloLabel(tier)} ${rank}`.trim(),
         tier,
         role,
@@ -267,7 +269,18 @@ export default function PlayersPage() {
                                 }}
                             >
                                 <div className="player-card-top">
-                                    <div className="player-avatar">{player.nick.slice(0, 2).toUpperCase()}</div>
+                                    <div className="player-avatar">
+                                        <span>{player.nick.slice(0, 2).toUpperCase()}</span>
+                                        {player.profileImageUrl && (
+                                            <img
+                                                src={player.profileImageUrl}
+                                                alt={player.nick}
+                                                onError={(event) => {
+                                                    event.currentTarget.style.display = "none";
+                                                }}
+                                            />
+                                        )}
+                                    </div>
                                     <div>
                                         <p className="players-eyebrow">{player.role}</p>
                                         <h2>{player.nick}</h2>

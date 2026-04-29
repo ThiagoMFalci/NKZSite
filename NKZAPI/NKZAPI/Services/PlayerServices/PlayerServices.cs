@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NKZAPI.Data;
@@ -113,9 +114,11 @@ namespace NKZAPI.Services.PlayerServices
                     await _context.SaveChangesAsync();
                 }
 
+                await SyncRecentPerformanceAsync(player.Id, account.Puuid, regionalRoute);
+
                 response.Success = true;
                 response.Message = "Player updated from Riot.";
-                response.Data = player;
+                response.Data = await _context.GetPlayerByIdAsync(player.Id) ?? player;
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -428,6 +431,148 @@ namespace NKZAPI.Services.PlayerServices
         {
             var allowedRoles = new[] { "Top", "Jungle", "Mid", "ADC", "Support", "Flex" };
             return allowedRoles.FirstOrDefault(item => item.Equals(role, StringComparison.OrdinalIgnoreCase)) ?? "Flex";
+        }
+
+        private async Task SyncRecentPerformanceAsync(Guid playerId, string puuid, string regionalRoute)
+        {
+            var matchIds = await _riotService.GetRecentMatchIdsAsync(regionalRoute, puuid, 5);
+            var matchHistory = new List<PlayerMatchHistory>();
+
+            foreach (var matchId in matchIds)
+            {
+                using var match = await _riotService.GetMatchAsync(regionalRoute, matchId);
+                if (match == null) continue;
+
+                var root = match.RootElement;
+                if (!root.TryGetProperty("info", out var info)) continue;
+                if (!info.TryGetProperty("participants", out var participants)) continue;
+
+                JsonElement? participant = null;
+                foreach (var item in participants.EnumerateArray())
+                {
+                    if (GetString(item, "puuid").Equals(puuid, StringComparison.Ordinal))
+                    {
+                        participant = item;
+                        break;
+                    }
+                }
+
+                if (participant == null) continue;
+
+                var playedAt = DateTimeOffset
+                    .FromUnixTimeMilliseconds(GetLong(info, "gameCreation"))
+                    .UtcDateTime;
+
+                matchHistory.Add(new PlayerMatchHistory
+                {
+                    Id = Guid.NewGuid(),
+                    PlayerId = playerId,
+                    PlayedAt = playedAt,
+                    ChampionName = GetString(participant.Value, "championName", "Unknown"),
+                    Role = NormalizeRiotRole(GetString(participant.Value, "teamPosition", GetString(participant.Value, "individualPosition", "Flex"))),
+                    QueueType = NormalizeQueue(GetInt(info, "queueId")),
+                    Win = GetBool(participant.Value, "win"),
+                    Kills = GetInt(participant.Value, "kills"),
+                    Deaths = GetInt(participant.Value, "deaths"),
+                    Assists = GetInt(participant.Value, "assists")
+                });
+            }
+
+            var championStats = matchHistory
+                .GroupBy(match => match.ChampionName)
+                .Select(group =>
+                {
+                    var wins = group.Count(match => match.Win);
+                    var matches = group.Count();
+                    return new PlayerChampionStat
+                    {
+                        Id = Guid.NewGuid(),
+                        PlayerId = playerId,
+                        ChampionName = group.Key,
+                        Matches = matches,
+                        Wins = wins,
+                        Losses = matches - wins,
+                        WinRate = matches == 0 ? 0 : Math.Round(wins * 100.0 / matches, 1)
+                    };
+                })
+                .OrderByDescending(stat => stat.Matches)
+                .ThenByDescending(stat => stat.WinRate)
+                .ToList();
+
+            var roleStats = matchHistory
+                .GroupBy(match => match.Role)
+                .Select(group =>
+                {
+                    var wins = group.Count(match => match.Win);
+                    var matches = group.Count();
+                    return new PlayerRoleStat
+                    {
+                        Id = Guid.NewGuid(),
+                        PlayerId = playerId,
+                        Role = group.Key,
+                        Matches = matches,
+                        Wins = wins,
+                        Losses = matches - wins,
+                        WinRate = matches == 0 ? 0 : Math.Round(wins * 100.0 / matches, 1)
+                    };
+                })
+                .OrderByDescending(stat => stat.Matches)
+                .ThenByDescending(stat => stat.WinRate)
+                .ToList();
+
+            await _context.ReplacePlayerPerformanceAsync(playerId, championStats, roleStats, matchHistory);
+        }
+
+        private static string NormalizeRiotRole(string role)
+        {
+            return role.ToUpperInvariant() switch
+            {
+                "TOP" => "Top",
+                "JUNGLE" => "Jungle",
+                "MIDDLE" or "MID" => "Mid",
+                "BOTTOM" or "ADC" => "ADC",
+                "UTILITY" or "SUPPORT" => "Support",
+                _ => "Flex"
+            };
+        }
+
+        private static string NormalizeQueue(int queueId)
+        {
+            return queueId switch
+            {
+                420 => "Ranqueada Solo/Duo",
+                440 => "Ranqueada Flex",
+                400 => "Normal Draft",
+                430 => "Normal Blind",
+                450 => "ARAM",
+                _ => "Outra"
+            };
+        }
+
+        private static string GetString(JsonElement element, string property, string fallback = "")
+        {
+            return element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.String
+                ? value.GetString() ?? fallback
+                : fallback;
+        }
+
+        private static int GetInt(JsonElement element, string property)
+        {
+            return element.TryGetProperty(property, out var value) && value.TryGetInt32(out var result)
+                ? result
+                : 0;
+        }
+
+        private static long GetLong(JsonElement element, string property)
+        {
+            return element.TryGetProperty(property, out var value) && value.TryGetInt64(out var result)
+                ? result
+                : DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        private static bool GetBool(JsonElement element, string property)
+        {
+            return element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.True;
         }
 
         private static (string GameName, string TagLine)? ParseRiotId(string riotId)
