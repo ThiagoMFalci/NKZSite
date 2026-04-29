@@ -93,7 +93,7 @@ namespace NKZAPI.Services.PlayerServices
                 player.SummonerLevel = (int)summoner.SummonerLevel;
                 player.SummonerName = riotDisplayName;
 
-                var leagueEntry = await _riotService.GetSoloQueueEntryAsync(region, summoner.Id);
+                var leagueEntry = await _riotService.GetSoloQueueEntryByPuuidAsync(region, account.Puuid);
                 if (leagueEntry != null)
                 {
                     player.SoloQueueTier = leagueEntry.Tier ?? "UNRANKED";

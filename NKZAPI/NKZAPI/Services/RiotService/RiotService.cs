@@ -90,6 +90,18 @@ namespace NKZAPI.Services.RiotService
         }
 
         // novo: endpoint de diagnóstico para validar a API Key (retorna corpo da resposta)
+        public async Task<LeagueEntryDto?> GetSoloQueueEntryByPuuidAsync(string region, string puuid)
+        {
+            var client = CreateClient();
+            var url = $"https://{region}.api.riotgames.com/lol/league/v4/entries/by-puuid/{Uri.EscapeDataString(puuid)}";
+            var res = await client.GetAsync(url);
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+            await EnsureSuccessOrThrow(res);
+            var stream = await res.Content.ReadAsStreamAsync();
+            var list = await JsonSerializer.DeserializeAsync<List<LeagueEntryDto>>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            return list?.FirstOrDefault(e => e.QueueType == "RANKED_SOLO_5x5");
+        }
+
         public async Task<string> ValidateApiKeyAsync(string region = "br1")
         {
             var client = CreateClient();
