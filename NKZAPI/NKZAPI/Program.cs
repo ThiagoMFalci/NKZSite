@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using NKZAPI.Controllers;
@@ -18,9 +19,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-var configuredOrigins = builder.Configuration
+var configuredOriginsArray = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>() ?? Array.Empty<string>();
+
+var configuredOriginsValue = builder.Configuration["Cors:AllowedOrigins"];
+
+var configuredOrigins = configuredOriginsArray
+    .Concat((configuredOriginsValue ?? "")
+        .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
 var allowedOrigins = configuredOrigins
     .Concat(new[]
@@ -106,6 +113,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 if (app.Environment.IsDevelopment())
 {
