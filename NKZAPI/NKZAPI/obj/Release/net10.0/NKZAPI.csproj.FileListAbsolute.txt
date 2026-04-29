@@ -2,7 +2,6 @@ C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\appsettings.json
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\NKZAPI.staticwebassets.runtime.json
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\NKZAPI.staticwebassets.endpoints.json
-C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\NKZAPI.exe
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\NKZAPI.deps.json
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\NKZAPI.runtimeconfig.json
 C:\Users\shora\OneDrive\Desktop\Github\NKZSite\NKZAPI\NKZAPI\bin\Release\net10.0\NKZAPI.dll
