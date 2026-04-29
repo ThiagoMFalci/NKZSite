@@ -51,7 +51,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Models.User, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[NKZAPI.Dtos.UserPublicDto, NKZAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -199,6 +199,22 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "GeneratePlayoffAsync",
+    "RelativePath": "api/league/{leagueId}/playoff/generate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "leagueId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
     "Method": "GetTeamsInLeagueAsync",
     "RelativePath": "api/league/{leagueId}/teams",
     "HttpMethod": "GET",
@@ -310,6 +326,27 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "CompleteMatchAsync",
+    "RelativePath": "api/league/matches/{matchId}/complete",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "matchId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "result",
+        "Type": "NKZAPI.Dtos.LeagueMatchResultDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "NKZAPI.Controllers.PlayerController",
@@ -493,18 +530,13 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "team",
-        "Type": "NKZAPI.Dtos.TeamDto",
+        "Name": "id",
+        "Type": "System.Guid",
         "IsRequired": true
       },
       {
-        "Name": "PlayerId",
-        "Type": "System.Guid",
-        "IsRequired": false
-      },
-      {
-        "Name": "id",
-        "Type": "",
+        "Name": "team",
+        "Type": "NKZAPI.Dtos.TeamDto",
         "IsRequired": true
       }
     ],
@@ -734,6 +766,27 @@
       },
       {
         "Name": "i",
+        "Type": "System.Boolean",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.TeamController",
+    "Method": "UpdateRecruitingAsync",
+    "RelativePath": "api/team/{teamId}/recruiting/{isRecruiting}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "isRecruiting",
         "Type": "System.Boolean",
         "IsRequired": true
       }

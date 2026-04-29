@@ -12,6 +12,11 @@ namespace NKZAPI.Models
         public int MaxTeams { get; set; }
         public double Prize { get; set; }
         public double EntryFee { get; set; }
+        public string MinimumElo { get; set; } = "UNRANKED";
+        public string MaximumElo { get; set; } = "CHALLENGER";
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Modality { get; set; } = "Chaveamento";
         public List<Team> Teams { get; set; } = new List<Team>();
     }
 }

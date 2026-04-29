@@ -6,6 +6,7 @@ import PlayersPage from './Pages/Players'
 import PlayerProfilePage from './Pages/PlayerProfile'
 import RankingPage from './Pages/Ranking'
 import LeaguesPage from './Pages/Leagues'
+import LeaguePage from './Pages/LeaguePage'
 import TournamentsPage from './Pages/Tournaments'
 import NotificationsPage from './Pages/Notifications'
 import Login from './Pages/Auth/Login'
@@ -39,6 +40,7 @@ function App() {
                     <Route path="/players/:playerId" element={<ProtectedRoute><PlayerProfilePage/></ProtectedRoute>}/>
                     <Route path="/ranking" element={<ProtectedRoute><RankingPage/></ProtectedRoute>}/>
                     <Route path="/leagues" element={<ProtectedRoute><LeaguesPage/></ProtectedRoute>}/>
+                    <Route path="/leagues/:leagueId" element={<ProtectedRoute><LeaguePage/></ProtectedRoute>}/>
                     <Route path="/tournaments" element={<ProtectedRoute><TournamentsPage/></ProtectedRoute>}/>
                     <Route path="/notifications" element={<ProtectedRoute><NotificationsPage/></ProtectedRoute>}/>
                     <Route path="/login" element={<Login/>}/>

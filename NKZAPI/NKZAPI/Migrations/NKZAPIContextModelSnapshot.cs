@@ -89,19 +89,177 @@ namespace NKZAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<float>("EntryFee")
                         .HasColumnType("real");
 
                     b.Property<int>("MaxTeams")
                         .HasColumnType("integer");
 
+                    b.Property<string>("MaximumElo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MinimumElo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Modality")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.ToTable("Leagues");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueMatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("BestOf")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Bracket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LeagueId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LoserTeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("MatchNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RoundKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoundName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ScheduledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("TeamAId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TeamAScore")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("TeamBId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TeamBScore")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("WinnerTeamId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
+
+                    b.ToTable("LeagueMatches");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueMatchReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LeagueMatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ProofImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReportedWinnerTeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubmittedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueMatchId");
+
+                    b.ToTable("LeagueMatchReports");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueStanding", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LeagueId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Losses")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MapDiff")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MapsPlayed")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Penalties")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Wins")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
+
+                    b.ToTable("LeagueStandings");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.Player", b =>
@@ -335,11 +493,26 @@ namespace NKZAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<double>("EntryFee")
                         .HasColumnType("double precision");
 
                     b.Property<int>("MaxTeams")
                         .HasColumnType("integer");
+
+                    b.Property<string>("MaximumElo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MinimumElo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Modality")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -350,6 +523,9 @@ namespace NKZAPI.Migrations
 
                     b.Property<double>("Prize")
                         .HasColumnType("double precision");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -384,6 +560,33 @@ namespace NKZAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueMatch", b =>
+                {
+                    b.HasOne("NKZAPI.Models.League", null)
+                        .WithMany("Matches")
+                        .HasForeignKey("LeagueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueMatchReport", b =>
+                {
+                    b.HasOne("NKZAPI.Models.LeagueMatch", null)
+                        .WithMany("Reports")
+                        .HasForeignKey("LeagueMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueStanding", b =>
+                {
+                    b.HasOne("NKZAPI.Models.League", null)
+                        .WithMany("Standings")
+                        .HasForeignKey("LeagueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NKZAPI.Models.Player", b =>
@@ -443,7 +646,16 @@ namespace NKZAPI.Migrations
 
             modelBuilder.Entity("NKZAPI.Models.League", b =>
                 {
+                    b.Navigation("Matches");
+
+                    b.Navigation("Standings");
+
                     b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueMatch", b =>
+                {
+                    b.Navigation("Reports");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.Player", b =>

@@ -43,6 +43,20 @@
     margin-bottom: 1.5rem;
 }
 
+.leagues-heading-actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: flex-end;
+}
+
+.leagues-create-button {
+    min-height: 44px;
+    padding-inline: 1rem;
+    white-space: nowrap;
+}
+
 .leagues-heading h1,
 .league-card h2,
 .league-modal h2 {
@@ -348,6 +362,54 @@
     transform: none;
 }
 
+.league-create-modal {
+    max-width: 760px;
+    width: min(100%, 760px);
+}
+
+.league-create-form {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.4rem;
+}
+
+.league-create-form label {
+    color: rgba(245,245,245,0.7);
+    display: grid;
+    font-size: 0.76rem;
+    font-weight: 700;
+    gap: 0.45rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.league-create-form input,
+.league-create-form select {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 4px;
+    color: white;
+    font: inherit;
+    min-height: 52px;
+    outline: none;
+    padding: 0 0.9rem;
+}
+
+.league-create-form input:disabled {
+    color: rgba(245,245,245,0.55);
+    cursor: not-allowed;
+}
+
+.league-create-form select option {
+    background: #0d0d18;
+}
+
+.league-create-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .leagues-filter.filter-shell {
     align-items: stretch;
     grid-template-columns: minmax(200px, 1fr) minmax(140px, 0.45fr) minmax(170px, 0.55fr) minmax(360px, 1.35fr) minmax(170px, 0.55fr);
@@ -448,9 +510,16 @@
         flex-direction: column;
     }
 
+    .leagues-heading-actions {
+        align-items: stretch;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
     .leagues-filter,
     .leagues-grid,
-    .league-summary-grid {
+    .league-summary-grid,
+    .league-create-grid {
         grid-template-columns: 1fr;
     }
 

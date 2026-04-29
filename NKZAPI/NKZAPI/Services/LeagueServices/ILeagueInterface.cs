@@ -1,4 +1,4 @@
-
+using NKZAPI.Dtos;
 using NKZAPI.Models;
 
 namespace NKZAPI.Services.LeagueServices
@@ -15,5 +15,8 @@ namespace NKZAPI.Services.LeagueServices
         Task<Response<string>> RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId);
         Task<List<Team>> GetTeamsInLeagueAsync(Guid leagueId);
         Task<List<League>> GetLeaguesByTeamIdAsync(Guid teamId);
+        Task<Response<string>> GeneratePlayoffAsync(Guid leagueId);
+        Task<Response<string>> CompleteMatchAsync(Guid matchId, LeagueMatchResultDto result);
+        Task<Response<string>> SubmitMatchReportAsync(Guid matchId, Guid reportedWinnerTeamId, IFormFile proofImage);
     }
 }

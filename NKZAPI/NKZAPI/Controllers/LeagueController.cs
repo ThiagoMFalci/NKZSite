@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.LeagueServices;
 
@@ -89,6 +90,35 @@ namespace NKZAPI.Controllers
         {
             var leagues = await _leagueServices.GetLeaguesByTeamIdAsync(teamId);
             return Ok(leagues);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{leagueId:guid}/playoff/generate")]
+        public async Task<ActionResult> GeneratePlayoffAsync(Guid leagueId)
+        {
+            var response = await _leagueServices.GeneratePlayoffAsync(leagueId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("matches/{matchId:guid}/complete")]
+        public async Task<ActionResult> CompleteMatchAsync(Guid matchId, [FromBody] LeagueMatchResultDto result)
+        {
+            var response = await _leagueServices.CompleteMatchAsync(matchId, result);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpPost("matches/{matchId:guid}/report")]
+        public async Task<ActionResult> SubmitMatchReportAsync(Guid matchId, [FromForm] Guid reportedWinnerTeamId, [FromForm] IFormFile proofImage)
+        {
+            var response = await _leagueServices.SubmitMatchReportAsync(matchId, reportedWinnerTeamId, proofImage);
+            if (!response.Success && response.Message == "Unauthorized") return Unauthorized(new { message = response.Message });
+            if (!response.Success && response.Message == "Forbidden") return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para reportar por este time." });
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
         }
     }
 }
