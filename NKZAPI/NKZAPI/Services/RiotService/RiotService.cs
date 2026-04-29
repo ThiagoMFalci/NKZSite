@@ -19,7 +19,7 @@ namespace NKZAPI.Services.RiotService
 
             var key = config.GetValue<string>("Riot:ApiKey");
             if (string.IsNullOrWhiteSpace(key))
-                throw new InvalidOperationException("Riot:ApiKey n„o encontrado em configuraÁ„o.");
+                throw new InvalidOperationException("Riot:ApiKey n√£o encontrado em configura√ß√£o.");
 
             _apiKey = key.Trim();
             _logger.LogDebug("Riot API key length: {Len}", _apiKey.Length);
@@ -42,6 +42,28 @@ namespace NKZAPI.Services.RiotService
                 var body = await res.Content.ReadAsStringAsync();
                 throw new HttpRequestException($"Riot API returned {(int)res.StatusCode} ({res.StatusCode}). Body: {body}");
             }
+        }
+
+        public async Task<RiotAccountDto?> GetAccountByRiotIdAsync(string regionalRoute, string gameName, string tagLine)
+        {
+            var client = CreateClient();
+            var url = $"https://{regionalRoute}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{Uri.EscapeDataString(gameName)}/{Uri.EscapeDataString(tagLine)}";
+            var res = await client.GetAsync(url);
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+            await EnsureSuccessOrThrow(res);
+            var stream = await res.Content.ReadAsStreamAsync();
+            return await JsonSerializer.DeserializeAsync<RiotAccountDto>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        }
+
+        public async Task<SummonerDto?> GetSummonerByPuuidAsync(string region, string puuid)
+        {
+            var client = CreateClient();
+            var url = $"https://{region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{Uri.EscapeDataString(puuid)}";
+            var res = await client.GetAsync(url);
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+            await EnsureSuccessOrThrow(res);
+            var stream = await res.Content.ReadAsStreamAsync();
+            return await JsonSerializer.DeserializeAsync<SummonerDto>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         public async Task<SummonerDto?> GetSummonerByNameAsync(string region, string summonerName)
@@ -67,11 +89,11 @@ namespace NKZAPI.Services.RiotService
             return list?.FirstOrDefault(e => e.QueueType == "RANKED_SOLO_5x5");
         }
 
-        // novo: endpoint de diagnÛstico para validar a API Key (retorna corpo da resposta)
+        // novo: endpoint de diagn√≥stico para validar a API Key (retorna corpo da resposta)
         public async Task<string> ValidateApiKeyAsync(string region = "br1")
         {
             var client = CreateClient();
-            // chamamos o endpoint de status (v4) que deve responder com 200 se a chave for v·lida
+            // chamamos o endpoint de status (v4) que deve responder com 200 se a chave for v√°lida
             var url = $"https://{region}.api.riotgames.com/lol/status/v4/platform-data";
             var res = await client.GetAsync(url);
             var body = await res.Content.ReadAsStringAsync();
