@@ -5,6 +5,8 @@ namespace NKZAPI.Services.RiotService
 {
     public interface IRiotService
     {
+        Task<RiotAccountDto?> GetAccountByRiotIdAsync(string regionalRoute, string gameName, string tagLine);
+        Task<SummonerDto?> GetSummonerByPuuidAsync(string region, string puuid);
         Task<SummonerDto?> GetSummonerByNameAsync(string region, string summonerName);
         Task<LeagueEntryDto?> GetSoloQueueEntryAsync(string region, string summonerId);
         Task<string> ValidateApiKeyAsync(string region = "br1");

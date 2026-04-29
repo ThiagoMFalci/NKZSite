@@ -282,8 +282,14 @@ export default function DashboardPage() {
             return;
         }
 
-        if (!summonerName.trim()) {
-            setSyncFeedback({ type: "error", message: "Informe o nome do invocador." });
+        const riotId = summonerName.trim();
+        if (!riotId) {
+            setSyncFeedback({ type: "error", message: "Informe seu Riot ID." });
+            return;
+        }
+
+        if (!riotId.includes("#")) {
+            setSyncFeedback({ type: "error", message: "Use o formato Nome#TAG, por exemplo Thiago#BR1." });
             return;
         }
 
@@ -292,7 +298,7 @@ export default function DashboardPage() {
             setSyncFeedback({ type: "", message: "" });
 
             const response = await axios.put(
-                `${API_BASE_URL}/api/player/${userId}/sync/${encodeURIComponent(summonerName.trim())}`,
+                `${API_BASE_URL}/api/player/${userId}/sync/${encodeURIComponent(riotId)}`,
                 null,
                 { headers: getAuthHeaders() }
             );
@@ -306,7 +312,7 @@ export default function DashboardPage() {
                 return;
             }
 
-            setSyncFeedback({ type: "success", message: "Jogador Riot vinculado com sucesso." });
+            setSyncFeedback({ type: "success", message: "Riot ID vinculado com sucesso." });
             setSummonerName("");
             await loadDashboardData();
         } catch (requestError) {
@@ -536,16 +542,16 @@ export default function DashboardPage() {
                 {currentUser && !loading && !dashboardData && (
                     <form className="dashboard-riot-link" onSubmit={handleSyncRiotPlayer}>
                         <label>
-                            Vincular jogador Riot
+                            Vincular Riot ID
                             <input
                                 type="text"
                                 value={summonerName}
                                 onChange={(event) => setSummonerName(event.target.value)}
-                                placeholder="Nome do invocador"
+                                placeholder="Nome#TAG, ex: Thiago#BR1"
                             />
                         </label>
                         <button className="btn-primary" type="submit" disabled={syncLoading}>
-                            {syncLoading ? "Vinculando..." : "Linkar player da Riot"}
+                            {syncLoading ? "Vinculando..." : "Sincronizar Riot ID"}
                         </button>
                         {syncFeedback.message && (
                             <div className={`dashboard-feedback ${syncFeedback.type}`}>{syncFeedback.message}</div>

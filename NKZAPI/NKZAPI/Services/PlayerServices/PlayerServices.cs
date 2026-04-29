@@ -44,14 +44,43 @@ namespace NKZAPI.Services.PlayerServices
                     return response;
                 }
 
-                var player = user.Player?.FirstOrDefault(p => p.SummonerName.Equals(summonerName, StringComparison.OrdinalIgnoreCase));
+                var riotId = ParseRiotId(summonerName);
+                if (riotId == null)
+                {
+                    response.Success = false;
+                    response.Message = "Informe o Riot ID no formato Nome#TAG, por exemplo Thiago#BR1.";
+                    return response;
+                }
+
+                var regionalRoute = GetRegionalRoute(region);
+                var account = await _riotService.GetAccountByRiotIdAsync(regionalRoute, riotId.Value.GameName, riotId.Value.TagLine);
+                if (account == null)
+                {
+                    response.Success = false;
+                    response.Message = "Riot ID not found.";
+                    return response;
+                }
+
+                var summoner = await _riotService.GetSummonerByPuuidAsync(region, account.Puuid);
+                if (summoner == null)
+                {
+                    response.Success = false;
+                    response.Message = "Summoner not found on this League region.";
+                    return response;
+                }
+
+                var riotDisplayName = $"{account.GameName}#{account.TagLine}";
+                var player = user.Player?.FirstOrDefault(p =>
+                    (!string.IsNullOrWhiteSpace(p.RiotPuuid) && p.RiotPuuid == account.Puuid) ||
+                    p.SummonerName.Equals(riotDisplayName, StringComparison.OrdinalIgnoreCase));
 
                 if (player == null)
                 {
                     player = new Player
                     {
                         Id = Guid.NewGuid(),
-                        SummonerName = summonerName,
+                        SummonerName = riotDisplayName,
+                        RiotPuuid = account.Puuid,
                         IsCaptain = false,
                         IsActive = true,
                         LastStatsUpdate = DateTime.UtcNow
@@ -60,17 +89,9 @@ namespace NKZAPI.Services.PlayerServices
                     user.Player.Add(player);
                 }
 
-                var summoner = await _riotService.GetSummonerByNameAsync(region, summonerName);
-                if (summoner == null)
-                {
-                    response.Success = false;
-                    response.Message = "Summoner not found on Riot.";
-                    return response;
-                }
-
-                player.RiotPuuid = summoner.Puuid;
+                player.RiotPuuid = account.Puuid;
                 player.SummonerLevel = (int)summoner.SummonerLevel;
-                player.SummonerName = summoner.Name;
+                player.SummonerName = riotDisplayName;
 
                 var leagueEntry = await _riotService.GetSoloQueueEntryAsync(region, summoner.Id);
                 if (leagueEntry != null)
@@ -398,6 +419,36 @@ namespace NKZAPI.Services.PlayerServices
         {
             var allowedRoles = new[] { "Top", "Jungle", "Mid", "ADC", "Support", "Flex" };
             return allowedRoles.FirstOrDefault(item => item.Equals(role, StringComparison.OrdinalIgnoreCase)) ?? "Flex";
+        }
+
+        private static (string GameName, string TagLine)? ParseRiotId(string riotId)
+        {
+            var normalized = (riotId ?? "").Trim();
+            var separatorIndex = normalized.LastIndexOf('#');
+            if (separatorIndex <= 0 || separatorIndex == normalized.Length - 1)
+                return null;
+
+            var gameName = normalized[..separatorIndex].Trim();
+            var tagLine = normalized[(separatorIndex + 1)..].Trim();
+
+            if (gameName.Length < 3 || gameName.Length > 16 || tagLine.Length < 3 || tagLine.Length > 5)
+                return null;
+
+            return (gameName, tagLine);
+        }
+
+        private static string GetRegionalRoute(string platformRoute)
+        {
+            var normalized = (platformRoute ?? "br1").Trim().ToLowerInvariant();
+
+            return normalized switch
+            {
+                "br1" or "la1" or "la2" or "na1" => "americas",
+                "eun1" or "euw1" or "me1" or "ru" or "tr1" => "europe",
+                "jp1" or "kr" => "asia",
+                "oc1" or "ph2" or "sg2" or "th2" or "tw2" or "vn2" => "sea",
+                _ => "americas"
+            };
         }
 
         }
