@@ -9,6 +9,7 @@ namespace NKZAPI.Services.RiotService
         Task<SummonerDto?> GetSummonerByPuuidAsync(string region, string puuid);
         Task<SummonerDto?> GetSummonerByNameAsync(string region, string summonerName);
         Task<LeagueEntryDto?> GetSoloQueueEntryAsync(string region, string summonerId);
+        Task<LeagueEntryDto?> GetSoloQueueEntryByPuuidAsync(string region, string puuid);
         Task<string> ValidateApiKeyAsync(string region = "br1");
     }
 }
