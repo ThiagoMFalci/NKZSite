@@ -97,15 +97,21 @@ function normalizeTeam(team, tournamentTeamIds = new Set()) {
     const id = team.id ?? team.Id;
     const averageElo = team.averageElo ?? team.AverageElo ?? getAverageElo(players);
     const tag = normalizeTeamTag(team.tag ?? team.Tag, name);
+    const isRecruiting = team.isRecruiting ?? team.IsRecruiting ?? true;
+    const automaticStatus = getTeamStatus(players, id, tournamentTeamIds);
+    const status = automaticStatus.key === "recruiting" && !isRecruiting
+        ? { key: "closed", label: "Nao recrutando" }
+        : automaticStatus;
 
     return {
         id,
         name,
         initials: getInitials(name),
         tag,
+        isRecruiting,
         players,
         playerCount: players.length,
-        status: getTeamStatus(players, id, tournamentTeamIds),
+        status,
         averageElo,
         points: getTeamPoints(players, team.points ?? team.Points),
         ownerId: team.ownerId ?? team.OwnerId,
@@ -122,6 +128,7 @@ function normalizeInvitation(invitation, player) {
         status: invitation.status ?? invitation.Status ?? "Pending",
         playerName: player?.summonerName ?? player?.SummonerName ?? "Jogador",
         playerRole: player?.role ?? player?.Role ?? "Flex",
+        playerImageUrl: player?.profileImageUrl ?? player?.ProfileImageUrl ?? "",
     };
 }
 
@@ -134,6 +141,7 @@ export default function TeamsPage() {
     const [teamImage, setTeamImage] = useState(null);
     const [search, setSearch] = useState("");
     const [selectedElos, setSelectedElos] = useState([]);
+    const [recruitingFilter, setRecruitingFilter] = useState("all");
     const [eloSort, setEloSort] = useState("none");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -210,10 +218,14 @@ export default function TeamsPage() {
         const filtered = teams.filter((team) => {
             const matchesName = team.name.toLowerCase().includes(normalizedSearch);
             const matchesElo = matchesSelectedElos(team.averageElo, selectedElos);
-            return matchesName && matchesElo;
+            const matchesRecruiting =
+                recruitingFilter === "all" ||
+                (recruitingFilter === "recruiting" && team.isRecruiting && team.status?.key !== "full" && team.status?.key !== "in-tournament") ||
+                (recruitingFilter === "closed" && (!team.isRecruiting || team.status?.key === "full" || team.status?.key === "in-tournament"));
+            return matchesName && matchesElo && matchesRecruiting;
         });
         return sortByElo(filtered, eloSort, (team) => team.averageElo);
-    }, [eloSort, search, selectedElos, teams]);
+    }, [eloSort, recruitingFilter, search, selectedElos, teams]);
 
     function toggleElo(elo) {
         setSelectedElos((current) =>
@@ -442,6 +454,31 @@ export default function TeamsPage() {
         }
     }
 
+    async function handleToggleRecruiting(nextValue) {
+        if (!selectedTeam?.id) return;
+
+        try {
+            setRequestLoading(true);
+            setRequestFeedback({ type: "", message: "" });
+            const response = await axios.patch(`${API_BASE_URL}/api/team/${selectedTeam.id}/recruiting/${nextValue}`, null, {
+                headers: getAuthHeaders(),
+            });
+            const success = response.data?.success ?? response.data?.Success ?? true;
+            setRequestFeedback({
+                type: success ? "success" : "error",
+                message: response.data?.message || response.data?.Message || (success ? "Status de recrutamento atualizado." : "Nao foi possivel atualizar o recrutamento."),
+            });
+            await refreshSelectedTeam();
+        } catch (requestError) {
+            setRequestFeedback({
+                type: "error",
+                message: requestError?.response?.data?.message || "Nao foi possivel atualizar o recrutamento.",
+            });
+        } finally {
+            setRequestLoading(false);
+        }
+    }
+
     async function handleRespondInvitation(invitation, accept) {
         const action = accept ? "aceitar" : "recusar";
         if (!window.confirm(`Tem certeza que deseja ${action} a solicitacao de ${invitation.playerName}?`)) return;
@@ -496,6 +533,7 @@ export default function TeamsPage() {
                     name: name.trim(),
                     tag: nextTag,
                     ownerId: selectedTeam.ownerId,
+                    isRecruiting: selectedTeam.isRecruiting,
                 }, {
                     headers: getAuthHeaders(),
                 });
@@ -602,9 +640,11 @@ export default function TeamsPage() {
                 <TeamFilter
                     search={search}
                     selectedElos={selectedElos}
+                    recruitingFilter={recruitingFilter}
                     eloSort={eloSort}
                     onSearchChange={setSearch}
                     onEloToggle={toggleElo}
+                    onRecruitingFilterChange={setRecruitingFilter}
                     onEloSortChange={setEloSort}
                 />
 
@@ -630,6 +670,7 @@ export default function TeamsPage() {
                 onLeaveTeam={handleLeaveTeam}
                 onExpelPlayer={handleExpelPlayer}
                 onToggleCaptain={handleToggleCaptain}
+                onToggleRecruiting={handleToggleRecruiting}
                 onUpdateTeam={handleUpdateTeam}
                 onDeleteTeam={handleDeleteTeam}
                 invitations={teamInvitations}

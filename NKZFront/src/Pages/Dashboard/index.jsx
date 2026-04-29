@@ -54,7 +54,7 @@ function normalizeChampionStats(champions = []) {
 function normalizeRoleStats(roles = {}) {
     const roleEntries = Array.isArray(roles)
         ? roles.reduce((acc, role) => {
-            const key = (role.role ?? role.lane ?? role.position ?? "").toUpperCase();
+            const key = normalizeRoleKey(role.role ?? role.Role ?? role.lane ?? role.position ?? "");
             acc[key] = role;
             return acc;
         }, {})
@@ -75,6 +75,16 @@ function normalizeRoleStats(roles = {}) {
 
         return acc;
     }, {});
+}
+
+function normalizeRoleKey(role = "") {
+    const normalized = String(role).trim().toUpperCase();
+    if (normalized === "TOP") return "TOP";
+    if (normalized === "JUNGLE") return "JUNGLE";
+    if (normalized === "MID" || normalized === "MIDDLE") return "MID";
+    if (normalized === "ADC" || normalized === "BOTTOM") return "ADC";
+    if (normalized === "SUPPORT" || normalized === "UTILITY") return "SUPPORT";
+    return normalized;
 }
 
 function normalizeRecentMatches(matches = []) {
@@ -170,7 +180,7 @@ function normalizeDashboardData(rawData) {
                 .filter(Boolean),
         },
         history: {
-            recentMatches: normalizeRecentMatches(player?.recentMatches ?? player?.RecentMatches ?? []),
+            recentMatches: normalizeRecentMatches(player?.recentMatches ?? player?.RecentMatches ?? player?.matchHistory ?? player?.MatchHistory ?? []),
             eloHistory: normalizeEloHistory(player?.eloHistory ?? player?.EloHistory ?? [], rank),
         },
     };
@@ -315,6 +325,7 @@ export default function DashboardPage() {
             setSyncFeedback({ type: "success", message: "Riot ID vinculado com sucesso." });
             setSummonerName("");
             await loadDashboardData();
+            window.dispatchEvent(new Event("nkz-player-synced"));
         } catch (requestError) {
             setSyncFeedback({
                 type: "error",

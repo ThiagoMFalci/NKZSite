@@ -13,6 +13,18 @@ export default function NotificationCard({ notification, onRespond, responding }
 
     return (
         <article className="notification-card">
+            <div className="notification-avatar">
+                <span>{String(notification.avatarLabel || notification.title || "NK").slice(0, 2).toUpperCase()}</span>
+                {notification.avatarUrl && (
+                    <img
+                        src={notification.avatarUrl}
+                        alt={notification.avatarLabel || notification.title}
+                        onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                        }}
+                    />
+                )}
+            </div>
             <div className="notification-card-main">
                 <p className="notifications-eyebrow">{notification.typeLabel}</p>
                 <h3>{notification.title}</h3>

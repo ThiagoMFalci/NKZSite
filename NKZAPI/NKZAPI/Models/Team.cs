@@ -9,6 +9,7 @@ namespace NKZAPI.Models
         public string Name { get; set; } = null!;
         public string? Tag { get; set; }
         public Guid? OwnerId { get; set; }
+        public bool IsRecruiting { get; set; } = true;
         public ICollection<Player>? Players { get; set; }
         // Persisted image path/URL
         public string? ProfileImageUrl { get; set; }

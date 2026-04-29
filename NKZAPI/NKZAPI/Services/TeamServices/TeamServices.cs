@@ -447,14 +447,20 @@ namespace NKZAPI.Services.TeamServices
                     Id = Guid.NewGuid(),
                     Name = team.Name,
                     Tag = normalizedTag,
-                    OwnerId = id
+                    OwnerId = id,
+                    IsRecruiting = true
                 };
 
-                var added = await _teamRepository.AddTeamAsync(teamEntity);
+                var added = await _teamRepository.AddTeamWithOwnerPlayerAsync(teamEntity, id);
 
                 response.Success = true;
-                response.Message = "Team created.";
+                response.Message = "Team created and owner added to roster.";
                 response.Data = added.Id.ToString();
+            }
+            catch (InvalidOperationException ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
             }
             catch (Exception ex)
             {
@@ -512,6 +518,7 @@ namespace NKZAPI.Services.TeamServices
                 existing.Name = team.Name;
                 existing.Tag = normalizedTag;
                 existing.OwnerId = team.OwnerId;
+                existing.IsRecruiting = team.IsRecruiting;
 
                 if (existing.OwnerId != callerId && !isAdmin)
                 {
@@ -730,6 +737,49 @@ namespace NKZAPI.Services.TeamServices
             response.Success = true;
             response.Message = "Player assigned as captain.";
             response.Data = player.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<Team>> UpdateRecruitingAsync(Guid teamId, bool isRecruiting)
+        {
+            var response = new Response<Team>();
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                response.Success = false;
+                response.Message = "Unauthorized";
+                return response;
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+            var callerIsCaptain = await IsCallerTeamCaptainAsync(teamId, callerId);
+            if (team.OwnerId != callerId && !callerIsCaptain && !isAdmin)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            var updated = await _teamRepository.UpdateRecruitingAsync(teamId, isRecruiting);
+            if (updated == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+
+            response.Success = true;
+            response.Message = isRecruiting ? "Team is recruiting." : "Team is not recruiting.";
+            response.Data = updated;
             return response;
         }
 

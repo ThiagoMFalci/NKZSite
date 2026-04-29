@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import NotificationSection from "./components/NotificationSection";
 import { getAuthHeaders, getCurrentUser } from "../../utils/auth";
+import { getPlayerImageUrl } from "../../utils/images";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -25,6 +26,7 @@ function normalizePlayer(player) {
     return {
         id: player.id ?? player.Id,
         name: player.summonerName ?? player.SummonerName ?? "Jogador",
+        profileImageUrl: getPlayerImageUrl(player),
         role: player.role ?? player.Role ?? player.position ?? player.Position ?? "Flex",
         elo: `${player.soloQueueTier ?? player.SoloQueueTier ?? "Unranked"} ${player.soloQueueRank ?? player.SoloQueueRank ?? ""}`.trim(),
     };
@@ -56,6 +58,7 @@ function normalizeInvitation(invitation) {
 export default function NotificationsPage() {
     const [player, setPlayer] = useState(null);
     const [teams, setTeams] = useState([]);
+    const [allPlayers, setAllPlayers] = useState([]);
     const [playerInvitations, setPlayerInvitations] = useState([]);
     const [teamInvitations, setTeamInvitations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -76,11 +79,17 @@ export default function NotificationsPage() {
             setError("");
             setFeedback({ type: "", message: "" });
 
-            const teamsResponse = await axios.get(`${API_BASE_URL}/api/team/ListTeams`, {
-                headers: getAuthHeaders(),
-            });
+            const [teamsResponse, playersResponse] = await Promise.all([
+                axios.get(`${API_BASE_URL}/api/team/ListTeams`, {
+                    headers: getAuthHeaders(),
+                }),
+                axios.get(`${API_BASE_URL}/api/player`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => ({ data: [] })),
+            ]);
             const normalizedTeams = (unwrapApiData(teamsResponse.data) || []).map(normalizeTeam).filter(Boolean);
             setTeams(normalizedTeams);
+            setAllPlayers((unwrapApiData(playersResponse.data) || []).map(normalizePlayer).filter(Boolean));
 
             let currentPlayer = null;
             try {
@@ -135,13 +144,15 @@ export default function NotificationsPage() {
     }, [teams]);
 
     const playerMap = useMemo(() => {
-        return teams
-            .flatMap((team) => team.players)
+        return [
+            ...allPlayers,
+            ...teams.flatMap((team) => team.players),
+        ]
             .reduce((map, teamPlayer) => {
                 map[teamPlayer.id] = teamPlayer;
                 return map;
             }, player ? { [player.id]: player } : {});
-    }, [player, teams]);
+    }, [allPlayers, player, teams]);
 
     const groupedNotifications = useMemo(() => {
         const receivedInvites = playerInvitations
@@ -154,6 +165,8 @@ export default function NotificationsPage() {
                     ...invite,
                     typeLabel: "Convite recebido",
                     title: team?.name || "Time",
+                    avatarUrl: sender?.profileImageUrl,
+                    avatarLabel: sender?.name || "Capitao",
                     details: [
                         `Enviado por ${sender?.name || "Capitao do time"}`,
                     ],
@@ -171,6 +184,8 @@ export default function NotificationsPage() {
                     ...invite,
                     typeLabel: "Pedido enviado",
                     title: team?.name || "Time",
+                    avatarUrl: player?.profileImageUrl,
+                    avatarLabel: player?.name || "Jogador",
                     details: ["Solicitacao para entrar na equipe"],
                     dateLabel: formatDate(invite.createdAt),
                     canRespond: false,
@@ -187,6 +202,8 @@ export default function NotificationsPage() {
                     ...invite,
                     typeLabel: "Pedido recebido",
                     title: requestedPlayer?.name || "Jogador",
+                    avatarUrl: requestedPlayer?.profileImageUrl,
+                    avatarLabel: requestedPlayer?.name || "Jogador",
                     details: [
                         team?.name || "Time",
                         `Rota ${requestedPlayer?.role || "Flex"}`,

@@ -77,6 +77,32 @@ namespace NKZAPI.Repositories
             return entry.Entity;
         }
 
+        public async Task ReplacePlayerPerformanceAsync(
+            Guid playerId,
+            List<PlayerChampionStat> championStats,
+            List<PlayerRoleStat> roleStats,
+            List<PlayerMatchHistory> matchHistory)
+        {
+            var existingChampionStats = await _playerRepository.PlayerChampionStats
+                .Where(stat => stat.PlayerId == playerId)
+                .ToListAsync();
+            var existingRoleStats = await _playerRepository.PlayerRoleStats
+                .Where(stat => stat.PlayerId == playerId)
+                .ToListAsync();
+            var existingMatchHistory = await _playerRepository.PlayerMatchHistory
+                .Where(match => match.PlayerId == playerId)
+                .ToListAsync();
+
+            _playerRepository.PlayerChampionStats.RemoveRange(existingChampionStats);
+            _playerRepository.PlayerRoleStats.RemoveRange(existingRoleStats);
+            _playerRepository.PlayerMatchHistory.RemoveRange(existingMatchHistory);
+
+            await _playerRepository.PlayerChampionStats.AddRangeAsync(championStats);
+            await _playerRepository.PlayerRoleStats.AddRangeAsync(roleStats);
+            await _playerRepository.PlayerMatchHistory.AddRangeAsync(matchHistory);
+            await _playerRepository.SaveChangesAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _playerRepository.SaveChangesAsync();

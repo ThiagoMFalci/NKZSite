@@ -102,6 +102,29 @@ namespace NKZAPI.Services.RiotService
             return list?.FirstOrDefault(e => e.QueueType == "RANKED_SOLO_5x5");
         }
 
+        public async Task<List<string>> GetRecentMatchIdsAsync(string regionalRoute, string puuid, int count = 5)
+        {
+            var client = CreateClient();
+            var safeCount = Math.Clamp(count, 1, 20);
+            var url = $"https://{regionalRoute}.api.riotgames.com/lol/match/v5/matches/by-puuid/{Uri.EscapeDataString(puuid)}/ids?start=0&count={safeCount}";
+            var res = await client.GetAsync(url);
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound) return new List<string>();
+            await EnsureSuccessOrThrow(res);
+            var stream = await res.Content.ReadAsStreamAsync();
+            return await JsonSerializer.DeserializeAsync<List<string>>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<string>();
+        }
+
+        public async Task<JsonDocument?> GetMatchAsync(string regionalRoute, string matchId)
+        {
+            var client = CreateClient();
+            var url = $"https://{regionalRoute}.api.riotgames.com/lol/match/v5/matches/{Uri.EscapeDataString(matchId)}";
+            var res = await client.GetAsync(url);
+            if (res.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+            await EnsureSuccessOrThrow(res);
+            var stream = await res.Content.ReadAsStreamAsync();
+            return await JsonDocument.ParseAsync(stream);
+        }
+
         public async Task<string> ValidateApiKeyAsync(string region = "br1")
         {
             var client = CreateClient();

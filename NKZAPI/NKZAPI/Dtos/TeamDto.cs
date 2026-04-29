@@ -11,6 +11,7 @@ namespace NKZAPI.Dtos
         public string Name { get; set; } = null!;
         public string? Tag { get; set; }
         public Guid? OwnerId { get; set; }
+        public bool IsRecruiting { get; set; } = true;
         public ICollection<Player>? Players { get; set; } = new List<Player>();
         public ICollection<Player>? Captains { get; set; } = new List<Player>();
     }

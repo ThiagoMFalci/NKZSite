@@ -20,6 +20,7 @@ export default function TeamDetails({
     onLeaveTeam,
     onExpelPlayer,
     onToggleCaptain,
+    onToggleRecruiting,
     onUpdateTeam,
     onDeleteTeam,
     invitations = [],
@@ -52,9 +53,10 @@ export default function TeamDetails({
         (player.id === currentPlayerId || player.userId === currentUserId) && player.isCaptain
     ));
     const canReviewRequests = canManage || isCaptain;
+    const canToggleRecruiting = canManage || isCaptain;
     const isMember = team.players.some((player) => player.id === currentPlayerId || player.userId === currentUserId);
     const isInOtherTeam = Boolean(currentPlayerTeamId && currentPlayerTeamId !== team.id && !isMember);
-    const teamUnavailable = team.status?.key === "full" || team.status?.key === "in-tournament";
+    const teamUnavailable = !team.isRecruiting || team.status?.key === "full" || team.status?.key === "in-tournament";
     const canRequestJoin = Boolean(currentUser && currentPlayerId && !isOwner && !isMember && !isInOtherTeam && !hasPendingRequest && !teamUnavailable);
     const previewSrc = imagePreview || resolveImageUrl(team.profileImageUrl);
     const roleKeys = ["Top", "Jungle", "Mid", "ADC", "Support"];
@@ -67,6 +69,7 @@ export default function TeamDetails({
         if (!currentPlayerId) return "Vincule um jogador";
         if (hasPendingRequest) return "Solicitacao enviada";
         if (isInOtherTeam) return "Voce ja esta em outro time";
+        if (!team.isRecruiting) return "Time nao esta recrutando";
         if (team.status?.key === "full") return "Time completo";
         if (team.status?.key === "in-tournament") return "Time em campeonato";
         return loading ? "Enviando..." : "Solicitar entrada";
@@ -168,6 +171,20 @@ export default function TeamDetails({
                         <strong>Resumo competitivo</strong>
                         <span>Media e lacunas do elenco atual.</span>
                     </div>
+                    {canToggleRecruiting && (
+                        <label className="team-recruiting-toggle">
+                            <span>
+                                <strong>Recrutamento</strong>
+                                <small>{team.isRecruiting ? "Jogadores podem solicitar entrada." : "Entrada de novos jogadores pausada."}</small>
+                            </span>
+                            <input
+                                type="checkbox"
+                                checked={Boolean(team.isRecruiting)}
+                                disabled={loading}
+                                onChange={(event) => onToggleRecruiting(event.target.checked)}
+                            />
+                        </label>
+                    )}
                     <div className="team-summary-grid">
                         <span><strong>{team.averageElo}</strong>Elo medio</span>
                         <span><strong>{teamWinRate}%</strong>Win rate medio</span>
@@ -227,6 +244,18 @@ export default function TeamDetails({
                         </div>
                         {invitations.map((invitation) => (
                             <article key={invitation.id} className="team-request-row">
+                                <div className="player-row-avatar compact">
+                                    <span>{String(invitation.playerName || "JG").slice(0, 2).toUpperCase()}</span>
+                                    {invitation.playerImageUrl && (
+                                        <img
+                                            src={resolveImageUrl(invitation.playerImageUrl)}
+                                            alt={invitation.playerName}
+                                            onError={(event) => {
+                                                event.currentTarget.style.display = "none";
+                                            }}
+                                        />
+                                    )}
+                                </div>
                                 <div>
                                     <strong>{invitation.playerName}</strong>
                                     <span>{invitation.playerRole} - aguardando resposta</span>

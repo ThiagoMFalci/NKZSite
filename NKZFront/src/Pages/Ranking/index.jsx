@@ -3,6 +3,7 @@ import axios from "axios";
 import RankingFilter from "./components/RankingFilter";
 import RankingTable from "./components/RankingTable";
 import { matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
+import { getPlayerImageUrl } from "../../utils/images";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -47,6 +48,7 @@ function normalizePlayer(player) {
     return {
         id: player.id ?? player.Id,
         summonerName: player.summonerName ?? player.SummonerName ?? "Invocador",
+        profileImageUrl: getPlayerImageUrl(player),
         summonerLevel: player.summonerLevel ?? player.SummonerLevel ?? 0,
         tier,
         elo: normalizeElo(tier, rank),

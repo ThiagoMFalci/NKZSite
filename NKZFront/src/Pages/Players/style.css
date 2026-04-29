@@ -158,7 +158,26 @@
     font-weight: 800;
     height: 58px;
     justify-content: center;
+    overflow: hidden;
+    position: relative;
     width: 58px;
+}
+
+.player-avatar span {
+    align-items: center;
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    position: absolute;
+}
+
+.player-avatar img {
+    height: 100%;
+    inset: 0;
+    object-fit: cover;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
 }
 
 .player-avatar.large {
