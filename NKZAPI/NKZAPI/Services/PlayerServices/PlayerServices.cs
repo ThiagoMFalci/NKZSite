@@ -35,9 +35,8 @@ namespace NKZAPI.Services.PlayerServices
             var response = new Response<Player>();
             try
             {
-                var user = await _context.GetUserWithPlayersAsync(userId);
-
-                if (user == null)
+                var userExists = await _context.UserExistsAsync(userId);
+                if (!userExists)
                 {
                     response.Success = false;
                     response.Message = "User not found.";
@@ -70,23 +69,21 @@ namespace NKZAPI.Services.PlayerServices
                 }
 
                 var riotDisplayName = $"{account.GameName}#{account.TagLine}";
-                var player = user.Player?.FirstOrDefault(p =>
-                    (!string.IsNullOrWhiteSpace(p.RiotPuuid) && p.RiotPuuid == account.Puuid) ||
-                    p.SummonerName.Equals(riotDisplayName, StringComparison.OrdinalIgnoreCase));
+                var player = await _context.GetPlayerForUserByRiotIdentityAsync(userId, account.Puuid, riotDisplayName);
+                var isNewPlayer = player == null;
 
-                if (player == null)
+                if (isNewPlayer)
                 {
                     player = new Player
                     {
                         Id = Guid.NewGuid(),
+                        UserId = userId,
                         SummonerName = riotDisplayName,
                         RiotPuuid = account.Puuid,
                         IsCaptain = false,
                         IsActive = true,
                         LastStatsUpdate = DateTime.UtcNow
                     };
-                    if (user.Player == null) user.Player = new List<Player>();
-                    user.Player.Add(player);
                 }
 
                 player.RiotPuuid = account.Puuid;
@@ -107,11 +104,23 @@ namespace NKZAPI.Services.PlayerServices
 
                 player.LastStatsUpdate = DateTime.UtcNow;
 
-                await _context.SaveChangesAsync();
+                if (isNewPlayer)
+                {
+                    await _context.AddSyncedPlayerAsync(userId, player);
+                }
+                else
+                {
+                    await _context.SaveChangesAsync();
+                }
 
                 response.Success = true;
                 response.Message = "Player updated from Riot.";
                 response.Data = player;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                response.Success = false;
+                response.Message = "Nao foi possivel salvar o player porque o registro foi alterado ou removido. Tente sincronizar novamente.";
             }
             catch (HttpRequestException ex)
             {

@@ -52,6 +52,31 @@ namespace NKZAPI.Repositories
                     .ThenInclude(p => p.MatchHistory)
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
+
+        public async Task<bool> UserExistsAsync(Guid id)
+        {
+            return await _playerRepository.Users.AnyAsync(u => u.Id == id);
+        }
+
+        public async Task<Player?> GetPlayerForUserByRiotIdentityAsync(Guid userId, string puuid, string riotDisplayName)
+        {
+            return await _playerRepository.Players
+                .FirstOrDefaultAsync(p =>
+                    p.UserId == userId &&
+                    ((!string.IsNullOrWhiteSpace(p.RiotPuuid) && p.RiotPuuid == puuid) ||
+                     p.SummonerName.ToLower() == riotDisplayName.ToLower()));
+        }
+
+        public async Task<Player> AddSyncedPlayerAsync(Guid userId, Player player)
+        {
+            player.UserId = userId;
+            if (player.Id == Guid.Empty) player.Id = Guid.NewGuid();
+
+            var entry = await _playerRepository.Players.AddAsync(player);
+            await _playerRepository.SaveChangesAsync();
+            return entry.Entity;
+        }
+
         public async Task SaveChangesAsync()
         {
             await _playerRepository.SaveChangesAsync();
