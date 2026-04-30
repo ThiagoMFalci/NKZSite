@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|c:\\users\\shora\\onedrive\\desktop\\github\\nkzsite\\nkzapi\\nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{189AFC19-4B12-711A-618E-2514D450FACA}|NKZAPI\\NKZAPI.csproj|solutionrelative:nkzapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,7 +38,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "NKZAPI\\appsettings.json",
+              "ToolTip": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\appsettings.json",
+              "RelativeToolTip": "NKZAPI\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-30T20:10:36.819Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "20260429143528_2904.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Migrations\\20260429143528_2904.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Migrations\\20260429143528_2904.cs",
@@ -46,7 +63,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\shora\\OneDrive\\Desktop\\Github\\NKZSite\\NKZAPI\\NKZAPI\\Program.cs",
               "RelativeDocumentMoniker": "NKZAPI\\Program.cs",
@@ -54,8 +71,7 @@
               "RelativeToolTip": "NKZAPI\\Program.cs",
               "ViewState": "AgIAAIAAAAAAAAAAAAAgwI0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-29T00:48:13.847Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-29T00:48:13.847Z"
             }
           ]
         }

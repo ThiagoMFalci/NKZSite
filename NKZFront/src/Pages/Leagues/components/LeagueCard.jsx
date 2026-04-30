@@ -70,6 +70,7 @@ export default function LeagueCard({ league, onSelect }) {
                     <span><BsCashCoin /> Entrada {league.entryFeeLabel}</span>
                     <span><RankEmblem tier={league.averageElo} label={league.averageElo} className="small" /> Media {league.averageElo}</span>
                     <span><BsShieldFillCheck /> {league.minimumElo} ate {league.maximumElo}</span>
+                    <span><BsShieldFillCheck /> {league.minimumTeamPoints} a {league.maximumTeamPoints} pts</span>
                     <span><BsCalendarEvent /> {formatShortDate(league.startDate)} - {formatShortDate(league.endDate)}</span>
                 </div>
 

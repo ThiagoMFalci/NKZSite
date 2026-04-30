@@ -268,6 +268,48 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "JoinRankingQueueAsync",
+    "RelativePath": "api/league/{leagueId}/queue/{teamId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "leagueId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "LeaveRankingQueueAsync",
+    "RelativePath": "api/league/{leagueId}/queue/{teamId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "leagueId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "teamId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
     "Method": "GetTeamsInLeagueAsync",
     "RelativePath": "api/league/{leagueId}/teams",
     "HttpMethod": "GET",
@@ -605,6 +647,27 @@
       {
         "Name": "image",
         "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.PlayerController",
+    "Method": "RefreshPlayerFromRiot",
+    "RelativePath": "api/player/{userId}/refresh",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "region",
+        "Type": "System.String",
         "IsRequired": false
       }
     ],

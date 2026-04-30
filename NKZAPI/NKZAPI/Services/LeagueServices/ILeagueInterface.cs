@@ -13,12 +13,16 @@ namespace NKZAPI.Services.LeagueServices
         Task DeleteLeagueAsync(League league);
 
         Task<Response<string>> AddTeamToLeagueAsync(Guid leagueId, Guid teamId);
+        Task<Response<string>> ConfirmLeaguePaymentAsync(Guid paymentId);
+        Task<Response<string>> ProcessMercadoPagoNotificationAsync(string? paymentId);
         Task<Response<string>> RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId);
         Task<List<Team>> GetTeamsInLeagueAsync(Guid leagueId);
         Task<List<League>> GetLeaguesByTeamIdAsync(Guid teamId);
         Task<Response<string>> GeneratePlayoffAsync(Guid leagueId);
         Task<Response<string>> CompleteMatchAsync(Guid matchId, LeagueMatchResultDto result);
         Task<Response<string>> SubmitMatchReportAsync(Guid matchId, Guid reportedWinnerTeamId, IFormFile proofImage);
+        Task<Response<string>> JoinRankingQueueAsync(Guid leagueId, Guid teamId);
+        Task<Response<string>> LeaveRankingQueueAsync(Guid leagueId, Guid teamId);
         Task<Response<string>> ProposeMatchScheduleAsync(Guid matchId, LeagueMatchScheduleProposalDto proposal);
         Task<Response<string>> AcceptMatchScheduleAsync(Guid matchId);
         Task<Response<string>> RejectMatchScheduleAsync(Guid matchId);

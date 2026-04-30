@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
     BsBarChartFill,
     BsCalendarEvent,
@@ -60,6 +60,7 @@ function normalizeTeam(team) {
         name: team.name ?? team.Name ?? "Time",
         tag: team.tag ?? team.Tag ?? "TIME",
         ownerId: team.ownerId ?? team.OwnerId,
+        points: team.points ?? team.Points ?? 0,
         imageUrl: resolveAssetUrl(team.profileImageUrl ?? team.ProfileImageUrl ?? ""),
         players: Array.isArray(players) ? players.map(normalizePlayer) : [],
     };
@@ -81,6 +82,7 @@ function normalizeMatch(match) {
         loserTeamId: match.loserTeamId ?? match.LoserTeamId,
         teamAScore: match.teamAScore ?? match.TeamAScore ?? 0,
         teamBScore: match.teamBScore ?? match.TeamBScore ?? 0,
+        accessCode: match.accessCode ?? match.AccessCode ?? "",
         scheduledAt: match.scheduledAt ?? match.ScheduledAt,
         proposedScheduledAt: match.proposedScheduledAt ?? match.ProposedScheduledAt,
         proposedByTeamId: match.proposedByTeamId ?? match.ProposedByTeamId,
@@ -119,15 +121,29 @@ function normalizeLeague(league) {
         name: league.name ?? league.Name ?? "Liga",
         imageUrl: resolveAssetUrl(league.imageUrl ?? league.ImageUrl ?? ""),
         award: league.award ?? league.Award ?? 0,
+        entryFee: league.entryFee ?? league.EntryFee ?? 0,
         maxTeams: league.maxTeams ?? league.MaxTeams ?? 16,
         minimumElo: league.minimumElo ?? league.MinimumElo ?? "UNRANKED",
         maximumElo: league.maximumElo ?? league.MaximumElo ?? "CHALLENGER",
+        minimumTeamPoints: league.minimumTeamPoints ?? league.MinimumTeamPoints ?? 0,
+        maximumTeamPoints: league.maximumTeamPoints ?? league.MaximumTeamPoints ?? 999999,
+        rankingQueueOpenTime: league.rankingQueueOpenTime ?? league.RankingQueueOpenTime,
+        rankingQueueCloseTime: league.rankingQueueCloseTime ?? league.RankingQueueCloseTime,
         startDate: league.startDate ?? league.StartDate,
         endDate: league.endDate ?? league.EndDate,
         modality: league.modality ?? league.Modality ?? "Chaveamento",
         teams,
         matches,
         standings,
+        queueEntries: (league.queueEntries ?? league.QueueEntries ?? []).map((entry) => ({
+            id: entry.id ?? entry.Id,
+            leagueId: entry.leagueId ?? entry.LeagueId,
+            teamId: entry.teamId ?? entry.TeamId,
+            status: entry.status ?? entry.Status ?? "Waiting",
+            joinedAt: entry.joinedAt ?? entry.JoinedAt,
+            matchedAt: entry.matchedAt ?? entry.MatchedAt,
+            matchId: entry.matchId ?? entry.MatchId,
+        })),
     };
 }
 
@@ -144,6 +160,14 @@ function formatDateTime(value) {
         hour: "2-digit",
         minute: "2-digit",
     });
+}
+
+function formatTime(value) {
+    if (!value) return "A definir";
+    const text = String(value);
+    const match = text.match(/(\d{1,2}):(\d{2})/);
+    if (!match) return text;
+    return `${match[1].padStart(2, "0")}:${match[2]}`;
 }
 
 function toDateTimeLocalValue(value) {
@@ -170,9 +194,14 @@ function getKdaLabel(entry) {
     return `${entry.kills}/${entry.deaths}/${entry.assists}`;
 }
 
+function isRankingMatch(match) {
+    return String(match.bracket || "").toLowerCase() === "ranking" || String(match.roundKey || "").toUpperCase() === "RANKING";
+}
+
 export default function LeaguePage() {
     const { leagueId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [league, setLeague] = useState(null);
     const [ownedTeam, setOwnedTeam] = useState(null);
     const [activeTab, setActiveTab] = useState("standings");
@@ -185,6 +214,7 @@ export default function LeaguePage() {
     const [feedback, setFeedback] = useState({ type: "", message: "" });
     const currentUser = getCurrentUser();
     const isAdmin = String(currentUser?.role || "").includes("Admin");
+    const isRankingLeague = String(league?.modality || "").toLowerCase() === "ranking";
 
     async function loadLeague() {
         try {
@@ -222,6 +252,32 @@ export default function LeaguePage() {
         loadOwnedTeam();
     }, [leagueId]);
 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const paymentId = params.get("payment_id") || params.get("collection_id");
+        if (!paymentId) return;
+
+        let cancelled = false;
+        async function syncReturnedPayment() {
+            try {
+                await axios.get(`${API_BASE_URL}/api/league/payments/mercadopago/webhook`, { params: { payment_id: paymentId } });
+                if (!cancelled) {
+                    setFeedback({ type: "success", message: "Pagamento confirmado. Atualizando inscricao." });
+                    await loadLeague();
+                }
+            } catch {
+                if (!cancelled) {
+                    setFeedback({ type: "warning", message: "Pagamento recebido pelo Mercado Pago. A inscricao sera atualizada assim que a confirmacao chegar." });
+                }
+            }
+        }
+
+        syncReturnedPayment();
+        return () => {
+            cancelled = true;
+        };
+    }, [location.search]);
+
     const teamById = useMemo(() => {
         const map = new Map();
         league?.teams.forEach((team) => map.set(team.id, team));
@@ -243,6 +299,7 @@ export default function LeaguePage() {
     const matchesByRound = useMemo(() => {
         const grouped = new Map();
         (league?.matches || [])
+            .filter((match) => match.bracket !== "Ranking")
             .sort((a, b) => ROUND_ORDER.indexOf(a.roundKey) - ROUND_ORDER.indexOf(b.roundKey) || a.matchNumber - b.matchNumber)
             .forEach((match) => {
                 if (!grouped.has(match.roundKey)) grouped.set(match.roundKey, []);
@@ -313,7 +370,40 @@ export default function LeaguePage() {
         Boolean(ownedTeam?.id && league?.teams.some((team) => team.id === ownedTeam.id))
     ), [league, ownedTeam]);
 
-    const leagueEntryDisabled = actionLoading === "join" || actionLoading === "leave" || Boolean(league?.matches.length && !ownedTeamInLeague);
+    const leagueEntryDisabled = actionLoading === "join" || actionLoading === "leave" || Boolean(!isRankingLeague && league?.matches.length && !ownedTeamInLeague);
+    const activeTabs = useMemo(() => (
+        isRankingLeague ? TAB_ITEMS.filter((tab) => tab.id !== "playoff") : TAB_ITEMS
+    ), [isRankingLeague]);
+    const ownedQueueEntry = useMemo(() => (
+        league?.queueEntries.find((entry) => entry.teamId === ownedTeam?.id && entry.status === "Waiting")
+    ), [league, ownedTeam]);
+    const ownedActiveRankingMatch = useMemo(() => (
+        isRankingLeague
+            ? league?.matches.find((match) => (
+                isRankingMatch(match) &&
+                match.status !== "Completed" &&
+                (match.teamAId === ownedTeam?.id || match.teamBId === ownedTeam?.id)
+            ))
+            : null
+    ), [isRankingLeague, league, ownedTeam]);
+    const queueCount = useMemo(() => (
+        league?.queueEntries.filter((entry) => entry.status === "Waiting").length || 0
+    ), [league]);
+    const queueButtonDisabled = !ownedTeamInLeague || actionLoading === "queue";
+    const queueStatusText = ownedQueueEntry
+        ? "Seu time esta na fila"
+        : ownedActiveRankingMatch
+            ? "Partida em andamento"
+            : ownedTeamInLeague
+                ? "Seu time pode entrar na fila"
+                : "Inscreva seu time primeiro";
+    const queueButtonText = ownedQueueEntry
+        ? "Sair da fila"
+        : ownedActiveRankingMatch
+            ? "Ver partida"
+            : actionLoading === "queue"
+                ? "Entrando..."
+                : "Entrar na fila";
 
     async function handleGeneratePlayoff() {
         try {
@@ -342,7 +432,13 @@ export default function LeaguePage() {
         try {
             setActionLoading("join");
             setFeedback({ type: "", message: "" });
-            await axios.post(`${API_BASE_URL}/api/league/${league.id}/teams/${ownedTeam.id}`, null, { headers: getAuthHeaders() });
+            const response = await axios.post(`${API_BASE_URL}/api/league/${league.id}/teams/${ownedTeam.id}`, null, { headers: getAuthHeaders() });
+            const checkoutUrl = response?.data?.data ?? response?.data?.Data;
+            if (checkoutUrl && String(checkoutUrl).startsWith("http")) {
+                setFeedback({ type: "success", message: "Pagamento gerado. Redirecionando para o Mercado Pago." });
+                window.location.href = checkoutUrl;
+                return;
+            }
             setFeedback({ type: "success", message: "Time inscrito na liga." });
             await loadLeague();
         } catch (requestError) {
@@ -369,6 +465,54 @@ export default function LeaguePage() {
             setFeedback({
                 type: "error",
                 message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel sair da liga.",
+            });
+        } finally {
+            setActionLoading("");
+        }
+    }
+
+    async function handleJoinQueue() {
+        if (!ownedTeam?.id) {
+            setFeedback({ type: "error", message: "Voce precisa ser dono ou capitao de um time para entrar na fila." });
+            return;
+        }
+
+        try {
+            setActionLoading("queue");
+            setFeedback({ type: "", message: "" });
+            const response = await axios.post(`${API_BASE_URL}/api/league/${league.id}/queue/${ownedTeam.id}`, null, { headers: getAuthHeaders() });
+            setFeedback({
+                type: "success",
+                message: response.data?.message || response.data?.Message || "Fila atualizada.",
+            });
+            await loadLeague();
+            setActiveTab("calendar");
+        } catch (requestError) {
+            setFeedback({
+                type: "error",
+                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel entrar na fila.",
+            });
+        } finally {
+            setActionLoading("");
+        }
+    }
+
+    async function handleLeaveQueue() {
+        if (!ownedTeam?.id) return;
+
+        try {
+            setActionLoading("queue");
+            setFeedback({ type: "", message: "" });
+            const response = await axios.delete(`${API_BASE_URL}/api/league/${league.id}/queue/${ownedTeam.id}`, { headers: getAuthHeaders() });
+            setFeedback({
+                type: "success",
+                message: response.data?.message || response.data?.Message || "Voce saiu da fila.",
+            });
+            await loadLeague();
+        } catch (requestError) {
+            setFeedback({
+                type: "error",
+                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel sair da fila.",
             });
         } finally {
             setActionLoading("");
@@ -648,6 +792,57 @@ export default function LeaguePage() {
         );
     }
 
+    function renderRankingResultControls(match) {
+        const isReady = match.teamAId && match.teamBId && match.status !== "Completed";
+        const canReport = isReady && ownedTeam?.id && (ownedTeam.id === match.teamAId || ownedTeam.id === match.teamBId);
+        const ownReport = match.reports.find((report) => report.teamId === ownedTeam?.id);
+
+        return (
+            <div className="calendar-result-box">
+                <div className="calendar-result-head">
+                    <span>Resultado da partida</span>
+                    {match.accessCode && <strong>Codigo: {match.accessCode}</strong>}
+                </div>
+
+                {match.reports.length > 0 && (
+                    <div className="league-match-reports calendar-report-links">
+                        {match.reports.map((report) => (
+                            <a key={report.id} href={report.proofImageUrl} target="_blank" rel="noreferrer">
+                                <BsImage /> {renderTeamNameNode(report.teamId)} indicou {renderTeamNameNode(report.reportedWinnerTeamId)}
+                            </a>
+                        ))}
+                    </div>
+                )}
+
+                {match.status === "Completed" ? (
+                    <div className="calendar-result-completed">
+                        <strong>Vencedor confirmado</strong>
+                        <span>{renderTeamNameNode(match.winnerTeamId)}</span>
+                    </div>
+                ) : canReport ? (
+                    <div className="calendar-result-form">
+                        <span>{ownReport ? "Voce ja enviou um resultado. Pode corrigir reenviando." : "Anexe o print e escolha quem venceu."}</span>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => setProofFiles((current) => ({ ...current, [match.id]: event.target.files?.[0] || null }))}
+                        />
+                        <div className="league-match-actions calendar-result-actions">
+                            <button type="button" disabled={actionLoading === `report-${match.id}`} onClick={() => handleReportMatch(match, match.teamAId)}>
+                                Venceu {teamById.get(match.teamAId)?.tag || "A"}
+                            </button>
+                            <button type="button" disabled={actionLoading === `report-${match.id}`} onClick={() => handleReportMatch(match, match.teamBId)}>
+                                Venceu {teamById.get(match.teamBId)?.tag || "B"}
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <span className="calendar-result-note">Apenas dono ou capitao de um dos times pode enviar o resultado.</span>
+                )}
+            </div>
+        );
+    }
+
     function renderMatchCard(match) {
         const teamA = teamById.get(match.teamAId);
         const teamB = teamById.get(match.teamBId);
@@ -661,6 +856,12 @@ export default function LeaguePage() {
                     <span>MD{match.bestOf}</span>
                     <strong>{match.roundName} #{match.matchNumber}</strong>
                 </div>
+                {match.accessCode && (
+                    <div className="league-match-access-code">
+                        <span>Codigo personalizada</span>
+                        <strong>{match.accessCode}</strong>
+                    </div>
+                )}
                 {[teamA, teamB].map((team, index) => {
                     const teamId = index === 0 ? match.teamAId : match.teamBId;
                     const score = index === 0 ? match.teamAScore : match.teamBScore;
@@ -805,6 +1006,8 @@ export default function LeaguePage() {
                             <span>{league.teams.length}/{league.maxTeams} times</span>
                             <span>{league.modality}</span>
                             <span>Elo {formatElo(league.minimumElo)} - {formatElo(league.maximumElo)}</span>
+                            <span>{league.minimumTeamPoints} - {league.maximumTeamPoints} pts</span>
+                            {isRankingLeague && <span>Fila {league.rankingQueueOpenTime || "A definir"} - {league.rankingQueueCloseTime || "A definir"}</span>}
                             <span>Inicio {formatDate(league.startDate)}</span>
                             <span>Final {formatDate(league.endDate)}</span>
                         </div>
@@ -815,9 +1018,14 @@ export default function LeaguePage() {
                                 <span>Premiacao</span>
                                 <strong>{Number(league.award || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong>
                             </div>
+                            <div className="league-prize entry-fee">
+                                <span>Entrada</span>
+                                <strong>{Number(league.entryFee || 0) > 0 ? Number(league.entryFee || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "Gratis"}</strong>
+                            </div>
                             <div className="league-requirements">
                                 <span>Elo minimo <strong>{formatElo(league.minimumElo)}</strong></span>
                                 <span>Elo maximo <strong>{formatElo(league.maximumElo)}</strong></span>
+                                <span>Pontos <strong>{league.minimumTeamPoints} - {league.maximumTeamPoints}</strong></span>
                             </div>
                         </div>
                         <button
@@ -831,6 +1039,48 @@ export default function LeaguePage() {
                         {!ownedTeam && <small className="league-entry-hint">Voce precisa ser dono ou capitao de um time.</small>}
                     </div>
                 </section>
+
+                {isRankingLeague && (
+                    <section className="league-ranking-queue-panel">
+                        <div>
+                            <p className="league-eyebrow">Fila ranking</p>
+                            <h2>Partidas automaticas</h2>
+                            <div className="league-ranking-queue-hours">
+                                <div className="queue-hour-card open">
+                                    <BsClockHistory />
+                                    <div>
+                                        <strong>Inicio da fila</strong>
+                                        <span>{formatTime(league.rankingQueueOpenTime)}</span>
+                                    </div>
+                                </div>
+                                <div className="queue-hour-card close">
+                                    <BsShieldLockFill />
+                                    <div>
+                                        <strong>Fim da fila</strong>
+                                        <span>{formatTime(league.rankingQueueCloseTime)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span>
+                                {queueCount} times aguardando. Quando dois times entram na fila, o site cria a partida e gera o codigo da personalizada.
+                            </span>
+                        </div>
+                        <div className="league-ranking-queue-actions">
+                            <strong>{queueStatusText}</strong>
+                            {ownedActiveRankingMatch && !ownedQueueEntry && (
+                                <small>Envie o resultado no calendario para liberar a proxima fila.</small>
+                            )}
+                            <button
+                                type="button"
+                                className={`league-entry-button ${ownedQueueEntry ? "leave" : ""}`}
+                                disabled={queueButtonDisabled}
+                                onClick={ownedQueueEntry ? handleLeaveQueue : ownedActiveRankingMatch ? () => setActiveTab("calendar") : handleJoinQueue}
+                            >
+                                {queueButtonText}
+                            </button>
+                        </div>
+                    </section>
+                )}
 
                 {feedback.message && <div className={`league-feedback ${feedback.type}`}>{feedback.message}</div>}
 
@@ -875,18 +1125,18 @@ export default function LeaguePage() {
 
                             <div className="league-admin-card">
                                 <strong><BsShieldLockFill /> Times inscritos</strong>
-                                <span>{league.matches.length ? "O playoff ja foi gerado, entao a lista esta travada." : "Voce pode expulsar times antes do chaveamento."}</span>
+                                <span>{!isRankingLeague && league.matches.length ? "O playoff ja foi gerado, entao a lista esta travada." : "Voce pode expulsar times antes das partidas decisivas."}</span>
                                 <div className="league-admin-team-list">
                                     {league.teams.length ? league.teams.map((team) => (
                                         <article key={team.id} className={`league-admin-team-row ${isOwnedTeamId(team.id) ? "my-team" : ""}`}>
                                             <TeamLogo team={team} />
                                             <div>
                                                 <strong>{isOwnedTeamId(team.id) ? renderTeamNameNode(team.id) : team.name}</strong>
-                                                <span>{team.tag} - {team.players.length}/5 jogadores</span>
+                                                <span>{team.tag} - {team.players.length} jogadores</span>
                                             </div>
                                             <button
                                                 type="button"
-                                                disabled={Boolean(league.matches.length) || actionLoading === `remove-${team.id}`}
+                                                disabled={Boolean(!isRankingLeague && league.matches.length) || actionLoading === `remove-${team.id}`}
                                                 onClick={() => handleRemoveTeam(team)}
                                             >
                                                 Expulsar
@@ -896,7 +1146,7 @@ export default function LeaguePage() {
                                 </div>
                             </div>
 
-                            <div className="league-admin-card">
+                            {!isRankingLeague && <div className="league-admin-card">
                                 <strong><BsDiagram3Fill /> Automacao</strong>
                                 <span>Com 16 times, o site gera upper/lower bracket automaticamente. O botao abaixo forca a geracao se for preciso.</span>
                                 <button
@@ -907,12 +1157,12 @@ export default function LeaguePage() {
                                 >
                                     {league.matches.length ? "Chaveamento gerado" : actionLoading === "generate" ? "Gerando..." : "Gerar chaveamento"}
                                 </button>
-                            </div>
+                            </div>}
                         </div>
                     </section>
                 )}
 
-                {!league.matches.length && (
+                {!isRankingLeague && !league.matches.length && (
                     <section className="league-setup-panel">
                         <BsDiagram3Fill />
                         <div>
@@ -928,7 +1178,7 @@ export default function LeaguePage() {
                 )}
 
                 <nav className="league-tabs">
-                    {TAB_ITEMS.map((tab) => {
+                    {activeTabs.map((tab) => {
                         const Icon = tab.icon;
                         return (
                             <button key={tab.id} type="button" className={activeTab === tab.id ? "active" : ""} onClick={() => setActiveTab(tab.id)}>
@@ -962,7 +1212,7 @@ export default function LeaguePage() {
 
                 {activeTab === "calendar" && (
                     <section className="league-panel">
-                        <PanelTitle icon={BsCalendarEvent} title="Calendario" subtitle="Cada semana acompanha a proxima etapa do chaveamento." />
+                        <PanelTitle icon={BsCalendarEvent} title="Calendario" subtitle={isRankingLeague ? "Partidas encontradas, codigos e envio de resultados." : "Cada semana acompanha a proxima etapa do chaveamento."} />
                         <div className="calendar-list">
                             {matchesByWeek.map((week) => (
                                 <article key={week.week} className="calendar-week">
@@ -976,7 +1226,7 @@ export default function LeaguePage() {
                                                 <span>{match.roundName}</span>
                                                 <strong>{renderTeamNameNode(match.teamAId)} vs {renderTeamNameNode(match.teamBId)}</strong>
                                                 <em>{match.status === "Completed" ? <>Vencedor: {renderTeamNameNode(match.winnerTeamId)}</> : match.status}</em>
-                                                {renderScheduleControls(match)}
+                                                {isRankingMatch(match) ? renderRankingResultControls(match) : renderScheduleControls(match)}
                                             </div>
                                         ))}
                                     </div>

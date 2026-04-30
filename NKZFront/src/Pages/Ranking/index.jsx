@@ -70,12 +70,13 @@ function getAverageElo(players) {
 function normalizeTeam(team) {
     const players = team.players ?? team.Players ?? [];
     const wins = team.wins ?? team.Wins ?? 0;
-    const points = team.points ?? team.Points ?? players.reduce((total, player) => {
+    const calculatedPoints = players.reduce((total, player) => {
         const tier = player.soloQueueTier ?? player.SoloQueueTier ?? "UNRANKED";
         const rank = player.soloQueueRank ?? player.SoloQueueRank ?? "";
         const lp = player.soloQueueLP ?? player.SoloQueueLP ?? 0;
         return total + calculateRankPoints(tier, rank, lp);
     }, 0);
+    const storedPoints = Number(team.points ?? team.Points);
     const teamWinRate = players.length ? Math.round(players.reduce((total, player) => {
         const playerWins = player.wins ?? player.Wins ?? 0;
         const playerLosses = player.losses ?? player.Losses ?? 0;
@@ -91,7 +92,7 @@ function normalizeTeam(team) {
         players: players.length,
         wins,
         winRate: teamWinRate,
-        points,
+        points: Number.isFinite(storedPoints) ? storedPoints : calculatedPoints,
     };
 }
 

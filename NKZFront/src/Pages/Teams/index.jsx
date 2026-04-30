@@ -45,8 +45,7 @@ function getAverageElo(players) {
     return normalizeEloLabel(closestTier);
 }
 
-function getTeamPoints(players, explicitPoints) {
-    if (Number.isFinite(explicitPoints)) return explicitPoints;
+function getTeamPoints(players) {
     return players.reduce((total, player) => {
         const tier = player.soloQueueTier ?? player.SoloQueueTier ?? "UNRANKED";
         const rank = player.soloQueueRank ?? player.SoloQueueRank ?? "";
@@ -64,6 +63,8 @@ function normalizePlayer(player, index) {
         role: player.mainRole ?? player.MainRole ?? player.role ?? player.Role ?? player.position ?? player.Position ?? "Flex",
         elo: `${normalizeEloLabel(player.soloQueueTier ?? player.SoloQueueTier)} ${player.soloQueueRank ?? player.SoloQueueRank ?? ""}`.trim(),
         soloQueueTier: player.soloQueueTier ?? player.SoloQueueTier,
+        soloQueueRank: player.soloQueueRank ?? player.SoloQueueRank ?? "",
+        soloQueueLP: player.soloQueueLP ?? player.SoloQueueLP ?? 0,
         isCaptain: player.isCaptain ?? player.IsCaptain ?? false,
         profileImageUrl: player.profileImageUrl ?? player.ProfileImageUrl ?? "",
         discordUsername: player.discordUsername ?? player.DiscordUsername ?? "",
@@ -101,6 +102,7 @@ function normalizeTeam(team, tournamentTeamIds = new Set()) {
     const status = automaticStatus.key === "recruiting" && !isRecruiting
         ? { key: "closed", label: "Nao recrutando" }
         : automaticStatus;
+    const storedPoints = Number(team.points ?? team.Points);
 
     return {
         id,
@@ -112,7 +114,7 @@ function normalizeTeam(team, tournamentTeamIds = new Set()) {
         playerCount: players.length,
         status,
         averageElo,
-        points: getTeamPoints(players, team.points ?? team.Points),
+        points: Number.isFinite(storedPoints) ? storedPoints : getTeamPoints(players),
         ownerId: team.ownerId ?? team.OwnerId,
         profileImageUrl: team.profileImageUrl ?? team.ProfileImageUrl ?? "",
     };

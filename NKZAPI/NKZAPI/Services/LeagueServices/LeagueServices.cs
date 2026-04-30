@@ -1,9 +1,13 @@
 
 using Microsoft.EntityFrameworkCore;
+using NKZAPI.Data;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Repositories;
+using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 
 namespace NKZAPI.Services.LeagueServices
 {
@@ -13,13 +17,19 @@ namespace NKZAPI.Services.LeagueServices
         private readonly TeamRepository _teamRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _env;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+        private readonly NKZAPIContext _context;
 
-        public LeagueServices(LeagueRepository leagueRepository, TeamRepository teamRepository, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment env)
+        public LeagueServices(LeagueRepository leagueRepository, TeamRepository teamRepository, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment env, IHttpClientFactory httpClientFactory, IConfiguration configuration, NKZAPIContext context)
         {
             _leagueRepository = leagueRepository;
             _teamRepository = teamRepository;
             _httpContextAccessor = httpContextAccessor;
             _env = env;
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+            _context = context;
         }
 
         public async Task<List<League>> GetAllLeaguesAsync()
@@ -45,6 +55,7 @@ namespace NKZAPI.Services.LeagueServices
                 }
 
                 league.MaxTeams = 16;
+                league.MaximumTeamPoints = league.MaximumTeamPoints <= 0 ? 999999 : league.MaximumTeamPoints;
                 if (string.IsNullOrWhiteSpace(league.Modality))
                 {
                     league.Modality = "Chaveamento";
@@ -93,6 +104,10 @@ namespace NKZAPI.Services.LeagueServices
                 existing.MaxTeams = league.MaxTeams;
                 existing.MinimumElo = league.MinimumElo;
                 existing.MaximumElo = league.MaximumElo;
+                existing.MinimumTeamPoints = league.MinimumTeamPoints;
+                existing.MaximumTeamPoints = league.MaximumTeamPoints <= 0 ? 999999 : league.MaximumTeamPoints;
+                existing.RankingQueueOpenTime = league.RankingQueueOpenTime;
+                existing.RankingQueueCloseTime = league.RankingQueueCloseTime;
                 existing.StartDate = league.StartDate;
                 existing.EndDate = league.EndDate;
                 existing.Modality = league.Modality;
@@ -185,6 +200,7 @@ namespace NKZAPI.Services.LeagueServices
 
         public async Task DeleteLeagueAsync(League league)
         {
+            await RefundLeaguePaymentsToWalletAsync(league.Id);
             await _leagueRepository.DeleteLeagueAsync(league);
         }
 
@@ -223,7 +239,7 @@ namespace NKZAPI.Services.LeagueServices
                     return response;
                 }
 
-                if (league.Matches.Any())
+                if (!IsRankingLeague(league) && league.Matches.Any())
                 {
                     response.Success = false;
                     response.Message = "O chaveamento desta liga ja foi gerado.";
@@ -244,12 +260,32 @@ namespace NKZAPI.Services.LeagueServices
                     return response;
                 }
 
-                await _leagueRepository.AddTeamToLeagueAsync(leagueId, team);
-                var updatedLeague = await _leagueRepository.GetLeagueByIdAsync(leagueId);
-                if (updatedLeague != null && updatedLeague.Teams.Count == 16 && !updatedLeague.Matches.Any())
+                if (!TeamMatchesPointRange(league, team))
                 {
-                    await GeneratePlayoffAsync(leagueId);
+                    response.Success = false;
+                    response.Message = $"O time precisa ter entre {league.MinimumTeamPoints} e {league.MaximumTeamPoints} pontos para entrar nesta liga.";
+                    return response;
                 }
+
+                if (league.EntryFee > 0 && await _leagueRepository.GetApprovedLeaguePaymentAsync(leagueId, teamId) == null)
+                {
+                    var paymentResponse = await PayLeagueEntryAsync(league, team);
+                    if (paymentResponse.Success && paymentResponse.Data == "wallet-paid")
+                    {
+                        await AddTeamToLeagueAfterApprovalAsync(leagueId, teamId);
+                        response.Success = true;
+                        response.Message = "Entrada paga com saldo da carteira. Time inscrito na liga.";
+                        response.Data = teamId.ToString();
+                        return response;
+                    }
+
+                    response.Success = paymentResponse.Success;
+                    response.Message = paymentResponse.Message;
+                    response.Data = paymentResponse.Data;
+                    return response;
+                }
+
+                await AddTeamToLeagueAfterApprovalAsync(leagueId, teamId);
                 response.Success = true;
                 response.Message = "Team added to league.";
                 response.Data = teamId.ToString();
@@ -260,6 +296,124 @@ namespace NKZAPI.Services.LeagueServices
                 response.Message = $"An error occurred while adding team to league: {ex.Message}";
             }
             return response;
+        }
+
+        public async Task<Response<string>> ConfirmLeaguePaymentAsync(Guid paymentId)
+        {
+            var response = new Response<string>();
+            try
+            {
+                var payment = await _leagueRepository.GetLeaguePaymentByIdAsync(paymentId);
+                if (payment == null)
+                {
+                    response.Success = false;
+                    response.Message = "Pagamento nao encontrado.";
+                    return response;
+                }
+
+                if (!string.IsNullOrWhiteSpace(payment.ProviderPaymentId))
+                {
+                    return await ProcessMercadoPagoNotificationAsync(payment.ProviderPaymentId);
+                }
+
+                response.Success = payment.Status == "Approved";
+                response.Message = payment.Status == "Approved"
+                    ? "Pagamento aprovado."
+                    : "Pagamento ainda nao foi aprovado.";
+                response.Data = payment.CheckoutUrl ?? payment.Id.ToString();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Erro ao confirmar pagamento: {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public async Task<Response<string>> ProcessMercadoPagoNotificationAsync(string? paymentId)
+        {
+            var response = new Response<string>();
+            try
+            {
+                if (string.IsNullOrWhiteSpace(paymentId))
+                {
+                    response.Success = false;
+                    response.Message = "Payment id is required.";
+                    return response;
+                }
+
+                var info = await GetMercadoPagoPaymentAsync(paymentId);
+                if (info == null)
+                {
+                    response.Success = false;
+                    response.Message = "Pagamento nao encontrado no Mercado Pago.";
+                    return response;
+                }
+
+                var payment = Guid.TryParse(info.ExternalReference, out var internalPaymentId)
+                    ? await _leagueRepository.GetLeaguePaymentByIdAsync(internalPaymentId)
+                    : await _leagueRepository.GetLeaguePaymentByProviderPaymentIdAsync(info.PaymentId);
+
+                if (payment == null)
+                {
+                    response.Success = false;
+                    response.Message = "Pagamento local nao encontrado.";
+                    return response;
+                }
+
+                payment.ProviderPaymentId = info.PaymentId;
+                payment.Status = ToLocalPaymentStatus(info.Status);
+                payment.UpdatedAt = DateTime.UtcNow;
+
+                if (payment.Status == "Approved")
+                {
+                    payment.ApprovedAt ??= DateTime.UtcNow;
+                    await AddTeamToLeagueAfterApprovalAsync(payment.LeagueId, payment.TeamId);
+                    response.Message = "Pagamento aprovado. Time inscrito na liga.";
+                }
+                else
+                {
+                    response.Message = $"Pagamento atualizado: {payment.Status}.";
+                }
+
+                await _leagueRepository.SaveChangesAsync();
+                response.Success = true;
+                response.Data = payment.Id.ToString();
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Erro ao processar pagamento: {ex.Message}";
+            }
+
+            return response;
+        }
+
+        private async Task RefundLeaguePaymentsToWalletAsync(Guid leagueId)
+        {
+            var payments = await _leagueRepository.GetApprovedLeaguePaymentsByLeagueAsync(leagueId);
+            foreach (var payment in payments.Where(item => item.CreatedByUserId.HasValue && item.TotalAmount > 0 && item.Status == "Approved"))
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(item => item.Id == payment.CreatedByUserId!.Value);
+                if (user == null) continue;
+
+                user.WalletBalance += payment.TotalAmount;
+                payment.Status = "Refunded";
+                payment.UpdatedAt = DateTime.UtcNow;
+                _context.WalletTransactions.Add(new WalletTransaction
+                {
+                    UserId = user.Id,
+                    Amount = payment.TotalAmount,
+                    Type = "Refund",
+                    Description = "Credito por cancelamento de liga",
+                    LeagueId = payment.LeagueId,
+                    TeamId = payment.TeamId,
+                    LeaguePaymentId = payment.Id
+                });
+            }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<Response<string>> RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId)
@@ -297,7 +451,7 @@ namespace NKZAPI.Services.LeagueServices
                     return response;
                 }
 
-                if (league.Matches.Any())
+                if (!IsRankingLeague(league) && league.Matches.Any())
                 {
                     response.Success = false;
                     response.Message = "Nao e possivel remover times depois que o chaveamento foi gerado.";
@@ -342,6 +496,13 @@ namespace NKZAPI.Services.LeagueServices
             {
                 response.Success = false;
                 response.Message = "A liga precisa ter exatamente 16 times para gerar o chaveamento.";
+                return response;
+            }
+
+            if (IsRankingLeague(league))
+            {
+                response.Success = false;
+                response.Message = "Ligas de ranking nao possuem chaveamento.";
                 return response;
             }
 
@@ -561,6 +722,146 @@ namespace NKZAPI.Services.LeagueServices
             return response;
         }
 
+        public async Task<Response<string>> JoinRankingQueueAsync(Guid leagueId, Guid teamId)
+        {
+            var response = new Response<string>();
+            var league = await _leagueRepository.GetLeagueByIdAsync(leagueId);
+            if (league == null)
+            {
+                response.Success = false;
+                response.Message = "League not found.";
+                return response;
+            }
+
+            if (!IsRankingLeague(league))
+            {
+                response.Success = false;
+                response.Message = "A fila esta disponivel apenas para ligas de ranking.";
+                return response;
+            }
+
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+
+            if (!CanManageTeam(team, out var authMessage))
+            {
+                response.Success = false;
+                response.Message = authMessage;
+                return response;
+            }
+
+            if (!league.Teams.Any(item => item.Id == teamId))
+            {
+                response.Success = false;
+                response.Message = "Seu time precisa estar inscrito nesta liga antes de entrar na fila.";
+                return response;
+            }
+
+            if (!TeamMatchesPointRange(league, team))
+            {
+                response.Success = false;
+                response.Message = $"O time precisa ter entre {league.MinimumTeamPoints} e {league.MaximumTeamPoints} pontos para jogar esta liga.";
+                return response;
+            }
+
+            if (!IsLeagueOpenByDates(league))
+            {
+                response.Success = false;
+                response.Message = "A liga nao esta dentro do periodo ativo.";
+                return response;
+            }
+
+            if (!IsQueueWindowOpen(league))
+            {
+                response.Success = false;
+                response.Message = league.RankingQueueOpenTime.HasValue
+                    ? $"A fila abre as {league.RankingQueueOpenTime.Value:hh\\:mm}."
+                    : "A fila ainda nao possui horario configurado.";
+                return response;
+            }
+
+            if (HasActiveRankingMatch(league, teamId))
+            {
+                response.Success = false;
+                response.Message = "Finalize sua partida atual antes de entrar na fila novamente.";
+                return response;
+            }
+
+            if (await _leagueRepository.GetWaitingQueueEntryAsync(leagueId, teamId) != null)
+            {
+                response.Success = false;
+                response.Message = "Seu time ja esta na fila.";
+                return response;
+            }
+
+            var entry = await _leagueRepository.AddQueueEntryAsync(new LeagueQueueEntry
+            {
+                Id = Guid.NewGuid(),
+                LeagueId = leagueId,
+                TeamId = teamId,
+                Status = "Waiting",
+                JoinedAt = DateTime.UtcNow
+            });
+
+            var waiting = await _leagueRepository.GetWaitingQueueEntriesAsync(leagueId);
+            if (waiting.Count >= 2)
+            {
+                var first = entry;
+                var second = waiting.First(item => item.TeamId != teamId);
+                var match = await CreateRankingMatchAsync(league, first, second);
+
+                response.Success = true;
+                response.Message = $"Partida encontrada. Codigo de acesso: {match.AccessCode}";
+                response.Data = match.Id.ToString();
+                return response;
+            }
+
+            response.Success = true;
+            response.Message = "Seu time entrou na fila. Aguardando outro time.";
+            response.Data = entry.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<string>> LeaveRankingQueueAsync(Guid leagueId, Guid teamId)
+        {
+            var response = new Response<string>();
+            var team = await _teamRepository.GetTeamByIdAsync(teamId);
+            if (team == null)
+            {
+                response.Success = false;
+                response.Message = "Team not found.";
+                return response;
+            }
+
+            if (!CanManageTeam(team, out var authMessage))
+            {
+                response.Success = false;
+                response.Message = authMessage;
+                return response;
+            }
+
+            var entry = await _leagueRepository.GetWaitingQueueEntryAsync(leagueId, teamId);
+            if (entry == null)
+            {
+                response.Success = false;
+                response.Message = "Seu time nao esta na fila.";
+                return response;
+            }
+
+            entry.Status = "Cancelled";
+            await _leagueRepository.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Seu time saiu da fila.";
+            response.Data = teamId.ToString();
+            return response;
+        }
+
         public async Task<Response<string>> ProposeMatchScheduleAsync(Guid matchId, LeagueMatchScheduleProposalDto proposal)
         {
             var response = new Response<string>();
@@ -725,7 +1026,10 @@ namespace NKZAPI.Services.LeagueServices
 
             await UpdateStandingAsync(match.LeagueId, winnerId, true, teamAScore, teamBScore, match.TeamAId == winnerId);
             await UpdateStandingAsync(match.LeagueId, loserId, false, teamAScore, teamBScore, match.TeamAId == loserId);
-            await AdvanceBracketAsync(match, winnerId, loserId);
+            if (!IsRankingMatch(match))
+            {
+                await AdvanceBracketAsync(match, winnerId, loserId);
+            }
         }
 
         private static LeagueMatch CreateMatch(Guid leagueId, string bracket, string roundKey, string roundName, int week, int matchNumber, Guid? teamAId, Guid? teamBId, int bestOf, DateTime startDate)
@@ -742,8 +1046,40 @@ namespace NKZAPI.Services.LeagueServices
                 BestOf = bestOf,
                 TeamAId = teamAId,
                 TeamBId = teamBId,
+                AccessCode = "",
                 ScheduledAt = startDate.Date.AddDays((week - 1) * 7)
             };
+        }
+
+        private async Task<LeagueMatch> CreateRankingMatchAsync(League league, LeagueQueueEntry first, LeagueQueueEntry second)
+        {
+            var match = new LeagueMatch
+            {
+                Id = Guid.NewGuid(),
+                LeagueId = league.Id,
+                Bracket = "Ranking",
+                RoundKey = "RANKING",
+                RoundName = "Partida de ranking",
+                WeekNumber = Math.Max(1, (int)Math.Ceiling((DateTime.UtcNow.Date - (league.StartDate?.ToUniversalTime().Date ?? DateTime.UtcNow.Date)).TotalDays / 7.0) + 1),
+                MatchNumber = league.Matches.Count(item => item.Bracket == "Ranking") + 1,
+                BestOf = 1,
+                TeamAId = first.TeamId,
+                TeamBId = second.TeamId,
+                ScheduledAt = DateTime.UtcNow,
+                ScheduleStatus = "Confirmed",
+                Status = "Ready",
+                AccessCode = GenerateAccessCode()
+            };
+
+            var created = await _leagueRepository.AddMatchAsync(match);
+            first.Status = "Matched";
+            first.MatchedAt = DateTime.UtcNow;
+            first.MatchId = created.Id;
+            second.Status = "Matched";
+            second.MatchedAt = DateTime.UtcNow;
+            second.MatchId = created.Id;
+            await _leagueRepository.SaveChangesAsync();
+            return created;
         }
 
         private static void AddEmptyRound(List<LeagueMatch> matches, Guid leagueId, string bracket, string roundKey, string roundName, int week, int count, int bestOf, DateTime startDate)
@@ -756,8 +1092,7 @@ namespace NKZAPI.Services.LeagueServices
 
         private static double GetTeamSeedScore(Team team)
         {
-            var players = team.Players ?? new List<Player>();
-            return players.Sum(GetPlayerSeedScore);
+            return team.Points > 0 ? team.Points : (team.Players ?? new List<Player>()).Sum(GetPlayerSeedScore);
         }
 
         private static double GetPlayerSeedScore(Player player)
@@ -854,6 +1189,296 @@ namespace NKZAPI.Services.LeagueServices
             standing.MapsPlayed += Math.Max(1, ownScore + opponentScore);
             standing.MapDiff += ownScore - opponentScore;
             await _leagueRepository.SaveChangesAsync();
+        }
+
+        private static bool IsRankingLeague(League league)
+        {
+            return string.Equals(league.Modality, "Ranking", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsRankingMatch(LeagueMatch match)
+        {
+            return string.Equals(match.Bracket, "Ranking", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(match.RoundKey, "RANKING", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool HasActiveRankingMatch(League league, Guid teamId)
+        {
+            return league.Matches.Any(match =>
+                IsRankingMatch(match) &&
+                !string.Equals(match.Status, "Completed", StringComparison.OrdinalIgnoreCase) &&
+                (match.TeamAId == teamId || match.TeamBId == teamId));
+        }
+
+        private async Task<Response<string>> PayLeagueEntryAsync(League league, Team team)
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                return new Response<string> { Success = false, Message = "Unauthorized" };
+            }
+
+            var existing = await _leagueRepository.GetPendingLeaguePaymentAsync(league.Id, team.Id);
+            if (existing != null && !string.IsNullOrWhiteSpace(existing.CheckoutUrl))
+            {
+                return new Response<string>
+                {
+                    Success = true,
+                    Message = "Pagamento pendente. Abra o checkout para concluir a inscricao.",
+                    Data = existing.CheckoutUrl
+                };
+            }
+
+            var entryFee = Convert.ToDecimal(league.EntryFee);
+            var account = await _context.Users.FirstOrDefaultAsync(item => item.Id == callerId);
+            if (account == null)
+            {
+                return new Response<string> { Success = false, Message = "Usuario nao encontrado." };
+            }
+
+            var walletCreditUsed = Math.Min(account.WalletBalance, entryFee);
+            var remaining = entryFee - walletCreditUsed;
+
+            if (remaining <= 0)
+            {
+                account.WalletBalance -= walletCreditUsed;
+                var walletPayment = await _leagueRepository.AddLeaguePaymentAsync(new LeaguePayment
+                {
+                    Id = Guid.NewGuid(),
+                    LeagueId = league.Id,
+                    TeamId = team.Id,
+                    CreatedByUserId = callerId,
+                    Amount = 0,
+                    TotalAmount = entryFee,
+                    WalletCreditUsed = walletCreditUsed,
+                    Status = "Approved",
+                    Provider = "Wallet",
+                    ApprovedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                _context.WalletTransactions.Add(new WalletTransaction
+                {
+                    UserId = callerId,
+                    Amount = -walletCreditUsed,
+                    Type = "Debit",
+                    Description = $"Inscricao na liga {league.Name}",
+                    LeagueId = league.Id,
+                    TeamId = team.Id,
+                    LeaguePaymentId = walletPayment.Id
+                });
+                await _context.SaveChangesAsync();
+
+                return new Response<string> { Success = true, Message = "Entrada paga com saldo da carteira.", Data = "wallet-paid" };
+            }
+
+            var paymentResponse = await CreateOrReuseLeaguePaymentAsync(league, team, callerId, remaining, entryFee, walletCreditUsed);
+            if (walletCreditUsed > 0 && paymentResponse.Success)
+            {
+                account.WalletBalance -= walletCreditUsed;
+                _context.WalletTransactions.Add(new WalletTransaction
+                {
+                    UserId = callerId,
+                    Amount = -walletCreditUsed,
+                    Type = "Debit",
+                    Description = $"Credito usado na inscricao da liga {league.Name}",
+                    LeagueId = league.Id,
+                    TeamId = team.Id
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            return paymentResponse;
+        }
+
+        private async Task<Response<string>> CreateOrReuseLeaguePaymentAsync(League league, Team team, Guid callerId, decimal amount, decimal totalAmount, decimal walletCreditUsed)
+        {
+            var response = new Response<string>();
+            var accessToken = _configuration["MercadoPago:AccessToken"];
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                response.Success = false;
+                response.Message = "Mercado Pago nao esta configurado. Defina MercadoPago__AccessToken.";
+                return response;
+            }
+
+            var payment = await _leagueRepository.AddLeaguePaymentAsync(new LeaguePayment
+            {
+                Id = Guid.NewGuid(),
+                LeagueId = league.Id,
+                TeamId = team.Id,
+                CreatedByUserId = callerId,
+                Amount = amount,
+                TotalAmount = totalAmount,
+                WalletCreditUsed = walletCreditUsed,
+                Status = "Pending"
+            });
+
+            var checkoutUrl = await CreateMercadoPagoPreferenceAsync(league, team, payment, accessToken);
+            payment.CheckoutUrl = checkoutUrl.Url;
+            payment.ProviderPreferenceId = checkoutUrl.PreferenceId;
+            payment.UpdatedAt = DateTime.UtcNow;
+            await _leagueRepository.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Pagamento necessario para entrar nesta liga.";
+            response.Data = payment.CheckoutUrl;
+            return response;
+        }
+
+        private async Task<(string PreferenceId, string Url)> CreateMercadoPagoPreferenceAsync(League league, Team team, LeaguePayment payment, string accessToken)
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            var apiBaseUrl = (_configuration["Api:BaseUrl"] ?? _configuration["App:BaseUrl"])?.TrimEnd('/');
+            if (string.IsNullOrWhiteSpace(apiBaseUrl) && httpContext != null)
+            {
+                apiBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+            }
+
+            var frontendBaseUrl = (_configuration["Frontend:BaseUrl"] ?? "http://localhost:5173").TrimEnd('/');
+            var leagueUrl = $"{frontendBaseUrl}/leagues/{league.Id}";
+            var payload = new Dictionary<string, object?>
+            {
+                ["items"] = new[]
+                {
+                    new Dictionary<string, object?>
+                    {
+                        ["title"] = $"Inscricao {league.Name} - {team.Name}",
+                        ["quantity"] = 1,
+                        ["currency_id"] = "BRL",
+                        ["unit_price"] = payment.Amount
+                    }
+                },
+                ["external_reference"] = payment.Id.ToString(),
+                ["notification_url"] = $"{apiBaseUrl}/api/league/payments/mercadopago/webhook",
+                ["back_urls"] = new Dictionary<string, object?>
+                {
+                    ["success"] = $"{leagueUrl}?payment=success",
+                    ["failure"] = $"{leagueUrl}?payment=failure",
+                    ["pending"] = $"{leagueUrl}?payment=pending"
+                },
+                ["auto_return"] = "approved"
+            };
+
+            var client = _httpClientFactory.CreateClient();
+            using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.mercadopago.com/checkout/preferences");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            request.Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+
+            using var result = await client.SendAsync(request);
+            var body = await result.Content.ReadAsStringAsync();
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException($"Mercado Pago retornou HTTP {(int)result.StatusCode}: {body}");
+            }
+
+            using var document = JsonDocument.Parse(body);
+            var root = document.RootElement;
+            var preferenceId = root.TryGetProperty("id", out var idElement) ? idElement.GetString() ?? "" : "";
+            var initPoint = root.TryGetProperty("init_point", out var initPointElement) ? initPointElement.GetString() : null;
+            var sandboxInitPoint = root.TryGetProperty("sandbox_init_point", out var sandboxElement) ? sandboxElement.GetString() : null;
+            var url = accessToken.StartsWith("TEST-", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(sandboxInitPoint)
+                ? sandboxInitPoint
+                : initPoint;
+
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                throw new InvalidOperationException("Mercado Pago nao retornou URL de checkout.");
+            }
+
+            return (preferenceId, url);
+        }
+
+        private async Task<MercadoPagoPaymentInfo?> GetMercadoPagoPaymentAsync(string paymentId)
+        {
+            var accessToken = _configuration["MercadoPago:AccessToken"];
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                throw new InvalidOperationException("Mercado Pago nao esta configurado. Defina MercadoPago__AccessToken.");
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"https://api.mercadopago.com/v1/payments/{paymentId}");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            using var result = await client.SendAsync(request);
+            var body = await result.Content.ReadAsStringAsync();
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new InvalidOperationException($"Mercado Pago retornou HTTP {(int)result.StatusCode}: {body}");
+            }
+
+            using var document = JsonDocument.Parse(body);
+            var root = document.RootElement;
+            var id = root.TryGetProperty("id", out var idElement) ? idElement.GetRawText().Trim('"') : paymentId;
+            var status = root.TryGetProperty("status", out var statusElement) ? statusElement.GetString() ?? "" : "";
+            var externalReference = root.TryGetProperty("external_reference", out var referenceElement) ? referenceElement.GetString() : null;
+            return new MercadoPagoPaymentInfo(id, status, externalReference);
+        }
+
+        private async Task AddTeamToLeagueAfterApprovalAsync(Guid leagueId, Guid teamId)
+        {
+            var league = await _leagueRepository.GetLeagueByIdAsync(leagueId) ?? throw new InvalidOperationException("League not found.");
+            if (league.Teams.Any(team => team.Id == teamId)) return;
+            if (league.Teams.Count >= league.MaxTeams)
+            {
+                throw new InvalidOperationException("League has reached its maximum number of teams.");
+            }
+
+            var team = await _teamRepository.GetTeamByIdAsync(teamId) ?? throw new InvalidOperationException("Team not found.");
+            await _leagueRepository.AddTeamToLeagueAsync(leagueId, team);
+            var updatedLeague = await _leagueRepository.GetLeagueByIdAsync(leagueId);
+            if (updatedLeague != null && !IsRankingLeague(updatedLeague) && updatedLeague.Teams.Count == 16 && !updatedLeague.Matches.Any())
+            {
+                await GeneratePlayoffAsync(leagueId);
+            }
+        }
+
+        private static string ToLocalPaymentStatus(string? mercadoPagoStatus)
+        {
+            return string.Equals(mercadoPagoStatus, "approved", StringComparison.OrdinalIgnoreCase)
+                ? "Approved"
+                : string.Equals(mercadoPagoStatus, "rejected", StringComparison.OrdinalIgnoreCase) ||
+                  string.Equals(mercadoPagoStatus, "cancelled", StringComparison.OrdinalIgnoreCase)
+                    ? "Rejected"
+                    : "Pending";
+        }
+
+        private static bool TeamMatchesPointRange(League league, Team team)
+        {
+            var max = league.MaximumTeamPoints <= 0 ? 999999 : league.MaximumTeamPoints;
+            return team.Points >= league.MinimumTeamPoints && team.Points <= max;
+        }
+
+        private static bool IsLeagueOpenByDates(League league)
+        {
+            var brazilOffset = TimeSpan.FromHours(-3);
+            var today = DateOnly.FromDateTime(DateTimeOffset.UtcNow.ToOffset(brazilOffset).DateTime);
+            var start = league.StartDate.HasValue
+                ? DateOnly.FromDateTime(new DateTimeOffset(DateTime.SpecifyKind(league.StartDate.Value, DateTimeKind.Utc)).ToOffset(brazilOffset).DateTime)
+                : (DateOnly?)null;
+            var end = league.EndDate.HasValue
+                ? DateOnly.FromDateTime(new DateTimeOffset(DateTime.SpecifyKind(league.EndDate.Value, DateTimeKind.Utc)).ToOffset(brazilOffset).DateTime)
+                : (DateOnly?)null;
+
+            return (!start.HasValue || today >= start.Value) && (!end.HasValue || today <= end.Value);
+        }
+
+        private static bool IsQueueWindowOpen(League league)
+        {
+            if (!league.RankingQueueOpenTime.HasValue) return false;
+
+            var now = DateTimeOffset.UtcNow.ToOffset(TimeSpan.FromHours(-3)).TimeOfDay;
+            var open = league.RankingQueueOpenTime.Value;
+            var close = league.RankingQueueCloseTime ?? open.Add(TimeSpan.FromHours(4));
+            return close.TotalHours >= 24
+                ? now >= open || now <= close.Subtract(TimeSpan.FromHours(24))
+                : now >= open && now <= close;
+        }
+
+        private static string GenerateAccessCode()
+        {
+            return $"NKZ-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
         }
 
         private async Task AdvanceBracketAsync(LeagueMatch match, Guid winnerId, Guid loserId)
@@ -993,5 +1618,7 @@ namespace NKZAPI.Services.LeagueServices
 
             return Path.Combine("images", "league-proofs", fileName).Replace("\\", "/");
         }
+
+        private sealed record MercadoPagoPaymentInfo(string PaymentId, string Status, string? ExternalReference);
     }
 }

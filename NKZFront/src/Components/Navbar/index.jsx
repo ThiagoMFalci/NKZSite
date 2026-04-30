@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaCalendarAlt, FaChevronDown, FaRegBell, FaUserShield } from "react-icons/fa";
+import { FaCalendarAlt, FaChevronDown, FaPlus, FaRegBell, FaUserShield, FaWallet } from "react-icons/fa";
 import { clearSession, getAuthHeaders, getCurrentUser } from "../../utils/auth";
 import logo from "/logo.png"
 import "./style.css";
@@ -35,6 +35,7 @@ export default function Index() {
     const [profileDisplayName, setProfileDisplayName] = useState("");
     const [pendingNotifications, setPendingNotifications] = useState(0);
     const [pendingSchedules, setPendingSchedules] = useState(0);
+    const [walletBalance, setWalletBalance] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
     const currentUser = getCurrentUser();
@@ -49,6 +50,7 @@ export default function Index() {
                 setProfileDisplayName("");
                 setPendingNotifications(0);
                 setPendingSchedules(0);
+                setWalletBalance(0);
                 return;
             }
 
@@ -105,11 +107,17 @@ export default function Index() {
                             ["Open", "Pending", "Rejected"].includes(scheduleStatus);
                     }).length;
 
+                const walletResponse = await axios.get(`${API_BASE_URL}/api/auth/User/wallet`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => ({ data: null }));
+                const wallet = unwrapApiData(walletResponse.data);
+
                 if (isMounted) {
                     setProfileImageUrl(resolveImageUrl(imageUrl));
                     setProfileDisplayName(summonerName);
                     setPendingNotifications(pendingCount);
                     setPendingSchedules(scheduleCount);
+                    setWalletBalance(wallet?.balance ?? wallet?.Balance ?? 0);
                 }
             } catch {
                 if (isMounted) {
@@ -117,6 +125,7 @@ export default function Index() {
                     setProfileDisplayName("");
                     setPendingNotifications(0);
                     setPendingSchedules(0);
+                    setWalletBalance(0);
                 }
             }
         }
@@ -124,11 +133,13 @@ export default function Index() {
         loadProfileImage();
         window.addEventListener("nkz-profile-image-updated", loadProfileImage);
         window.addEventListener("nkz-player-synced", loadProfileImage);
+        window.addEventListener("nkz-wallet-updated", loadProfileImage);
 
         return () => {
             isMounted = false;
             window.removeEventListener("nkz-profile-image-updated", loadProfileImage);
             window.removeEventListener("nkz-player-synced", loadProfileImage);
+            window.removeEventListener("nkz-wallet-updated", loadProfileImage);
         };
     }, [currentUser?.userId]);
 
@@ -173,6 +184,11 @@ export default function Index() {
                         </span>
                     )}
                     <FaChevronDown className={`user-menu-arrow ${userMenuOpen ? "open" : ""}`} />
+                </button>
+                <button className="wallet-chip" type="button" onClick={() => navigateAndClose("/wallet")} aria-label="Adicionar saldo">
+                    <FaWallet />
+                    <span>{Number(walletBalance || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                    <FaPlus />
                 </button>
 
                 <div className={`user-menu-dropdown ${userMenuOpen ? "open" : ""}`}>

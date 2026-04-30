@@ -188,6 +188,9 @@
 
 .user-menu,
 .mobile-user-menu {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
     position: relative;
 }
 
@@ -254,6 +257,34 @@
     flex: 0 0 auto;
     font-size: 0.75rem;
     transition: transform 0.2s;
+}
+
+.wallet-chip {
+    align-items: center;
+    background: rgba(47, 134, 190, 0.08);
+    border: 1px solid rgba(47, 134, 190, 0.24);
+    border-radius: 4px;
+    color: #9bd2f6;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 800;
+    gap: 0.4rem;
+    min-height: 40px;
+    padding: 0.35rem 0.55rem;
+    transition: all 0.2s;
+}
+
+.wallet-chip:hover {
+    background: rgba(47, 134, 190, 0.14);
+    border-color: rgba(47, 134, 190, 0.42);
+    color: white;
+}
+
+.wallet-chip svg:last-child {
+    color: var(--laranja);
+    font-size: 0.68rem;
 }
 
 .notification-pulse {
@@ -401,11 +432,17 @@
 
 .mobile-user-menu {
     width: 100%;
+    flex-wrap: wrap;
 }
 
 .mobile-user-menu .user-menu-button {
     justify-content: space-between;
     max-width: none;
+    width: 100%;
+}
+
+.mobile-user-menu .wallet-chip {
+    justify-content: center;
     width: 100%;
 }
 

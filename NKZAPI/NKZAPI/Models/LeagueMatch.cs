@@ -15,6 +15,7 @@ namespace NKZAPI.Models
         public Guid? LoserTeamId { get; set; }
         public int TeamAScore { get; set; }
         public int TeamBScore { get; set; }
+        public string AccessCode { get; set; } = "";
         public DateTime? ScheduledAt { get; set; }
         public DateTime? ProposedScheduledAt { get; set; }
         public Guid? ProposedByTeamId { get; set; }

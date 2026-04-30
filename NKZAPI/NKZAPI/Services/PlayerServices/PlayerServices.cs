@@ -138,6 +138,33 @@ namespace NKZAPI.Services.PlayerServices
             return response;
         }
 
+        public async Task<Response<Player>> RefreshPlayerFromRiotAsync(Guid userId, string region = "br1")
+        {
+            var playerResponse = await GetPlayerByUserIdAsync(userId);
+            if (!playerResponse.Success || playerResponse.Data == null)
+            {
+                return new Response<Player>
+                {
+                    Success = false,
+                    Message = "Player not found.",
+                    Data = null
+                };
+            }
+
+            var player = playerResponse.Data;
+            if (string.IsNullOrWhiteSpace(player.SummonerName))
+            {
+                return new Response<Player>
+                {
+                    Success = false,
+                    Message = "Player does not have a Riot ID linked.",
+                    Data = null
+                };
+            }
+
+            return await UpdatePlayerFromRiotAsync(userId, player.SummonerName, region);
+        }
+
         public async Task<Response<List<Player>>> GetAllPlayersAsync()
         {
             var response = new Response<List<Player>>();

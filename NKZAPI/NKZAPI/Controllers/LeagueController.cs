@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.LeagueServices;
+using System.Text.Json;
 
 namespace NKZAPI.Controllers
 {
@@ -79,6 +80,51 @@ namespace NKZAPI.Controllers
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
+
+        [Authorize]
+        [HttpPost("payments/{paymentId:guid}/confirm")]
+        public async Task<ActionResult> ConfirmLeaguePaymentAsync(Guid paymentId)
+        {
+            var response = await _leagueServices.ConfirmLeaguePaymentAsync(paymentId);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [HttpPost("payments/mercadopago/webhook")]
+        public async Task<ActionResult> MercadoPagoWebhookAsync()
+        {
+            var paymentId = Request.Query["data.id"].FirstOrDefault()
+                ?? Request.Query["id"].FirstOrDefault()
+                ?? Request.Query["payment_id"].FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(paymentId) && Request.ContentLength.GetValueOrDefault() > 0)
+            {
+                using var document = await JsonDocument.ParseAsync(Request.Body);
+                var root = document.RootElement;
+                if (root.TryGetProperty("data", out var data) && data.TryGetProperty("id", out var dataId))
+                {
+                    paymentId = dataId.GetRawText().Trim('"');
+                }
+                else if (root.TryGetProperty("id", out var id))
+                {
+                    paymentId = id.GetRawText().Trim('"');
+                }
+            }
+
+            var response = await _leagueServices.ProcessMercadoPagoNotificationAsync(paymentId);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpGet("payments/mercadopago/webhook")]
+        public async Task<ActionResult> MercadoPagoWebhookGetAsync()
+        {
+            var paymentId = Request.Query["data.id"].FirstOrDefault()
+                ?? Request.Query["id"].FirstOrDefault()
+                ?? Request.Query["payment_id"].FirstOrDefault();
+            var response = await _leagueServices.ProcessMercadoPagoNotificationAsync(paymentId);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
         [Authorize]
         [HttpDelete("{leagueId:guid}/teams/{teamId:guid}")]
         public async Task<ActionResult> RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId)
@@ -129,6 +175,28 @@ namespace NKZAPI.Controllers
             var response = await _leagueServices.SubmitMatchReportAsync(matchId, reportedWinnerTeamId, proofImage);
             if (!response.Success && response.Message == "Unauthorized") return Unauthorized(new { message = response.Message });
             if (!response.Success && response.Message == "Forbidden") return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para reportar por este time." });
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpPost("{leagueId:guid}/queue/{teamId:guid}")]
+        public async Task<ActionResult> JoinRankingQueueAsync(Guid leagueId, Guid teamId)
+        {
+            var response = await _leagueServices.JoinRankingQueueAsync(leagueId, teamId);
+            if (!response.Success && response.Message == "Unauthorized") return Unauthorized(new { message = response.Message });
+            if (!response.Success && response.Message == "Forbidden") return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para usar este time." });
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpDelete("{leagueId:guid}/queue/{teamId:guid}")]
+        public async Task<ActionResult> LeaveRankingQueueAsync(Guid leagueId, Guid teamId)
+        {
+            var response = await _leagueServices.LeaveRankingQueueAsync(leagueId, teamId);
+            if (!response.Success && response.Message == "Unauthorized") return Unauthorized(new { message = response.Message });
+            if (!response.Success && response.Message == "Forbidden") return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao tem permissao para usar este time." });
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }

@@ -36,6 +36,7 @@
 .league-champion-showcase,
 .league-stars-showcase,
 .league-setup-panel,
+.league-ranking-queue-panel,
 .league-admin-panel,
 .league-panel,
 .league-state {
@@ -355,6 +356,18 @@
     white-space: nowrap;
 }
 
+.league-prize.entry-fee {
+    background: rgba(47, 134, 190, 0.08);
+    border: 1px solid rgba(47, 134, 190, 0.22);
+    border-radius: 5px;
+    padding: 0.55rem 0.65rem;
+}
+
+.league-prize.entry-fee strong {
+    color: #9bd2f6;
+    font-size: 1.2rem;
+}
+
 .league-prize span,
 .league-panel-title p,
 .league-setup-panel span,
@@ -403,6 +416,131 @@
     background: rgba(47, 134, 190, 0.12);
     border: 1px solid rgba(47, 134, 190, 0.34);
     color: #9bd2f6;
+}
+
+.league-feedback.warning {
+    background: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    color: #ffb274;
+}
+
+.league-ranking-queue-panel {
+    align-items: center;
+    background:
+        radial-gradient(circle at 12% 20%, rgba(47, 134, 190, 0.18), transparent 32%),
+        radial-gradient(circle at 88% 50%, rgba(249, 115, 22, 0.14), transparent 28%),
+        var(--league-card);
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.league-ranking-queue-panel h2 {
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.45rem;
+    letter-spacing: 0.04em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.league-ranking-queue-hours {
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    margin-top: 0.8rem;
+    max-width: 430px;
+}
+
+.queue-hour-card {
+    align-items: center;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.025));
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 6px;
+    display: grid;
+    gap: 0.65rem;
+    grid-template-columns: 38px minmax(0, 1fr);
+    min-height: 66px;
+    padding: 0.75rem;
+}
+
+.queue-hour-card svg {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 5px;
+    height: 38px;
+    padding: 0.55rem;
+    width: 38px;
+}
+
+.queue-hour-card strong {
+    color: rgba(245, 245, 245, 0.62);
+    display: block;
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.queue-hour-card span {
+    color: white;
+    display: block;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-top: 0.35rem;
+}
+
+.queue-hour-card.open {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(47, 134, 190, 0.28), transparent 48%),
+        rgba(47, 134, 190, 0.08);
+    border-color: rgba(47, 134, 190, 0.36);
+}
+
+.queue-hour-card.open svg,
+.queue-hour-card.open span {
+    color: #9bd2f6;
+}
+
+.queue-hour-card.close {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.25), transparent 48%),
+        rgba(249, 115, 22, 0.08);
+    border-color: rgba(249, 115, 22, 0.34);
+}
+
+.queue-hour-card.close svg,
+.queue-hour-card.close span {
+    color: var(--laranja);
+}
+
+.league-ranking-queue-panel span {
+    color: var(--league-muted);
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.league-ranking-queue-actions {
+    align-items: end;
+    display: grid;
+    gap: 0.6rem;
+    min-width: min(100%, 280px);
+}
+
+.league-ranking-queue-actions strong {
+    color: #9bd2f6;
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.league-ranking-queue-actions small {
+    color: rgba(245, 245, 245, 0.58);
+    line-height: 1.35;
+    max-width: 280px;
+    text-align: right;
 }
 
 .my-team-name {
@@ -892,6 +1030,109 @@
     padding: 0.7rem;
 }
 
+.calendar-result-box {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.14), transparent 34%),
+        rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(249, 115, 22, 0.22);
+    border-radius: 6px;
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 0.65rem;
+    padding: 0.75rem;
+}
+
+.calendar-result-head {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: space-between;
+}
+
+.calendar-result-head span {
+    color: var(--laranja);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.calendar-result-head strong {
+    background: rgba(47, 134, 190, 0.12);
+    border: 1px solid rgba(47, 134, 190, 0.34);
+    border-radius: 999px;
+    color: #9bd2f6;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    padding: 0.35rem 0.65rem;
+    text-transform: uppercase;
+}
+
+.calendar-result-form {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.calendar-result-form > span,
+.calendar-result-note {
+    color: var(--league-muted);
+    font-size: 0.86rem;
+    line-height: 1.4;
+}
+
+.calendar-result-form input {
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 5px;
+    color: var(--league-muted);
+    font: inherit;
+    padding: 0.55rem;
+    width: 100%;
+}
+
+.calendar-result-actions {
+    border-top: 0;
+    padding: 0;
+}
+
+.calendar-result-actions button:first-child {
+    background: rgba(47, 134, 190, 0.14);
+    border-color: rgba(47, 134, 190, 0.42);
+    color: #9bd2f6;
+}
+
+.calendar-result-actions button:last-child {
+    background: rgba(249, 115, 22, 0.13);
+    border-color: rgba(249, 115, 22, 0.42);
+    color: var(--laranja);
+}
+
+.calendar-result-completed {
+    align-items: center;
+    background: rgba(33, 198, 107, 0.1);
+    border: 1px solid rgba(33, 198, 107, 0.28);
+    border-radius: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: space-between;
+    padding: 0.65rem;
+}
+
+.calendar-result-completed strong {
+    color: #21c66b;
+}
+
+.calendar-result-completed span {
+    color: white;
+}
+
+.calendar-report-links {
+    border-top: 0;
+    padding: 0;
+}
+
 .calendar-schedule-badge {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 999px;
@@ -1087,6 +1328,31 @@
     padding: 0.65rem 0.75rem;
 }
 
+.league-match-access-code {
+    align-items: center;
+    background: rgba(47, 134, 190, 0.09);
+    border-bottom: 1px solid rgba(47, 134, 190, 0.22);
+    display: flex;
+    gap: 0.6rem;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+}
+
+.league-match-access-code span {
+    color: var(--league-muted);
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.league-match-access-code strong {
+    color: #9bd2f6;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+}
+
 .league-match-meta strong {
     color: var(--league-muted);
     font-size: 0.74rem;
@@ -1242,8 +1508,10 @@
 
 @media (max-width: 980px) {
     .league-hero,
-    .league-setup-panel {
+    .league-setup-panel,
+    .league-ranking-queue-panel {
         align-items: stretch;
+        flex-direction: column;
         grid-template-columns: 1fr;
     }
 
@@ -1276,6 +1544,15 @@
     .league-hero-side {
         text-align: left;
         width: 100%;
+    }
+
+    .league-ranking-queue-actions {
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .league-ranking-queue-actions strong {
+        text-align: left;
     }
 
     .standing-row,

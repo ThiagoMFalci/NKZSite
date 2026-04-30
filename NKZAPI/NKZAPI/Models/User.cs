@@ -13,5 +13,6 @@
         public string? DiscordVerificationCodeHash { get; set; }
         public DateTime? DiscordVerificationCodeExpiresAt { get; set; }
         public DateTime? DiscordVerifiedAt { get; set; }
+        public decimal WalletBalance { get; set; }
     }
 }
