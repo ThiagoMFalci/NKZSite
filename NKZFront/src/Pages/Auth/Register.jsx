@@ -18,7 +18,7 @@ function getApiMessage(error) {
 
 export default function Register() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "", discordUserId: "", code: "" });
+    const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "", discordUsername: "", code: "" });
     const [awaitingDiscord, setAwaitingDiscord] = useState(false);
     const [loading, setLoading] = useState(false);
     const [feedback, setFeedback] = useState({ type: "", message: "" });
@@ -43,7 +43,7 @@ export default function Register() {
         event.preventDefault();
         setFeedback({ type: "", message: "" });
 
-        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.discordUserId) {
+        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.discordUsername) {
             setFeedback({ type: "error", message: "Preencha todos os campos." });
             return;
         }
@@ -60,7 +60,7 @@ export default function Register() {
                 passwordHash: formData.password,
                 passwordSalt: formData.confirmPassword,
                 role: "User",
-                discordUserId: formData.discordUserId,
+                discordUsername: formData.discordUsername,
             });
 
             const success = response.data?.success ?? response.data?.Success ?? true;
@@ -159,53 +159,56 @@ export default function Register() {
                         </>
                     ) : (
                         <>
-                    <label>
-                        Email
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            autoComplete="email"
-                            placeholder="voce@email.com"
-                        />
-                    </label>
+                            <label>
+                                Email
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    autoComplete="email"
+                                    placeholder="voce@email.com"
+                                />
+                            </label>
 
-                    <label>
-                        Senha
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            autoComplete="new-password"
-                            placeholder="Crie uma senha"
-                        />
-                    </label>
+                            <label>
+                                Senha
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    autoComplete="new-password"
+                                    placeholder="Crie uma senha"
+                                />
+                            </label>
 
-                    <label>
-                        Confirmar senha
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            autoComplete="new-password"
-                            placeholder="Repita a senha"
-                        />
-                    </label>
+                            <label>
+                                Confirmar senha
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    autoComplete="new-password"
+                                    placeholder="Repita a senha"
+                                />
+                            </label>
 
-                    <label>
-                        Discord ID
-                        <input
-                            type="text"
-                            name="discordUserId"
-                            value={formData.discordUserId}
-                            onChange={handleChange}
-                            inputMode="numeric"
-                            placeholder="Ex: 123456789012345678"
-                        />
-                    </label>
+                            <label>
+                                Usuario do Discord
+                                <input
+                                    type="text"
+                                    name="discordUsername"
+                                    value={formData.discordUsername}
+                                    onChange={handleChange}
+                                    autoComplete="username"
+                                    placeholder="Ex: shorainopureiya"
+                                />
+                                <span className="auth-hint">
+                                    Use o nome de usuario, sem @. Voce precisa estar no servidor NKZ para receber o codigo.
+                                </span>
+                            </label>
                         </>
                     )}
 

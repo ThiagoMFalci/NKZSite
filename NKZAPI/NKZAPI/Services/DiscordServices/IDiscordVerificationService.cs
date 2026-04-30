@@ -1,7 +1,9 @@
+using NKZAPI.Dtos;
+
 namespace NKZAPI.Services.DiscordServices
 {
     public interface IDiscordVerificationService
     {
-        Task SendVerificationCodeAsync(string discordUserId, string email, string code);
+        Task<DiscordVerificationDeliveryDto> SendVerificationCodeAsync(string discordIdentity, string email, string code);
     }
 }

@@ -110,6 +110,16 @@
     color: rgba(245,245,245,0.28);
 }
 
+.auth-hint {
+    color: rgba(245,245,245,0.48);
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.45;
+    margin-top: -0.35rem;
+    text-transform: none;
+}
+
 .auth-feedback {
     border-radius: 3px;
     font-size: 0.82rem;

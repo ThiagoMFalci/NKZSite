@@ -89,6 +89,22 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "ResendDiscordVerificationAsync",
+    "RelativePath": "api/auth/User/ResendDiscordVerification",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
     "Method": "UpdateUsers",
     "RelativePath": "api/auth/User/UpdateUsers",
     "HttpMethod": "PUT",
@@ -117,6 +133,22 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "VerifyDiscordAsync",
+    "RelativePath": "api/auth/User/VerifyDiscord",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verification",
+        "Type": "NKZAPI.Dtos.DiscordVerificationDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "NKZAPI.Controllers.LeagueController",

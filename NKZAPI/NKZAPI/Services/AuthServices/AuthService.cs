@@ -36,16 +36,27 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
-                var discordUserId = NormalizeDiscordUserId(User.DiscordUserId);
-                if (string.IsNullOrWhiteSpace(discordUserId))
+                var discordIdentity = NormalizeDiscordIdentity(User.DiscordUsername, User.DiscordUserId);
+                if (string.IsNullOrWhiteSpace(discordIdentity))
                 {
                     response.Data = null;
-                    response.Message = "Informe seu Discord ID para criar a conta.";
+                    response.Message = "Informe seu usuario do Discord para criar a conta.";
                     response.Success = false;
                     return response;
                 }
 
-                var discordExists = await _context.Users.AnyAsync(u => u.DiscordUserId == discordUserId);
+                _passInterface.CreatePassHash(User.PasswordHash, out byte[] passwordHash, out byte[] passwordSalt);
+                var code = GenerateCode();
+                var delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, User.Email, code);
+                if (string.IsNullOrWhiteSpace(delivery.DiscordUserId))
+                {
+                    response.Data = null;
+                    response.Message = "Nao foi possivel localizar este Discord no servidor NKZ.";
+                    response.Success = false;
+                    return response;
+                }
+
+                var discordExists = await _context.Users.AnyAsync(u => u.DiscordUserId == delivery.DiscordUserId);
                 if (discordExists)
                 {
                     response.Data = null;
@@ -54,8 +65,6 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
-                _passInterface.CreatePassHash(User.PasswordHash, out byte[] passwordHash, out byte[] passwordSalt);
-                var code = GenerateCode();
                 var user = new User
                 {
                     Email = User.Email,
@@ -63,13 +72,12 @@ namespace NKZAPI.Services.AuthServices
                     PasswordSalt = passwordSalt,
                     Player = new List<Player>(),
                     Role = User.Role,
-                    DiscordUserId = discordUserId,
+                    DiscordUserId = delivery.DiscordUserId,
+                    DiscordUsername = string.IsNullOrWhiteSpace(delivery.DiscordUsername) ? discordIdentity : delivery.DiscordUsername,
                     DiscordVerified = false,
                     DiscordVerificationCodeHash = HashCode(code),
                     DiscordVerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
                 };
-
-                await _discordVerificationService.SendVerificationCodeAsync(discordUserId, User.Email, code);
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
@@ -80,7 +88,8 @@ namespace NKZAPI.Services.AuthServices
                     PasswordHash = "",
                     PasswordSalt = "",
                     Role = user.Role,
-                    DiscordUserId = discordUserId,
+                    DiscordUserId = user.DiscordUserId,
+                    DiscordUsername = user.DiscordUsername ?? "",
                 };
                 response.Message = "Conta criada. Enviamos um codigo no privado do Discord para confirmacao.";
             }
@@ -224,10 +233,17 @@ namespace NKZAPI.Services.AuthServices
             return user == null;
         }
 
-        private static string NormalizeDiscordUserId(string? value)
+        private static string NormalizeDiscordIdentity(string? username, string? userId)
         {
-            var normalized = Regex.Replace(value ?? "", "[^0-9]", "");
-            return Regex.IsMatch(normalized, "^[0-9]{17,20}$") ? normalized : "";
+            var raw = string.IsNullOrWhiteSpace(username) ? userId : username;
+            raw = (raw ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(raw)) return "";
+
+            var numeric = Regex.Replace(raw, "[^0-9]", "");
+            if (Regex.IsMatch(numeric, "^[0-9]{17,20}$")) return numeric;
+
+            raw = raw.TrimStart('@');
+            return raw.Length is >= 2 and <= 32 ? raw : "";
         }
 
         private static string GenerateCode()
