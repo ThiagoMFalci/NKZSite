@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BsBoxArrowRight, BsCheck2, BsPersonDashFill, BsPersonPlusFill, BsShieldFillCheck, BsTrash, BsX } from "react-icons/bs";
+import { BsBoxArrowRight, BsCheck2, BsDiscord, BsPersonDashFill, BsPersonPlusFill, BsShieldFillCheck, BsTrash, BsX } from "react-icons/bs";
 import RankEmblem from "../../../Components/RankEmblem";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -57,7 +57,7 @@ export default function TeamDetails({
     const canToggleRecruiting = canManage || isCaptain;
     const isMember = team.players.some((player) => player.id === currentPlayerId || player.userId === currentUserId);
     const isInOtherTeam = Boolean(currentPlayerTeamId && currentPlayerTeamId !== team.id && !isMember);
-    const teamUnavailable = !team.isRecruiting || team.status?.key === "full" || team.status?.key === "in-tournament";
+    const teamUnavailable = !team.isRecruiting || team.status?.key === "in-tournament";
     const canRequestJoin = Boolean(currentUser && currentPlayerId && !isOwner && !isMember && !isInOtherTeam && !hasPendingRequest && !teamUnavailable);
     const previewSrc = imagePreview || resolveImageUrl(team.profileImageUrl);
     const roleKeys = ["Top", "Jungle", "Mid", "ADC", "Support"];
@@ -71,7 +71,6 @@ export default function TeamDetails({
         if (hasPendingRequest) return "Solicitacao enviada";
         if (isInOtherTeam) return "Voce ja esta em outro time";
         if (!team.isRecruiting) return "Time nao esta recrutando";
-        if (team.status?.key === "full") return "Time completo";
         if (team.status?.key === "in-tournament") return "Time em campeonato";
         return loading ? "Enviando..." : "Solicitar entrada";
     })();
@@ -101,7 +100,7 @@ export default function TeamDetails({
                         <h2>{team.name}</h2>
                         <div className="team-detail-meta">
                             <span>{team.tag}</span>
-                            <span>{team.playerCount}/5 jogadores</span>
+                            <span>{team.playerCount} jogadores</span>
                             <span><RankEmblem tier={team.averageElo} label={team.averageElo} className="compact" /> {team.averageElo}</span>
                             <span>{team.points} pts</span>
                         </div>
@@ -196,7 +195,7 @@ export default function TeamDetails({
                 <div className="players-list team-panel">
                     <div className="team-panel-heading">
                         <strong>Jogadores</strong>
-                        <span>{team.playerCount}/5 vagas ocupadas</span>
+                            <span>{team.playerCount} jogadores no elenco</span>
                     </div>
                     {team.players.length ? (
                         team.players.map((player) => (
@@ -216,6 +215,9 @@ export default function TeamDetails({
                                 <div className="player-main">
                                     <strong>{player.summonerName}</strong>
                                     <span>{player.role}{player.isCaptain ? " - Capitao" : ""}</span>
+                                    {player.discordUsername && (
+                                        <span className="player-discord-tag"><BsDiscord /> {player.discordUsername}</span>
+                                    )}
                                 </div>
                                 <span className="player-elo"><RankEmblem tier={player.elo} label={player.elo} className="compact" /> {player.elo}</span>
                                 {canManage && player.userId !== team.ownerId && (

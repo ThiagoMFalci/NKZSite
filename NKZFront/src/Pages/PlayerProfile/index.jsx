@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { BsArrowLeft, BsController, BsStars } from "react-icons/bs";
+import { BsArrowLeft, BsController, BsDiscord, BsStars } from "react-icons/bs";
 import RankEmblem from "../../Components/RankEmblem";
 import { calculateRankPoints, calculateWinRate, normalizeEloLabel } from "../../utils/elo";
 import { getAuthHeaders } from "../../utils/auth";
@@ -28,6 +28,7 @@ function normalizePlayer(player) {
     return {
         id: player?.id ?? player?.Id,
         nick: player?.summonerName ?? player?.SummonerName ?? "Invocador",
+        discordUsername: player?.discordUsername ?? player?.DiscordUsername ?? "",
         profileImageUrl: getPlayerImageUrl(player),
         rank: `${normalizeEloLabel(tier)} ${rank}`.trim(),
         tier,
@@ -118,6 +119,7 @@ export default function PlayerProfilePage() {
                                     <span><RankEmblem tier={player.tier} label={player.rank} className="compact" /> {player.rank}</span>
                                     <span><BsStars /> {player.points} pontos</span>
                                     <span><BsController /> {player.winRate}% win rate</span>
+                                    {player.discordUsername && <span><BsDiscord /> {player.discordUsername}</span>}
                                 </div>
                                 <em className={`player-looking-badge ${player.lookingForTeam ? "active" : ""}`}>
                                     {player.lookingForTeam ? "Procurando time" : "Nao procurando time"}

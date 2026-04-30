@@ -44,7 +44,7 @@ export default function TeamCard({ team, selected, onSelect }) {
             </span>
 
             <div className="team-card-stats">
-                <span><BsPeopleFill /> {team.playerCount}/5 jogadores</span>
+                <span><BsPeopleFill /> {team.playerCount} jogadores</span>
                 <span><RankEmblem tier={team.averageElo} label={team.averageElo} className="compact" /> {team.averageElo}</span>
                 <span><BsStars /> {team.points} pts</span>
             </div>

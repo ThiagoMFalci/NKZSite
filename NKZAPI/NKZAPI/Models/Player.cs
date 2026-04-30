@@ -20,6 +20,10 @@ namespace NKZAPI.Models
 
         // Persist the image URL/path
         public string? ProfileImageUrl { get; set; }
+        [NotMapped]
+        public string? DiscordUserId { get; set; }
+        [NotMapped]
+        public string? DiscordUsername { get; set; }
 
         // Temp upload field, not mapped to the database
         [NotMapped]

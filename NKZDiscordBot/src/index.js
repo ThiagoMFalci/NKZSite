@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import { Client, GatewayIntentBits, GatewayDispatchEvents, RESTEvents } from "discord.js";
+import { ChannelType, Client, GatewayIntentBits, GatewayDispatchEvents, RESTEvents } from "discord.js";
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN?.trim();
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID?.trim();
@@ -76,6 +76,12 @@ function normalizeDiscordUserId(value) {
 
 function normalizeDiscordUsername(value) {
   return String(value || "").trim().replace(/^@/, "").toLowerCase();
+}
+
+function normalizeRoleName(teamName, teamTag) {
+  const tag = String(teamTag || "").trim().toUpperCase();
+  const name = String(teamName || "Time").trim().replace(/\s+/g, " ").slice(0, 64);
+  return tag ? `NKZ ${tag} - ${name}`.slice(0, 90) : `NKZ ${name}`.slice(0, 90);
 }
 
 async function resolveGuildMember(guild, identity) {
@@ -259,6 +265,96 @@ app.post("/verification/send", requireInternalSecret, async (req, res) => {
     return res.status(500).json({
       message: error?.message || "Could not send Discord verification.",
     });
+  }
+});
+
+app.post("/discord/bootstrap", requireInternalSecret, async (_req, res) => {
+  try {
+    if (!client.isReady()) {
+      return res.status(503).json({ message: "Discord bot is not ready." });
+    }
+
+    const guild = await client.guilds.fetch(DISCORD_GUILD_ID);
+    const channels = await guild.channels.fetch();
+    let category = channels.find((channel) =>
+      channel?.type === ChannelType.GuildCategory &&
+      channel.name.toLowerCase() === "ligas"
+    );
+
+    if (!category) {
+      category = await guild.channels.create({
+        name: "ligas",
+        type: ChannelType.GuildCategory,
+        reason: "NKZ bootstrap",
+      });
+    }
+
+    return res.json({ success: true, categoryId: category.id, categoryName: category.name });
+  } catch (error) {
+    return res.status(500).json({ message: error?.message || "Could not bootstrap Discord guild." });
+  }
+});
+
+app.post("/teams/sync-role", requireInternalSecret, async (req, res) => {
+  try {
+    if (!client.isReady()) {
+      return res.status(503).json({ message: "Discord bot is not ready." });
+    }
+
+    const teamName = String(req.body.teamName || "Time").trim();
+    const teamTag = String(req.body.teamTag || "").trim().toUpperCase();
+    const players = Array.isArray(req.body.players) ? req.body.players : [];
+    const desiredUserIds = new Set(players
+      .map((player) => normalizeDiscordUserId(player.discordUserId))
+      .filter((id) => /^\d{17,20}$/.test(id)));
+
+    const guild = await client.guilds.fetch(DISCORD_GUILD_ID);
+    const roleName = normalizeRoleName(teamName, teamTag);
+    let roles = await guild.roles.fetch();
+    let role = roles.find((item) => item.name === roleName);
+
+    if (!role) {
+      role = await guild.roles.create({
+        name: roleName,
+        mentionable: true,
+        reason: `NKZ team role for ${teamName}`,
+      });
+    }
+
+    const assigned = [];
+    const failed = [];
+
+    for (const userId of desiredUserIds) {
+      try {
+        const member = await guild.members.fetch(userId);
+        if (!member.roles.cache.has(role.id)) {
+          await member.roles.add(role, `NKZ team sync: ${teamName}`);
+        }
+        assigned.push(userId);
+      } catch (error) {
+        failed.push({ userId, message: error?.message || String(error) });
+      }
+    }
+
+    const currentMembers = await guild.members.fetch();
+    const removed = [];
+    for (const member of currentMembers.values()) {
+      if (member.roles.cache.has(role.id) && !desiredUserIds.has(member.id)) {
+        await member.roles.remove(role, `NKZ team sync: ${teamName}`);
+        removed.push(member.id);
+      }
+    }
+
+    return res.json({
+      success: true,
+      roleId: role.id,
+      roleName: role.name,
+      assigned,
+      removed,
+      failed,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error?.message || "Could not sync team role." });
   }
 });
 

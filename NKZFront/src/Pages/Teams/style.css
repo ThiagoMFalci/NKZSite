@@ -651,12 +651,15 @@
 }
 
 .team-detail-meta span {
+    align-items: center;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 4px;
     color: var(--teams-muted);
+    display: inline-flex;
     font-size: 0.78rem;
     font-weight: 700;
+    gap: 0.45rem;
     letter-spacing: 0.04em;
     margin: 0;
     min-height: 30px;
@@ -908,6 +911,11 @@
     text-transform: uppercase;
 }
 
+.team-detail-meta .rank-emblem-real.compact {
+    height: 26px;
+    width: 26px;
+}
+
 .team-recruiting-toggle {
     align-items: center;
     background: rgba(255, 255, 255, 0.035);
@@ -1058,7 +1066,18 @@
 }
 
 .player-main {
+    display: grid;
+    gap: 0.25rem;
     min-width: 0;
+}
+
+.player-discord-tag {
+    align-items: center;
+    color: #8fcaf0;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    gap: 0.35rem;
 }
 
 .player-elo {
