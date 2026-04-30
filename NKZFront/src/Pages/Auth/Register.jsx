@@ -6,6 +6,7 @@ import { saveSession } from "../../utils/auth";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL || "";
 
 function getApiMessage(error) {
     return (
@@ -206,7 +207,16 @@ export default function Register() {
                                     placeholder="Ex: shorainopureiya"
                                 />
                                 <span className="auth-hint">
-                                    Use o nome de usuario, sem @. Voce precisa estar no servidor NKZ para receber o codigo.
+                                    Use o nome de usuario, sem @. Voce precisa estar no{" "}
+                                    <a
+                                        className="auth-inline-link"
+                                        href={DISCORD_INVITE_URL || undefined}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        servidor NKZ
+                                    </a>{" "}
+                                    para receber o codigo.
                                 </span>
                             </label>
                         </>

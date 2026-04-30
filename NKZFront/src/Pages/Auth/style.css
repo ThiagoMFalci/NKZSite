@@ -120,6 +120,17 @@
     text-transform: none;
 }
 
+.auth-inline-link {
+    color: #8fcaf0;
+    font-weight: 800;
+    text-decoration: none;
+    text-shadow: 0 0 16px rgba(47, 134, 190, 0.32);
+}
+
+.auth-inline-link:hover {
+    color: white;
+}
+
 .auth-feedback {
     border-radius: 3px;
     font-size: 0.82rem;
