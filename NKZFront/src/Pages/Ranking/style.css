@@ -192,6 +192,14 @@
     min-width: 0;
 }
 
+.ranking-elo-cell {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.55rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
 .ranking-row:last-child {
     border-bottom: none;
 }

@@ -258,6 +258,10 @@
     color: var(--laranja);
 }
 
+.team-card-stats .rank-emblem-real {
+    margin-right: 0.05rem;
+}
+
 .teams-state {
     color: rgba(245, 245, 245, 0.72);
     padding: 2rem;
