@@ -2,24 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import RankingFilter from "./components/RankingFilter";
 import RankingTable from "./components/RankingTable";
-import { matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
+import { calculateRankPoints, calculateWinRate, getEloScore, matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
 import { getPlayerImageUrl } from "../../utils/images";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
-
-const tierScore = {
-    IRON: 100,
-    BRONZE: 200,
-    SILVER: 300,
-    GOLD: 400,
-    PLATINUM: 500,
-    EMERALD: 600,
-    DIAMOND: 700,
-    MASTER: 850,
-    GRANDMASTER: 950,
-    CHALLENGER: 1100,
-};
 
 function unwrapApiData(responseData) {
     return responseData?.data ?? responseData?.Data ?? responseData ?? [];
@@ -31,11 +18,6 @@ function normalizeElo(tier, rank) {
     return `${label} ${rank || ""}`.trim();
 }
 
-function calculateWinRate(wins, losses) {
-    const total = wins + losses;
-    return total ? Math.round((wins / total) * 100) : 0;
-}
-
 function normalizePlayer(player) {
     const tier = player.soloQueueTier ?? player.SoloQueueTier ?? "UNRANKED";
     const rank = player.soloQueueRank ?? player.SoloQueueRank ?? "";
@@ -43,7 +25,8 @@ function normalizePlayer(player) {
     const wins = player.wins ?? player.Wins ?? 0;
     const losses = player.losses ?? player.Losses ?? 0;
     const totalMatches = player.totalMatches ?? player.TotalMatches ?? wins + losses;
-    const points = (tierScore[String(tier).toUpperCase()] || 0) + lp + wins * 3 - losses;
+    const winRate = calculateWinRate(wins, losses);
+    const points = calculateRankPoints(tier, rank, lp);
 
     return {
         id: player.id ?? player.Id,
@@ -53,7 +36,7 @@ function normalizePlayer(player) {
         tier,
         elo: normalizeElo(tier, rank),
         totalMatches,
-        winRate: calculateWinRate(wins, losses),
+        winRate,
         points: Math.max(0, points),
     };
 }
@@ -61,12 +44,23 @@ function normalizePlayer(player) {
 function getAverageElo(players) {
     const rankedPlayers = players
         .map((player) => String(player.soloQueueTier ?? player.SoloQueueTier ?? "").toUpperCase())
-        .filter((tier) => tierScore[tier]);
+        .filter((tier) => getEloScore(tier));
 
     if (!rankedPlayers.length) return "Unranked";
 
-    const averageScore = rankedPlayers.reduce((total, tier) => total + tierScore[tier], 0) / rankedPlayers.length;
-    const [closestTier] = Object.entries(tierScore).reduce((closest, current) => {
+    const averageScore = rankedPlayers.reduce((total, tier) => total + getEloScore(tier), 0) / rankedPlayers.length;
+    const [closestTier] = Object.entries({
+        IRON: 1,
+        BRONZE: 2,
+        SILVER: 3,
+        GOLD: 4,
+        PLATINUM: 5,
+        EMERALD: 6,
+        DIAMOND: 7,
+        MASTER: 8,
+        GRANDMASTER: 9,
+        CHALLENGER: 10,
+    }).reduce((closest, current) => {
         return Math.abs(current[1] - averageScore) < Math.abs(closest[1] - averageScore) ? current : closest;
     });
 
@@ -77,10 +71,16 @@ function normalizeTeam(team) {
     const players = team.players ?? team.Players ?? [];
     const wins = team.wins ?? team.Wins ?? 0;
     const points = team.points ?? team.Points ?? players.reduce((total, player) => {
+        const tier = player.soloQueueTier ?? player.SoloQueueTier ?? "UNRANKED";
+        const rank = player.soloQueueRank ?? player.SoloQueueRank ?? "";
+        const lp = player.soloQueueLP ?? player.SoloQueueLP ?? 0;
+        return total + calculateRankPoints(tier, rank, lp);
+    }, 0);
+    const teamWinRate = players.length ? Math.round(players.reduce((total, player) => {
         const playerWins = player.wins ?? player.Wins ?? 0;
         const playerLosses = player.losses ?? player.Losses ?? 0;
-        return total + Math.max(0, playerWins * 3 - playerLosses);
-    }, 0);
+        return total + calculateWinRate(playerWins, playerLosses);
+    }, 0) / players.length) : 0;
 
     return {
         id: team.id ?? team.Id,
@@ -90,6 +90,7 @@ function normalizeTeam(team) {
         elo: getAverageElo(players),
         players: players.length,
         wins,
+        winRate: teamWinRate,
         points,
     };
 }
@@ -175,7 +176,7 @@ export default function RankingPage() {
                 const matchesElo = matchesSelectedElos(player.tier, selectedElos);
                 return matchesName && matchesElo;
             })
-            .sort((a, b) => b.points - a.points);
+            .sort((a, b) => b.points - a.points || b.winRate - a.winRate);
 
         return sortByElo(filtered, eloSort, (player) => player.tier);
     }, [eloSort, players, search, selectedElos]);
@@ -188,7 +189,7 @@ export default function RankingPage() {
                 const matchesElo = matchesSelectedElos(team.elo, selectedElos);
                 return matchesName && matchesElo;
             })
-            .sort((a, b) => b.points - a.points);
+            .sort((a, b) => b.points - a.points || b.winRate - a.winRate);
 
         return sortByElo(filtered, eloSort, (team) => team.elo);
     }, [eloSort, search, selectedElos, teams]);

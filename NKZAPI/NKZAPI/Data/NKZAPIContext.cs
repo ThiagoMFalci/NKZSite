@@ -24,6 +24,9 @@ namespace NKZAPI.Data
         public DbSet<Invitation> Invitations { get; set; }
         public DbSet<Game> Games { get; set; }
         public DbSet<League> Leagues { get; set; }
+        public DbSet<LeagueMatch> LeagueMatches { get; set; }
+        public DbSet<LeagueMatchReport> LeagueMatchReports { get; set; }
+        public DbSet<LeagueStanding> LeagueStandings { get; set; }
         public DbSet<Tournament> Tournaments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

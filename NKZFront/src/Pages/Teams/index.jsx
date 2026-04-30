@@ -5,7 +5,7 @@ import TeamDetails from "./components/TeamDetails";
 import TeamFilter from "./components/TeamFilter";
 import TeamList from "./components/TeamList";
 import { getAuthHeaders, getCurrentUser } from "../../utils/auth";
-import { ELO_SCORE, matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
+import { calculateRankPoints, ELO_SCORE, matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -48,9 +48,10 @@ function getAverageElo(players) {
 function getTeamPoints(players, explicitPoints) {
     if (Number.isFinite(explicitPoints)) return explicitPoints;
     return players.reduce((total, player) => {
-        const wins = player.wins ?? player.Wins ?? 0;
-        const losses = player.losses ?? player.Losses ?? 0;
-        return total + Math.max(0, wins * 3 - losses);
+        const tier = player.soloQueueTier ?? player.SoloQueueTier ?? "UNRANKED";
+        const rank = player.soloQueueRank ?? player.SoloQueueRank ?? "";
+        const lp = player.soloQueueLP ?? player.SoloQueueLP ?? 0;
+        return total + calculateRankPoints(tier, rank, lp);
     }, 0);
 }
 

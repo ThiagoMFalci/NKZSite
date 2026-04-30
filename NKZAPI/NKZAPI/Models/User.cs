@@ -7,5 +7,10 @@
         public byte[] PasswordSalt { get; set; } = null!;
         public List<Player> Player { get; set; } = null!;
         public string Role { get; set; } = "User";
+        public string? DiscordUserId { get; set; }
+        public bool DiscordVerified { get; set; } = true;
+        public string? DiscordVerificationCodeHash { get; set; }
+        public DateTime? DiscordVerificationCodeExpiresAt { get; set; }
+        public DateTime? DiscordVerifiedAt { get; set; }
     }
 }

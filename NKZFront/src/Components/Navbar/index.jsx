@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaChevronDown, FaRegBell, FaUserShield } from "react-icons/fa";
+import { FaCalendarAlt, FaChevronDown, FaRegBell, FaUserShield } from "react-icons/fa";
 import { clearSession, getAuthHeaders, getCurrentUser } from "../../utils/auth";
 import logo from "/logo.png"
 import "./style.css";
@@ -33,6 +33,8 @@ export default function Index() {
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [profileImageUrl, setProfileImageUrl] = useState("");
     const [profileDisplayName, setProfileDisplayName] = useState("");
+    const [pendingNotifications, setPendingNotifications] = useState(0);
+    const [pendingSchedules, setPendingSchedules] = useState(0);
     const location = useLocation();
     const navigate = useNavigate();
     const currentUser = getCurrentUser();
@@ -45,6 +47,8 @@ export default function Index() {
             if (!currentUser?.userId) {
                 setProfileImageUrl("");
                 setProfileDisplayName("");
+                setPendingNotifications(0);
+                setPendingSchedules(0);
                 return;
             }
 
@@ -55,14 +59,64 @@ export default function Index() {
                 const player = unwrapApiData(response.data);
                 const imageUrl = player?.profileImageUrl ?? player?.ProfileImageUrl ?? "";
                 const summonerName = player?.summonerName ?? player?.SummonerName ?? "";
+                let pendingCount = 0;
+
+                if (player?.id ?? player?.Id) {
+                    const invitationsResponse = await axios.get(`${API_BASE_URL}/api/team/players/${player.id ?? player.Id}/invitations`, {
+                        headers: getAuthHeaders(),
+                    }).catch(() => ({ data: [] }));
+                    pendingCount += (unwrapApiData(invitationsResponse.data) || [])
+                        .filter((invite) => (invite.status ?? invite.Status) === "Pending").length;
+                }
+
+                const teamsResponse = await axios.get(`${API_BASE_URL}/api/team/ListTeams`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => ({ data: [] }));
+                const manageableTeams = (unwrapApiData(teamsResponse.data) || []).filter((team) => (
+                    (team.ownerId ?? team.OwnerId) === currentUser.userId ||
+                    (team.players ?? team.Players ?? []).some((teamPlayer) => (
+                        (teamPlayer.userId ?? teamPlayer.UserId) === currentUser.userId &&
+                        (teamPlayer.isCaptain ?? teamPlayer.IsCaptain)
+                    ))
+                ));
+
+                const teamInvitationLists = await Promise.all(manageableTeams.map(async (team) => {
+                    const teamId = team.id ?? team.Id;
+                    const response = await axios.get(`${API_BASE_URL}/api/team/${teamId}/invitations`, {
+                        headers: getAuthHeaders(),
+                    }).catch(() => ({ data: [] }));
+                    return unwrapApiData(response.data) || [];
+                }));
+                pendingCount += teamInvitationLists.flat()
+                    .filter((invite) => (invite.status ?? invite.Status) === "Pending").length;
+
+                const manageableTeamIds = new Set(manageableTeams.map((team) => team.id ?? team.Id));
+                const leaguesResponse = await axios.get(`${API_BASE_URL}/api/league/ListLeagues`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => ({ data: [] }));
+                const scheduleCount = (unwrapApiData(leaguesResponse.data) || []).flatMap((league) => league.matches ?? league.Matches ?? [])
+                    .filter((match) => {
+                        const teamAId = match.teamAId ?? match.TeamAId;
+                        const teamBId = match.teamBId ?? match.TeamBId;
+                        const status = match.status ?? match.Status;
+                        const scheduleStatus = match.scheduleStatus ?? match.ScheduleStatus ?? "Open";
+                        return status !== "Completed" &&
+                            (manageableTeamIds.has(teamAId) || manageableTeamIds.has(teamBId)) &&
+                            ["Open", "Pending", "Rejected"].includes(scheduleStatus);
+                    }).length;
+
                 if (isMounted) {
                     setProfileImageUrl(resolveImageUrl(imageUrl));
                     setProfileDisplayName(summonerName);
+                    setPendingNotifications(pendingCount);
+                    setPendingSchedules(scheduleCount);
                 }
             } catch {
                 if (isMounted) {
                     setProfileImageUrl("");
                     setProfileDisplayName("");
+                    setPendingNotifications(0);
+                    setPendingSchedules(0);
                 }
             }
         }
@@ -113,12 +167,21 @@ export default function Index() {
                         )}
                     </span>
                     <span className="user-menu-name">{userLabel}</span>
+                    {pendingNotifications > 0 && (
+                        <span className="notification-pulse" aria-label={`${pendingNotifications} notificacoes pendentes`}>
+                            {pendingNotifications > 9 ? "9+" : pendingNotifications}
+                        </span>
+                    )}
                     <FaChevronDown className={`user-menu-arrow ${userMenuOpen ? "open" : ""}`} />
                 </button>
 
                 <div className={`user-menu-dropdown ${userMenuOpen ? "open" : ""}`}>
                     <button onClick={() => navigateAndClose("/notifications")}>
                         <FaRegBell /> Notificacoes
+                    </button>
+                    <button onClick={() => navigateAndClose("/notifications?tab=schedules")}>
+                        <FaCalendarAlt /> Agendamentos
+                        {pendingSchedules > 0 && <span className="menu-count">{pendingSchedules > 9 ? "9+" : pendingSchedules}</span>}
                     </button>
                     <button onClick={() => navigateAndClose("/dashboard")}>
                         <FaUserShield /> Dashboard

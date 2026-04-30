@@ -1,0 +1,31 @@
+.rank-emblem-real {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 30px;
+    justify-content: center;
+    width: 30px;
+}
+
+.rank-emblem-real img {
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(47, 134, 190, 0.24));
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
+.rank-emblem-real.large {
+    height: 90px;
+    width: 90px;
+}
+
+.rank-emblem-real.small {
+    height: 24px;
+    width: 24px;
+}
+
+.rank-emblem-real.compact {
+    height: 32px;
+    width: 32px;
+}

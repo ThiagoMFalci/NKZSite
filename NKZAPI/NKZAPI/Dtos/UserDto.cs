@@ -14,6 +14,7 @@ namespace NKZAPI.Dtos
         [Required(ErrorMessage = "O Player é obrigatorio")]
 
         public string Role { get; set; } = "User";
+        public string DiscordUserId { get; set; } = string.Empty;
 
 
     }

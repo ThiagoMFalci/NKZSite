@@ -7,5 +7,7 @@ namespace NKZAPI.Services.AuthServices
     {
         Task<Response<UserDto>> UserAddAsync(UserDto User);
         Task<Response<string>> Login(UserLoginDto userLogin);
+        Task<Response<string>> VerifyDiscordAsync(DiscordVerificationDto verification);
+        Task<Response<string>> ResendDiscordVerificationAsync(string email);
     }
 }

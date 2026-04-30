@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { BsController, BsEnvelopePlus, BsPeopleFill, BsShieldFillCheck, BsStars } from "react-icons/bs";
+import { BsController, BsEnvelopePlus, BsPeopleFill, BsStars } from "react-icons/bs";
 import EloSelector from "../../Components/EloSelector";
+import RankEmblem from "../../Components/RankEmblem";
 import { getAuthHeaders, getCurrentUser } from "../../utils/auth";
-import { matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
+import { calculateRankPoints, calculateWinRate, matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
 import { getPlayerImageUrl } from "../../utils/images";
 import "./style.css";
 
@@ -13,18 +14,6 @@ const ROLE_OPTIONS = ["Top", "Jungle", "Mid", "ADC", "Support", "Flex"];
 
 function unwrapApiData(responseData) {
     return responseData?.data ?? responseData?.Data ?? responseData ?? [];
-}
-
-function calculatePoints(player) {
-    const lp = player.soloQueueLP ?? player.SoloQueueLP ?? 0;
-    const wins = player.wins ?? player.Wins ?? 0;
-    const losses = player.losses ?? player.Losses ?? 0;
-    return Math.max(0, lp + wins * 3 - losses);
-}
-
-function calculateWinRate(wins, losses) {
-    const total = wins + losses;
-    return total ? Math.round((wins / total) * 100) : 0;
 }
 
 function normalizeChampions(champions = []) {
@@ -40,6 +29,7 @@ function normalizeChampions(champions = []) {
 function normalizePlayer(player) {
     const tier = player.soloQueueTier ?? player.SoloQueueTier ?? "UNRANKED";
     const rank = player.soloQueueRank ?? player.SoloQueueRank ?? "";
+    const lp = player.soloQueueLP ?? player.SoloQueueLP ?? 0;
     const wins = player.wins ?? player.Wins ?? 0;
     const losses = player.losses ?? player.Losses ?? 0;
     const role = player.role ?? player.Role ?? player.mainRole ?? player.MainRole ?? "Flex";
@@ -59,7 +49,7 @@ function normalizePlayer(player) {
         role,
         lookingForTeam: player.lookingForTeam ?? player.LookingForTeam ?? true,
         tags,
-        points: calculatePoints(player),
+        points: calculateRankPoints(tier, rank, lp),
         level: player.summonerLevel ?? player.SummonerLevel ?? 0,
         wins,
         losses,
@@ -146,7 +136,7 @@ export default function PlayersPage() {
             return matchesName && matchesElo && matchesRole && matchesAvailability;
         });
 
-        const byPoints = [...filtered].sort((a, b) => b.points - a.points);
+        const byPoints = [...filtered].sort((a, b) => b.points - a.points || b.winRate - a.winRate);
         return sortByElo(byPoints, eloSort, (player) => player.tier);
     }, [availabilityFilter, eloSort, players, roleFilter, search, selectedElos]);
 
@@ -292,7 +282,7 @@ export default function PlayersPage() {
                                 </div>
 
                                 <div className="player-card-stats">
-                                    <span><BsShieldFillCheck /> {player.rank}</span>
+                                    <span><RankEmblem tier={player.tier} label={player.rank} className="compact" /> {player.rank}</span>
                                     <span><BsStars /> {player.points} pontos</span>
                                     <span><BsController /> {player.winRate}% win rate</span>
                                 </div>

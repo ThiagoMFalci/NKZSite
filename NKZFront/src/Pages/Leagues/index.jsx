@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { BsPlusLg } from "react-icons/bs";
+import CreateLeagueModal from "./components/CreateLeagueModal";
 import LeagueDetails from "./components/LeagueDetails";
 import LeagueFilter from "./components/LeagueFilter";
 import LeagueList from "./components/LeagueList";
@@ -8,6 +11,17 @@ import { ELO_SCORE, matchesSelectedElos, normalizeEloLabel, sortByElo } from "..
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const DEFAULT_LEAGUE_FORM = {
+    name: "",
+    image: null,
+    award: "0",
+    entryFee: "0",
+    minimumElo: "UNRANKED",
+    maximumElo: "CHALLENGER",
+    startDate: "",
+    endDate: "",
+    modality: "Chaveamento",
+};
 
 function unwrapApiData(responseData) {
     return responseData?.data ?? responseData?.Data ?? responseData ?? [];
@@ -58,9 +72,15 @@ function normalizeLeague(league) {
     return {
         id: league.id ?? league.Id,
         name: league.name ?? league.Name ?? "Liga",
+        imageUrl: league.imageUrl ?? league.ImageUrl ?? "",
         award: league.award ?? league.Award ?? 0,
         awardLabel: money(league.award ?? league.Award),
         entryFeeLabel: money(league.entryFee ?? league.EntryFee),
+        minimumElo: league.minimumElo ?? league.MinimumElo ?? "UNRANKED",
+        maximumElo: league.maximumElo ?? league.MaximumElo ?? "CHALLENGER",
+        startDate: league.startDate ?? league.StartDate,
+        endDate: league.endDate ?? league.EndDate,
+        modality: league.modality ?? league.Modality ?? "Chaveamento",
         maxTeams,
         teamCount,
         teams,
@@ -71,6 +91,7 @@ function normalizeLeague(league) {
 }
 
 export default function LeaguesPage() {
+    const navigate = useNavigate();
     const [leagues, setLeagues] = useState([]);
     const [selectedLeague, setSelectedLeague] = useState(null);
     const [search, setSearch] = useState("");
@@ -82,7 +103,13 @@ export default function LeaguesPage() {
     const [error, setError] = useState("");
     const [joinLoading, setJoinLoading] = useState(false);
     const [feedback, setFeedback] = useState({ type: "", message: "" });
+    const [createOpen, setCreateOpen] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
+    const [createFeedback, setCreateFeedback] = useState({ type: "", message: "" });
+    const [createForm, setCreateForm] = useState(DEFAULT_LEAGUE_FORM);
     const [ownedTeam, setOwnedTeam] = useState(null);
+    const currentUser = getCurrentUser();
+    const isAdmin = String(currentUser?.role || "").includes("Admin");
 
     async function loadLeagues(isMounted = () => true) {
         try {
@@ -100,8 +127,6 @@ export default function LeaguesPage() {
 
     useEffect(() => {
         let isMounted = true;
-        const currentUser = getCurrentUser();
-
         loadLeagues(() => isMounted);
         if (currentUser?.userId) {
             getOwnedTeam(currentUser.userId)
@@ -116,7 +141,7 @@ export default function LeaguesPage() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [currentUser?.userId]);
 
     const filteredLeagues = useMemo(() => {
         const normalizedSearch = search.trim().toLowerCase();
@@ -141,13 +166,7 @@ export default function LeaguesPage() {
     }
 
     async function handleSelectLeague(league) {
-        setFeedback({ type: "", message: "" });
-        try {
-            const response = await axios.get(`${API_BASE_URL}/api/league/${league.id}`);
-            setSelectedLeague(normalizeLeague(unwrapApiData(response.data)));
-        } catch {
-            setSelectedLeague(league);
-        }
+        navigate(`/leagues/${league.id}`);
     }
 
     async function getOwnedTeam(userId) {
@@ -237,6 +256,66 @@ export default function LeaguesPage() {
         }
     }
 
+function handleCreateChange(event) {
+        const { name, value, files, type } = event.target;
+        setCreateForm((current) => ({ ...current, [name]: type === "file" ? files?.[0] || null : value }));
+    }
+
+    async function handleCreateLeague(event) {
+        event.preventDefault();
+        if (!createForm.name.trim()) {
+            setCreateFeedback({ type: "error", message: "Informe o nome da liga." });
+            return;
+        }
+
+        if (createForm.startDate && createForm.endDate && new Date(createForm.endDate) < new Date(createForm.startDate)) {
+            setCreateFeedback({ type: "error", message: "A data final precisa ser depois da data de inicio." });
+            return;
+        }
+
+        try {
+            setCreateLoading(true);
+            setCreateFeedback({ type: "", message: "" });
+            const payload = {
+                name: createForm.name.trim(),
+                award: Number(createForm.award || 0),
+                entryFee: Number(createForm.entryFee || 0),
+                maxTeams: 16,
+                minimumElo: createForm.minimumElo,
+                maximumElo: createForm.maximumElo,
+                startDate: createForm.startDate ? new Date(createForm.startDate).toISOString() : null,
+                endDate: createForm.endDate ? new Date(createForm.endDate).toISOString() : null,
+                modality: createForm.modality,
+            };
+
+            const createResponse = await axios.post(`${API_BASE_URL}/api/league`, payload, { headers: getAuthHeaders() });
+            const leagueId = unwrapApiData(createResponse.data);
+
+            if (createForm.image && leagueId) {
+                const imagePayload = new FormData();
+                imagePayload.append("image", createForm.image);
+                await axios.post(`${API_BASE_URL}/api/league/${leagueId}/image`, imagePayload, {
+                    headers: {
+                        ...getAuthHeaders(),
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+            }
+
+            setCreateFeedback({ type: "success", message: "Liga criada." });
+            setCreateForm(DEFAULT_LEAGUE_FORM);
+            setCreateOpen(false);
+            await loadLeagues();
+        } catch (requestError) {
+            setCreateFeedback({
+                type: "error",
+                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel criar a liga.",
+            });
+        } finally {
+            setCreateLoading(false);
+        }
+    }
+
     return (
         <main className="leagues-page">
             <div className="leagues-bg-grid" />
@@ -246,7 +325,14 @@ export default function LeaguesPage() {
                         <p className="leagues-eyebrow">Ligas</p>
                         <h1>Temporadas competitivas</h1>
                     </div>
-                    <span>{filteredLeagues.length} ligas</span>
+                    <div className="leagues-heading-actions">
+                        <span>{filteredLeagues.length} ligas</span>
+                        {isAdmin && (
+                            <button type="button" className="btn-primary leagues-create-button" onClick={() => setCreateOpen(true)}>
+                                <BsPlusLg /> Criar liga
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <LeagueFilter
@@ -275,6 +361,16 @@ export default function LeaguesPage() {
                 onClose={() => setSelectedLeague(null)}
                 onJoin={handleJoinLeague}
                 onLeave={handleLeaveLeague}
+            />
+
+            <CreateLeagueModal
+                open={createOpen}
+                formData={createForm}
+                loading={createLoading}
+                feedback={createFeedback}
+                onClose={() => setCreateOpen(false)}
+                onChange={handleCreateChange}
+                onSubmit={handleCreateLeague}
             />
         </main>
     );

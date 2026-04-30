@@ -1,5 +1,5 @@
 import { BsPeopleFill, BsStars } from "react-icons/bs";
-import { GiRank3 } from "react-icons/gi";
+import RankEmblem from "../../../Components/RankEmblem";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -45,7 +45,7 @@ export default function TeamCard({ team, selected, onSelect }) {
 
             <div className="team-card-stats">
                 <span><BsPeopleFill /> {team.playerCount}/5 jogadores</span>
-                <span><GiRank3 /> {team.averageElo}</span>
+                <span><RankEmblem tier={team.averageElo} label={team.averageElo} className="compact" /> {team.averageElo}</span>
                 <span><BsStars /> {team.points} pts</span>
             </div>
         </article>

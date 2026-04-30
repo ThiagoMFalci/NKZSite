@@ -256,6 +256,23 @@
     transition: transform 0.2s;
 }
 
+.notification-pulse {
+    align-items: center;
+    background: linear-gradient(135deg, var(--laranja), #ffb347);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.55);
+    color: #10080a;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 0.64rem;
+    font-weight: 800;
+    height: 20px;
+    justify-content: center;
+    min-width: 20px;
+    padding: 0 0.28rem;
+}
+
 .user-menu-arrow.open {
     transform: rotate(180deg);
 }
@@ -295,11 +312,27 @@
     text-align: left;
     text-transform: uppercase;
     transition: all 0.2s;
+    width: 100%;
 }
 
 .user-menu-dropdown button:hover {
     background: rgba(123, 47, 190, 0.14);
     color: white;
+}
+
+.menu-count {
+    align-items: center;
+    background: linear-gradient(135deg, var(--laranja), #ffb347);
+    border-radius: 999px;
+    color: #12080a;
+    display: inline-flex;
+    font-size: 0.68rem;
+    font-weight: 800;
+    height: 20px;
+    justify-content: center;
+    margin-left: auto;
+    min-width: 20px;
+    padding: 0 0.3rem;
 }
 
 /* ─── Mobile Toggle ─────────────────────────────────── */

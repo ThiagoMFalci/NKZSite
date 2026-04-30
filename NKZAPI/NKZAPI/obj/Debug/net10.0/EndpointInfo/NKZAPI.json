@@ -390,6 +390,93 @@
         }
       }
     },
+    "/api/league/{leagueId}/playoff/generate": {
+      "post": {
+        "tags": [
+          "League"
+        ],
+        "parameters": [
+          {
+            "name": "leagueId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
+    "/api/league/matches/{matchId}/complete": {
+      "post": {
+        "tags": [
+          "League"
+        ],
+        "parameters": [
+          {
+            "name": "matchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeagueMatchResultDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeagueMatchResultDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeagueMatchResultDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
     "/api/player/{userId}/sync/{summonerName}": {
       "put": {
         "tags": [
@@ -425,8 +512,19 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
       }
     },
     "/api/player/{userId}": {
@@ -860,19 +958,12 @@
         ],
         "parameters": [
           {
-            "name": "PlayerId",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1368,6 +1459,48 @@
         ]
       }
     },
+    "/api/team/{teamId}/recruiting/{isRecruiting}": {
+      "patch": {
+        "tags": [
+          "Team"
+        ],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "isRecruiting",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
+      }
+    },
     "/api/team/{teamId}/players/{playerId}/IsCaptain/{i}": {
       "post": {
         "tags": [
@@ -1674,7 +1807,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/UserPublicDto"
                   }
                 }
               },
@@ -1682,7 +1815,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/UserPublicDto"
                   }
                 }
               },
@@ -1690,13 +1823,24 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/User"
+                    "$ref": "#/components/schemas/UserPublicDto"
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
-        }
+        },
+        "security": [
+          {
+            "oauth2": [ ]
+          }
+        ]
       }
     },
     "/api/auth/User/CreateUsers": {
@@ -1997,6 +2141,186 @@
           "maxTeams": {
             "type": "integer",
             "format": "int32"
+          },
+          "minimumElo": {
+            "type": "string",
+            "nullable": true
+          },
+          "maximumElo": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modality": {
+            "type": "string",
+            "nullable": true
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeagueMatch"
+            },
+            "nullable": true
+          },
+          "standings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeagueStanding"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LeagueMatch": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "leagueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bracket": {
+            "type": "string",
+            "nullable": true
+          },
+          "roundKey": {
+            "type": "string",
+            "nullable": true
+          },
+          "roundName": {
+            "type": "string",
+            "nullable": true
+          },
+          "weekNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matchNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bestOf": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamAId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "teamBId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "winnerTeamId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "loserTeamId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "teamAScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamBScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LeagueMatchResultDto": {
+        "type": "object",
+        "properties": {
+          "winnerTeamId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "teamAScore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamBScore": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LeagueStanding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "leagueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "teamId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "wins": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "losses": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mapsPlayed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mapDiff": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "penalties": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2268,6 +2592,9 @@
             "format": "uuid",
             "nullable": true
           },
+          "isRecruiting": {
+            "type": "boolean"
+          },
           "players": {
             "type": "array",
             "items": {
@@ -2309,6 +2636,9 @@
             "type": "string",
             "format": "uuid",
             "nullable": true
+          },
+          "isRecruiting": {
+            "type": "boolean"
           },
           "players": {
             "type": "array",
@@ -2354,6 +2684,28 @@
           "entryFee": {
             "type": "number",
             "format": "double"
+          },
+          "minimumElo": {
+            "type": "string",
+            "nullable": true
+          },
+          "maximumElo": {
+            "type": "string",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "modality": {
+            "type": "string",
+            "nullable": true
           },
           "teams": {
             "type": "array",
@@ -2452,6 +2804,28 @@
           "passwordSalt": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserPublicDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
