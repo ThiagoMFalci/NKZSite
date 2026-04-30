@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using NKZAPI.Dtos;
 
 namespace NKZAPI.Services.DiscordServices
 {
@@ -15,7 +16,7 @@ namespace NKZAPI.Services.DiscordServices
             _configuration = configuration;
         }
 
-        public async Task SendVerificationCodeAsync(string discordUserId, string email, string code)
+        public async Task<DiscordVerificationDeliveryDto> SendVerificationCodeAsync(string discordIdentity, string email, string code)
         {
             var baseUrl = _configuration["DiscordBot:BaseUrl"];
             var secret = _configuration["DiscordBot:Secret"];
@@ -27,7 +28,7 @@ namespace NKZAPI.Services.DiscordServices
 
             var payload = JsonSerializer.Serialize(new
             {
-                discordUserId,
+                discordIdentity,
                 email,
                 code,
                 serverInviteUrl = _configuration["Discord:ServerInviteUrl"]
@@ -38,13 +39,18 @@ namespace NKZAPI.Services.DiscordServices
             request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
             using var response = await _httpClient.SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                var body = await response.Content.ReadAsStringAsync();
                 throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)
                     ? "Discord bot could not send the verification code."
                     : body);
             }
+
+            return JsonSerializer.Deserialize<DiscordVerificationDeliveryDto>(body, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            }) ?? new DiscordVerificationDeliveryDto();
         }
     }
 }

@@ -34,6 +34,7 @@ namespace NKZAPI.Controllers
                 Email = user.Email,
                 Role = user.Role,
                 DiscordUserId = user.DiscordUserId,
+                DiscordUsername = user.DiscordUsername,
                 DiscordVerified = user.DiscordVerified,
                 CreatedAt = user.CreatedAt
             }).ToList();

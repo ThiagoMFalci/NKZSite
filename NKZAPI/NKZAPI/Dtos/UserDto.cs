@@ -15,6 +15,7 @@ namespace NKZAPI.Dtos
 
         public string Role { get; set; } = "User";
         public string DiscordUserId { get; set; } = string.Empty;
+        public string DiscordUsername { get; set; } = string.Empty;
 
 
     }

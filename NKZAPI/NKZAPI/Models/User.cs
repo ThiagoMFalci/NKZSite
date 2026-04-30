@@ -8,6 +8,7 @@
         public List<Player> Player { get; set; } = null!;
         public string Role { get; set; } = "User";
         public string? DiscordUserId { get; set; }
+        public string? DiscordUsername { get; set; }
         public bool DiscordVerified { get; set; } = true;
         public string? DiscordVerificationCodeHash { get; set; }
         public DateTime? DiscordVerificationCodeExpiresAt { get; set; }
