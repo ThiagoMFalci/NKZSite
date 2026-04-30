@@ -193,6 +193,8 @@ export default function DashboardPage() {
     const [summonerName, setSummonerName] = useState("");
     const [syncLoading, setSyncLoading] = useState(false);
     const [syncFeedback, setSyncFeedback] = useState({ type: "", message: "" });
+    const [refreshLoading, setRefreshLoading] = useState(false);
+    const [refreshFeedback, setRefreshFeedback] = useState({ type: "", message: "" });
     const [profileLoading, setProfileLoading] = useState(false);
     const [profileFeedback, setProfileFeedback] = useState({ type: "", message: "" });
     const [competitiveLoading, setCompetitiveLoading] = useState(false);
@@ -201,6 +203,8 @@ export default function DashboardPage() {
     const [captainRequests, setCaptainRequests] = useState([]);
     const [profileImageFile, setProfileImageFile] = useState(null);
     const [profileImagePreview, setProfileImagePreview] = useState("");
+    const [selectedCompetitiveTags, setSelectedCompetitiveTags] = useState([]);
+    const [tagsDropdownOpen, setTagsDropdownOpen] = useState(false);
     const currentUser = getCurrentUser();
 
     async function loadDashboardData(isMounted = () => true) {
@@ -217,7 +221,9 @@ export default function DashboardPage() {
             if (!isMounted()) return;
 
             const data = unwrapApiData(response.data);
-            setDashboardData(normalizeDashboardData(data));
+            const normalized = normalizeDashboardData(data);
+            setDashboardData(normalized);
+            setSelectedCompetitiveTags(normalized.competitive.tags);
         } catch (requestError) {
             if (!isMounted()) return;
             setError(requestError?.response?.data?.message || "Erro ao carregar dados");
@@ -410,6 +416,50 @@ export default function DashboardPage() {
         }
     }
 
+    async function handleRefreshProfile() {
+        const userId = currentUser?.userId || getStoredUserId();
+
+        if (!userId) {
+            setRefreshFeedback({ type: "error", message: "Entre na sua conta para atualizar o perfil." });
+            return;
+        }
+
+        try {
+            setRefreshLoading(true);
+            setRefreshFeedback({ type: "", message: "" });
+
+            const response = await axios.post(`${API_BASE_URL}/api/player/${userId}/refresh`, null, {
+                headers: getAuthHeaders(),
+            });
+
+            const success = response.data?.success ?? response.data?.Success ?? true;
+            if (!success) {
+                setRefreshFeedback({
+                    type: "error",
+                    message: response.data?.message || response.data?.Message || "Nao foi possivel atualizar o perfil.",
+                });
+                return;
+            }
+
+            setRefreshFeedback({ type: "success", message: "Perfil atualizado com as ultimas 5 partidas." });
+            await loadDashboardData();
+            window.dispatchEvent(new Event("nkz-player-synced"));
+        } catch (requestError) {
+            setRefreshFeedback({
+                type: "error",
+                message: requestError?.response?.data?.message || "Nao foi possivel atualizar o perfil.",
+            });
+        } finally {
+            setRefreshLoading(false);
+        }
+    }
+
+    function toggleCompetitiveTag(tag) {
+        setSelectedCompetitiveTags((current) =>
+            current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]
+        );
+    }
+
     const content = (() => {
         if (loading) {
             return <div className="dashboard-state">Carregando dados...</div>;
@@ -425,6 +475,19 @@ export default function DashboardPage() {
 
         return (
             <>
+                <section className="dashboard-refresh-panel">
+                    <div>
+                        <strong>Dados da Riot</strong>
+                        <span>Sincronize rank, estatisticas e as ultimas 5 partidas.</span>
+                    </div>
+                    <button className="dashboard-small-action" type="button" onClick={handleRefreshProfile} disabled={refreshLoading}>
+                        {refreshLoading ? "Atualizando..." : "Atualizar perfil"}
+                    </button>
+                    {refreshFeedback.message && (
+                        <div className={`dashboard-feedback compact ${refreshFeedback.type}`}>{refreshFeedback.message}</div>
+                    )}
+                </section>
+
                 <div className="dashboard-top-grid">
                     <UserHeader
                         user={dashboardData.user}
@@ -464,7 +527,7 @@ export default function DashboardPage() {
                             {captainTeams.map((team) => (
                                 <article key={team.id}>
                                     <strong>{team.tag} - {team.name}</strong>
-                                    <span>{team.players}/5 jogadores</span>
+                                    <span>{team.players} jogadores</span>
                                     <em>{team.missingRoles.length ? `Faltam: ${team.missingRoles.join(", ")}` : "Composicao completa"}</em>
                                 </article>
                             ))}
@@ -482,11 +545,10 @@ export default function DashboardPage() {
                         onSubmit={(event) => {
                             event.preventDefault();
                             const form = event.currentTarget;
-                            const selectedTags = PLAYER_TAGS.filter((tag) => form.elements[`tag-${tag}`]?.checked);
                             handleCompetitiveProfileSave({
                                 mainRole: form.elements.mainRole.value,
                                 lookingForTeam: form.elements.lookingForTeam.checked,
-                                tags: selectedTags,
+                                tags: selectedCompetitiveTags,
                             });
                         }}
                     >
@@ -504,17 +566,37 @@ export default function DashboardPage() {
                                     <small>Aparece como procurando time.</small>
                                 </span>
                             </label>
-                            <fieldset>
-                                <legend>Tags do jogador</legend>
-                                <div className="competitive-tag-grid">
-                                    {PLAYER_TAGS.map((tag) => (
-                                        <label key={tag} className="competitive-tag">
-                                            <input name={`tag-${tag}`} type="checkbox" defaultChecked={dashboardData.competitive.tags.includes(tag)} />
-                                            <span>{tag}</span>
-                                        </label>
-                                    ))}
+                            <div className="competitive-tags-dropdown">
+                                <span>Tags do jogador</span>
+                                <button
+                                    type="button"
+                                    className="competitive-tags-trigger"
+                                    onClick={() => setTagsDropdownOpen((current) => !current)}
+                                    aria-expanded={tagsDropdownOpen}
+                                >
+                                    <strong>{selectedCompetitiveTags.length ? `${selectedCompetitiveTags.length} selecionadas` : "Selecionar tags"}</strong>
+                                    <small>{selectedCompetitiveTags.length ? selectedCompetitiveTags.join(", ") : "Escolha como os times enxergam voce."}</small>
+                                </button>
+                                {tagsDropdownOpen && (
+                                    <div className="competitive-tags-menu">
+                                        {PLAYER_TAGS.map((tag) => (
+                                            <label key={tag} className="competitive-tag">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCompetitiveTags.includes(tag)}
+                                                    onChange={() => toggleCompetitiveTag(tag)}
+                                                />
+                                                <span>{tag}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className="competitive-tags-selected">
+                                    {selectedCompetitiveTags.length
+                                        ? selectedCompetitiveTags.map((tag) => <em key={tag}>{tag}</em>)
+                                        : <em>Nenhuma tag selecionada</em>}
                                 </div>
-                            </fieldset>
+                            </div>
                             <div className="competitive-actions">
                                 <button className="dashboard-small-action" type="submit" disabled={competitiveLoading}>
                                     {competitiveLoading ? "Salvando..." : "Salvar perfil"}

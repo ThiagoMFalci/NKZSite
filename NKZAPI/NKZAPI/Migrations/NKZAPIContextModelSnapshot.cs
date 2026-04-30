@@ -105,9 +105,15 @@ namespace NKZAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("MaximumTeamPoints")
+                        .HasColumnType("integer");
+
                     b.Property<string>("MinimumElo")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("MinimumTeamPoints")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Modality")
                         .IsRequired()
@@ -116,6 +122,12 @@ namespace NKZAPI.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<TimeSpan?>("RankingQueueCloseTime")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan?>("RankingQueueOpenTime")
+                        .HasColumnType("interval");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -130,6 +142,10 @@ namespace NKZAPI.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("AccessCode")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("BestOf")
                         .HasColumnType("integer");
@@ -236,6 +252,96 @@ namespace NKZAPI.Migrations
                     b.HasIndex("LeagueMatchId");
 
                     b.ToTable("LeagueMatchReports");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeaguePayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LeagueId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderPaymentId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderPreferenceId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("WalletCreditUsed")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LeaguePayments");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueQueueEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LeagueId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("MatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("MatchedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
+
+                    b.ToTable("LeagueQueueEntries");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.LeagueStanding", b =>
@@ -482,6 +588,9 @@ namespace NKZAPI.Migrations
                     b.Property<Guid?>("OwnerId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Points")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ProfileImageUrl")
                         .HasColumnType("text");
 
@@ -588,9 +697,95 @@ namespace NKZAPI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<decimal>("WalletBalance")
+                        .HasColumnType("numeric");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.WalletPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CheckoutUrl")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderPaymentId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderPreferenceId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WalletPayments");
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.WalletTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("LeagueId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LeaguePaymentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("TeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("WalletPaymentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WalletTransactions");
                 });
 
             modelBuilder.Entity("NKZAPI.Models.LeagueMatch", b =>
@@ -607,6 +802,15 @@ namespace NKZAPI.Migrations
                     b.HasOne("NKZAPI.Models.LeagueMatch", null)
                         .WithMany("Reports")
                         .HasForeignKey("LeagueMatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NKZAPI.Models.LeagueQueueEntry", b =>
+                {
+                    b.HasOne("NKZAPI.Models.League", null)
+                        .WithMany("QueueEntries")
+                        .HasForeignKey("LeagueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -678,6 +882,8 @@ namespace NKZAPI.Migrations
             modelBuilder.Entity("NKZAPI.Models.League", b =>
                 {
                     b.Navigation("Matches");
+
+                    b.Navigation("QueueEntries");
 
                     b.Navigation("Standings");
 

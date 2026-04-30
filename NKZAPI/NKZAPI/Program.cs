@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using NKZAPI.Services.DiscordServices;
 using NKZAPI.Services.RiotService;
+using NKZAPI.Services.WalletServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +110,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<IDiscordVerificationService, DiscordBotClient>();
 builder.Services.AddHttpClient<IDiscordTeamRoleService, DiscordTeamRoleService>();
 builder.Services.AddScoped<IRiotService, RiotService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
 
 // Required for services that need access to the current HttpContext (e.g. authorization checks inside services)
 builder.Services.AddHttpContextAccessor();

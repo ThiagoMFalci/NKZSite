@@ -46,7 +46,7 @@ export default function RankingTable({ rows, type = "players" }) {
                 <span className="rank-position">{index < 3 ? <BsTrophyFill /> : index + 1}</span>,
                 <span><strong>{team.name}</strong><small>{team.tag}</small></span>,
                 <span className="ranking-elo-cell"><RankEmblem tier={team.tier} label={team.elo} className="compact" /> {team.elo}</span>,
-                <span>{team.players}/5</span>,
+                <span>{team.players}</span>,
                 <span>{team.wins}</span>,
                 <span className="ranking-points">{team.points}</span>,
             ],

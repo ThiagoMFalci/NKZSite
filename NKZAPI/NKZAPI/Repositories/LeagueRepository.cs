@@ -28,6 +28,7 @@ namespace NKZAPI.Repositories
                 .Include(l => l.Matches)
                     .ThenInclude(m => m.Reports)
                 .Include(l => l.Standings)
+                .Include(l => l.QueueEntries)
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
         public async Task<League> AddLeagueAsync(League league)
@@ -52,6 +53,10 @@ namespace NKZAPI.Repositories
             dbLeague.MaxTeams = league.MaxTeams;
             dbLeague.MinimumElo = league.MinimumElo;
             dbLeague.MaximumElo = league.MaximumElo;
+            dbLeague.MinimumTeamPoints = league.MinimumTeamPoints;
+            dbLeague.MaximumTeamPoints = league.MaximumTeamPoints;
+            dbLeague.RankingQueueOpenTime = league.RankingQueueOpenTime;
+            dbLeague.RankingQueueCloseTime = league.RankingQueueCloseTime;
             dbLeague.StartDate = league.StartDate;
             dbLeague.EndDate = league.EndDate;
             dbLeague.Modality = league.Modality;
@@ -77,31 +82,54 @@ namespace NKZAPI.Repositories
         }
         public async Task AddTeamToLeagueAsync(Guid leagueId, Team team)
         {
-            var league = await _context.Leagues
-                .Include(l => l.Teams)
-                .FirstOrDefaultAsync(l => l.Id == leagueId);
-            if (league == null)
+            var leagueExists = await _context.Leagues.AnyAsync(l => l.Id == leagueId);
+            if (!leagueExists)
             {
                 throw new DbUpdateConcurrencyException("The league was not found in the database.");
             }
-            league.Teams.Add(team);
-            await _context.SaveChangesAsync();
+
+            var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
+                $@"UPDATE ""Teams"" SET ""LeagueId"" = {leagueId} WHERE ""Id"" = {team.Id}");
+            if (affected == 0)
+            {
+                throw new DbUpdateConcurrencyException("The team was not found in the database.");
+            }
+
+            var hasStanding = await _context.LeagueStandings.AnyAsync(standing => standing.LeagueId == leagueId && standing.TeamId == team.Id);
+            if (!hasStanding)
+            {
+                await _context.LeagueStandings.AddAsync(new LeagueStanding
+                {
+                    Id = Guid.NewGuid(),
+                    LeagueId = leagueId,
+                    TeamId = team.Id
+                });
+                await _context.SaveChangesAsync();
+            }
         }
         public async Task RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId)
         {
-            var league = await _context.Leagues
-                .Include(l => l.Teams)
-                .FirstOrDefaultAsync(l => l.Id == leagueId);
-            if (league == null)
+            var leagueExists = await _context.Leagues.AnyAsync(l => l.Id == leagueId);
+            if (!leagueExists)
             {
                 throw new DbUpdateConcurrencyException("The league was not found in the database.");
             }
-            var team = league.Teams.FirstOrDefault(t => t.Id == teamId);
-            if (team == null)
+
+            var affected = await _context.Database.ExecuteSqlInterpolatedAsync(
+                $@"UPDATE ""Teams"" SET ""LeagueId"" = NULL WHERE ""Id"" = {teamId} AND ""LeagueId"" = {leagueId}");
+            if (affected == 0)
             {
                 throw new DbUpdateConcurrencyException("The team was not found in the league.");
             }
-            league.Teams.Remove(team);
+
+            var standings = await _context.LeagueStandings
+                .Where(standing => standing.LeagueId == leagueId && standing.TeamId == teamId)
+                .ToListAsync();
+            _context.LeagueStandings.RemoveRange(standings);
+            var queueEntries = await _context.LeagueQueueEntries
+                .Where(entry => entry.LeagueId == leagueId && entry.TeamId == teamId && entry.Status == "Waiting")
+                .ToListAsync();
+            _context.LeagueQueueEntries.RemoveRange(queueEntries);
             await _context.SaveChangesAsync();
         }
         public async Task<List<Team>> GetTeamsInLeagueAsync(Guid leagueId)
@@ -179,6 +207,74 @@ namespace NKZAPI.Repositories
         {
             await _context.LeagueMatchReports.AddAsync(report);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<LeagueQueueEntry?> GetWaitingQueueEntryAsync(Guid leagueId, Guid teamId)
+        {
+            return await _context.LeagueQueueEntries
+                .FirstOrDefaultAsync(entry => entry.LeagueId == leagueId && entry.TeamId == teamId && entry.Status == "Waiting");
+        }
+
+        public async Task<List<LeagueQueueEntry>> GetWaitingQueueEntriesAsync(Guid leagueId)
+        {
+            return await _context.LeagueQueueEntries
+                .Where(entry => entry.LeagueId == leagueId && entry.Status == "Waiting")
+                .OrderBy(entry => entry.JoinedAt)
+                .ToListAsync();
+        }
+
+        public async Task<LeagueQueueEntry> AddQueueEntryAsync(LeagueQueueEntry entry)
+        {
+            var added = await _context.LeagueQueueEntries.AddAsync(entry);
+            await _context.SaveChangesAsync();
+            return added.Entity;
+        }
+
+        public async Task<LeaguePayment?> GetApprovedLeaguePaymentAsync(Guid leagueId, Guid teamId)
+        {
+            return await _context.LeaguePayments
+                .Where(payment => payment.LeagueId == leagueId && payment.TeamId == teamId && payment.Status == "Approved")
+                .OrderByDescending(payment => payment.UpdatedAt)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<LeaguePayment?> GetPendingLeaguePaymentAsync(Guid leagueId, Guid teamId)
+        {
+            return await _context.LeaguePayments
+                .Where(payment => payment.LeagueId == leagueId && payment.TeamId == teamId && payment.Status == "Pending")
+                .OrderByDescending(payment => payment.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<LeaguePayment?> GetLeaguePaymentByIdAsync(Guid paymentId)
+        {
+            return await _context.LeaguePayments.FirstOrDefaultAsync(payment => payment.Id == paymentId);
+        }
+
+        public async Task<LeaguePayment?> GetLeaguePaymentByProviderPaymentIdAsync(string providerPaymentId)
+        {
+            return await _context.LeaguePayments.FirstOrDefaultAsync(payment => payment.ProviderPaymentId == providerPaymentId);
+        }
+
+        public async Task<List<LeaguePayment>> GetApprovedLeaguePaymentsByLeagueAsync(Guid leagueId)
+        {
+            return await _context.LeaguePayments
+                .Where(payment => payment.LeagueId == leagueId && payment.Status == "Approved")
+                .ToListAsync();
+        }
+
+        public async Task<LeaguePayment> AddLeaguePaymentAsync(LeaguePayment payment)
+        {
+            var added = await _context.LeaguePayments.AddAsync(payment);
+            await _context.SaveChangesAsync();
+            return added.Entity;
+        }
+
+        public async Task<LeagueMatch> AddMatchAsync(LeagueMatch match)
+        {
+            var added = await _context.LeagueMatches.AddAsync(match);
+            await _context.SaveChangesAsync();
+            return added.Entity;
         }
 
         public async Task SaveChangesAsync()

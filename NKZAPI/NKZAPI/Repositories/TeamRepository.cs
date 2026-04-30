@@ -40,6 +40,7 @@ namespace NKZAPI.Repositories
 
         public async Task<Team> AddTeamAsync(Team team)
         {
+            team.Points = CalculateTeamPoints(team.Players);
             var entry = await _context.Teams.AddAsync(team);
             await _context.SaveChangesAsync();
             return entry.Entity;
@@ -66,6 +67,7 @@ namespace NKZAPI.Repositories
             ownerPlayer.TeamId = entry.Entity.Id;
             ownerPlayer.IsCaptain = false;
             await _context.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(entry.Entity.Id);
 
             await transaction.CommitAsync();
             await HydrateDiscordAsync(new List<Team> { entry.Entity });
@@ -97,6 +99,7 @@ namespace NKZAPI.Repositories
             dbTeam.Tag = team.Tag;
             dbTeam.OwnerId = team.OwnerId;
             dbTeam.IsRecruiting = team.IsRecruiting;
+            dbTeam.Points = CalculateTeamPoints(dbTeam.Players);
 
             await _context.SaveChangesAsync();
             return dbTeam;
@@ -162,6 +165,12 @@ namespace NKZAPI.Repositories
 
         public async Task UpdatePlayerAsync(Player player)
         {
+            var previousTeamId = await _context.Players
+                .AsNoTracking()
+                .Where(p => p.Id == player.Id)
+                .Select(p => p.TeamId)
+                .FirstOrDefaultAsync();
+
             var entry = _context.Entry(player);
             if (entry.State == EntityState.Detached)
             {
@@ -170,6 +179,8 @@ namespace NKZAPI.Repositories
             }
             entry.State = EntityState.Modified;
             await _context.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(previousTeamId);
+            await RecalculateTeamPointsAsync(player.TeamId);
         }
 
         public async Task<Team?> UpdateRecruitingAsync(Guid teamId, bool isRecruiting)
@@ -184,8 +195,28 @@ namespace NKZAPI.Repositories
 
         public async Task RemovePlayerAsync(Player player)
         {
+            var teamId = player.TeamId;
             _context.Players.Remove(player);
             await _context.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(teamId);
+        }
+
+        public async Task RecalculateTeamPointsAsync(Guid? teamId)
+        {
+            if (!teamId.HasValue) return;
+
+            var team = await _context.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.Id == teamId.Value);
+            if (team == null) return;
+
+            team.Points = CalculateTeamPoints(team.Players);
+            await _context.SaveChangesAsync();
+        }
+
+        private static int CalculateTeamPoints(IEnumerable<Player>? players)
+        {
+            return players?.Sum(CompetitivePoints.FromPlayer) ?? 0;
         }
 
         private async Task HydrateDiscordAsync(List<Team> teams)

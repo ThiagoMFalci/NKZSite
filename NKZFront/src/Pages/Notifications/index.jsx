@@ -252,6 +252,7 @@ export default function NotificationsPage() {
                 const scheduleStatus = match.scheduleStatus ?? match.ScheduleStatus ?? "Open";
                 const proposedByTeamId = match.proposedByTeamId ?? match.ProposedByTeamId;
                 const proposedAt = match.proposedScheduledAt ?? match.ProposedScheduledAt ?? match.scheduledAt ?? match.ScheduledAt;
+                const accessCode = match.accessCode ?? match.AccessCode;
                 const teamA = teamMap[teamAId];
                 const teamB = teamMap[teamBId];
                 const opponentId = manageableTeamIds.has(teamAId) ? teamBId : teamAId;
@@ -270,6 +271,7 @@ export default function NotificationsPage() {
                     details: [
                         leagueName,
                         match.roundName ?? match.RoundName ?? `Semana ${match.weekNumber ?? match.WeekNumber ?? "-"}`,
+                        accessCode ? `Codigo personalizada: ${accessCode}` : "Codigo personalizada a definir",
                         proposedAt ? `Horario: ${formatDateTime(proposedAt)}` : "Sem horario sugerido",
                         scheduleStatus === "Pending"
                             ? (proposedByMine ? "Aguardando resposta do adversario" : "Outro time sugeriu um horario")

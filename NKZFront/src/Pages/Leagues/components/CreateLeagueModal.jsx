@@ -143,6 +143,54 @@ export default function CreateLeagueModal({
 
                     <div className="league-create-grid">
                         <label>
+                            Pontos minimos do time
+                            <input
+                                type="number"
+                                name="minimumTeamPoints"
+                                min="0"
+                                value={formData.minimumTeamPoints}
+                                onChange={onChange}
+                            />
+                        </label>
+
+                        <label>
+                            Pontos maximos do time
+                            <input
+                                type="number"
+                                name="maximumTeamPoints"
+                                min="0"
+                                value={formData.maximumTeamPoints}
+                                onChange={onChange}
+                            />
+                        </label>
+
+                        <label>
+                            Inicio da fila
+                            <input
+                                type="time"
+                                name="rankingQueueOpenTime"
+                                value={formData.rankingQueueOpenTime}
+                                onChange={onChange}
+                                disabled={formData.modality !== "Ranking"}
+                            />
+                        </label>
+                    </div>
+
+                    <div className="league-create-grid">
+                        <label>
+                            Final da fila
+                            <input
+                                type="time"
+                                name="rankingQueueCloseTime"
+                                value={formData.rankingQueueCloseTime}
+                                onChange={onChange}
+                                disabled={formData.modality !== "Ranking"}
+                            />
+                        </label>
+                    </div>
+
+                    <div className="league-create-grid">
+                        <label>
                             Data de inicio
                             <input
                                 type="date"

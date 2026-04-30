@@ -34,6 +34,24 @@ namespace NKZAPI.Controllers
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
+
+        [Authorize]
+        [HttpPost("{userId:guid}/refresh")]
+        public async Task<ActionResult> RefreshPlayerFromRiot(Guid userId, [FromQuery] string region = "br1")
+        {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized(new { message = "Token invalido ou sem identificador de usuario." });
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+            if (callerId != userId && !isAdmin)
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao pode atualizar player de outro usuario." });
+
+            var response = await _playerInterface.RefreshPlayerFromRiotAsync(userId, region);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+
         [Authorize]
         [HttpPost("{userId:guid}")]
         public async Task<ActionResult> AddPlayer(Guid userId, [FromBody] CreatePlayerDto player)

@@ -26,7 +26,11 @@ namespace NKZAPI.Data
         public DbSet<League> Leagues { get; set; }
         public DbSet<LeagueMatch> LeagueMatches { get; set; }
         public DbSet<LeagueMatchReport> LeagueMatchReports { get; set; }
+        public DbSet<LeagueQueueEntry> LeagueQueueEntries { get; set; }
+        public DbSet<LeaguePayment> LeaguePayments { get; set; }
         public DbSet<LeagueStanding> LeagueStandings { get; set; }
+        public DbSet<WalletPayment> WalletPayments { get; set; }
+        public DbSet<WalletTransaction> WalletTransactions { get; set; }
         public DbSet<Tournament> Tournaments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

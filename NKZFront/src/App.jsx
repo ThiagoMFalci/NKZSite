@@ -9,6 +9,7 @@ import LeaguesPage from './Pages/Leagues'
 import LeaguePage from './Pages/LeaguePage'
 import TournamentsPage from './Pages/Tournaments'
 import NotificationsPage from './Pages/Notifications'
+import WalletPage from './Pages/Wallet'
 import Login from './Pages/Auth/Login'
 import Register from './Pages/Auth/Register'
 import NotFound from './Pages/NotFound'
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/leagues/:leagueId" element={<ProtectedRoute><LeaguePage/></ProtectedRoute>}/>
                     <Route path="/tournaments" element={<ProtectedRoute><TournamentsPage/></ProtectedRoute>}/>
                     <Route path="/notifications" element={<ProtectedRoute><NotificationsPage/></ProtectedRoute>}/>
+                    <Route path="/wallet" element={<ProtectedRoute><WalletPage/></ProtectedRoute>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/register" element={<Register/>}/>
                     <Route path="*" element={<ProtectedRoute><NotFound/></ProtectedRoute>}/>

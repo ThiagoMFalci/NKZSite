@@ -41,8 +41,10 @@ namespace NKZAPI.Repositories
         {
             var player = await _playerRepository.Players.FirstOrDefaultAsync(p => p.Id == playerid);
             if (player == null) return;
+            var teamId = player.TeamId;
             _playerRepository.Players.Remove(player);
             await _playerRepository.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(teamId);
         }
 
         public async Task<User?> GetUserWithPlayersAsync(Guid id)
@@ -87,6 +89,7 @@ namespace NKZAPI.Repositories
 
             var entry = await _playerRepository.Players.AddAsync(player);
             await _playerRepository.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(player.TeamId);
             return entry.Entity;
         }
 
@@ -118,7 +121,27 @@ namespace NKZAPI.Repositories
 
         public async Task SaveChangesAsync()
         {
+            var affectedTeamIds = _playerRepository.ChangeTracker
+                .Entries<Player>()
+                .Where(entry => entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted)
+                .SelectMany(entry => new[]
+                {
+                    entry.Entity.TeamId,
+                    entry.State == EntityState.Added
+                        ? null
+                        : entry.OriginalValues.GetValue<Guid?>(nameof(Player.TeamId))
+                })
+                .Where(teamId => teamId.HasValue)
+                .Select(teamId => teamId!.Value)
+                .Distinct()
+                .ToList();
+
             await _playerRepository.SaveChangesAsync();
+
+            foreach (var teamId in affectedTeamIds)
+            {
+                await RecalculateTeamPointsAsync(teamId);
+            }
         }
 
         private async Task HydrateDiscordAsync(List<Player> players)
@@ -163,6 +186,7 @@ namespace NKZAPI.Repositories
 
             var entry = await _playerRepository.Players.AddAsync(player);
             await _playerRepository.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(player.TeamId);
             return entry.Entity;
         }
         public async Task<Player> IsCaptain(Guid id, bool i)
@@ -187,9 +211,24 @@ namespace NKZAPI.Repositories
 
         public async Task<Player> UpdateCompetitiveProfileAsync(Player player)
         {
+            var teamId = player.TeamId;
             _playerRepository.Players.Update(player);
             await _playerRepository.SaveChangesAsync();
+            await RecalculateTeamPointsAsync(teamId);
             return player;
+        }
+
+        private async Task RecalculateTeamPointsAsync(Guid? teamId)
+        {
+            if (!teamId.HasValue) return;
+
+            var team = await _playerRepository.Teams
+                .Include(t => t.Players)
+                .FirstOrDefaultAsync(t => t.Id == teamId.Value);
+            if (team == null) return;
+
+            team.Points = team.Players?.Sum(CompetitivePoints.FromPlayer) ?? 0;
+            await _playerRepository.SaveChangesAsync();
         }
 
     }

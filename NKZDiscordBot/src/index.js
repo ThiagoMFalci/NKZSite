@@ -1,11 +1,15 @@
 import "dotenv/config";
 import express from "express";
-import { ChannelType, Client, GatewayIntentBits, GatewayDispatchEvents, RESTEvents } from "discord.js";
+import { ChannelType, Client, GatewayIntentBits, GatewayDispatchEvents, PermissionFlagsBits, RESTEvents } from "discord.js";
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN?.trim();
 const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID?.trim();
 const NKZ_BOT_SECRET = process.env.NKZ_BOT_SECRET?.trim();
 const PORT = process.env.PORT?.trim() || 3001;
+const LEAGUES_CATEGORY_NAME = "ligas";
+const VOICE_CREATOR_CHANNEL_NAME = "➕ criarchatdevoz";
+const TEAM_VOICE_PREFIX = "🎧";
+const EMPTY_VOICE_DELETE_MS = 5 * 60 * 1000;
 
 const missingConfig = [
   ["DISCORD_BOT_TOKEN", DISCORD_BOT_TOKEN],
@@ -50,7 +54,7 @@ function addDiagnosticLog(level, message, detail = null) {
 }
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildVoiceStates],
   failIfNotExists: false,
   rest: {
     retries: 1,
@@ -60,6 +64,7 @@ const client = new Client({
 
 const app = express();
 app.use(express.json({ limit: "32kb" }));
+const emptyVoiceDeleteTimers = new Map();
 
 function requireInternalSecret(req, res, next) {
   const header = req.headers.authorization || "";
@@ -82,6 +87,144 @@ function normalizeRoleName(teamName, teamTag) {
   const tag = String(teamTag || "").trim().toUpperCase();
   const name = String(teamName || "Time").trim().replace(/\s+/g, " ").slice(0, 64);
   return tag ? `NKZ ${tag} - ${name}`.slice(0, 90) : `NKZ ${name}`.slice(0, 90);
+}
+
+function isTeamRole(role) {
+  return role?.name?.startsWith("NKZ ");
+}
+
+function getTeamVoiceName(role) {
+  const cleanName = role.name
+    .replace(/^NKZ\s+/i, "")
+    .replace(/\s+-\s+/g, " - ")
+    .slice(0, 72);
+  return `${TEAM_VOICE_PREFIX} ${cleanName}`;
+}
+
+async function ensureLeagueCategory(guild) {
+  const channels = await guild.channels.fetch();
+  let category = channels.find((channel) =>
+    channel?.type === ChannelType.GuildCategory &&
+    channel.name.toLowerCase() === LEAGUES_CATEGORY_NAME
+  );
+
+  if (!category) {
+    category = await guild.channels.create({
+      name: LEAGUES_CATEGORY_NAME,
+      type: ChannelType.GuildCategory,
+      reason: "NKZ bootstrap",
+    });
+  }
+
+  return category;
+}
+
+async function ensureVoiceCreatorChannel(guild) {
+  const category = await ensureLeagueCategory(guild);
+  const channels = await guild.channels.fetch();
+  let channel = channels.find((item) =>
+    item?.type === ChannelType.GuildVoice &&
+    item.parentId === category.id &&
+    item.name.toLowerCase() === VOICE_CREATOR_CHANNEL_NAME.toLowerCase()
+  );
+
+  if (!channel) {
+    channel = await guild.channels.create({
+      name: VOICE_CREATOR_CHANNEL_NAME,
+      type: ChannelType.GuildVoice,
+      parent: category.id,
+      reason: "NKZ voice room creator",
+      permissionOverwrites: [
+        {
+          id: guild.roles.everyone.id,
+          allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.Connect],
+        },
+      ],
+    });
+  }
+
+  return { category, channel };
+}
+
+function clearVoiceDeleteTimer(channelId) {
+  const timer = emptyVoiceDeleteTimers.get(channelId);
+  if (timer) clearTimeout(timer);
+  emptyVoiceDeleteTimers.delete(channelId);
+}
+
+function scheduleVoiceDeleteIfEmpty(channel) {
+  if (!channel || channel.type !== ChannelType.GuildVoice) return;
+  if (!channel.name.startsWith(TEAM_VOICE_PREFIX)) return;
+  if (channel.members.size > 0) {
+    clearVoiceDeleteTimer(channel.id);
+    return;
+  }
+
+  clearVoiceDeleteTimer(channel.id);
+  const timer = setTimeout(async () => {
+    try {
+      const fresh = await channel.guild.channels.fetch(channel.id).catch(() => null);
+      if (fresh?.type === ChannelType.GuildVoice && fresh.name.startsWith(TEAM_VOICE_PREFIX) && fresh.members.size === 0) {
+        await fresh.delete("NKZ temporary team voice empty for 5 minutes");
+      }
+    } catch (error) {
+      addDiagnosticLog("warn", "Could not delete empty team voice:", error?.message || String(error));
+    } finally {
+      emptyVoiceDeleteTimers.delete(channel.id);
+    }
+  }, EMPTY_VOICE_DELETE_MS);
+
+  emptyVoiceDeleteTimers.set(channel.id, timer);
+}
+
+async function createPrivateTeamVoice(member, sourceChannel) {
+  const role = member.roles.cache
+    .filter(isTeamRole)
+    .sort((a, b) => b.position - a.position)
+    .first();
+
+  if (!role) {
+    await member.send("Entre em um time no site da NKZ antes de criar uma sala de voz privada.").catch(() => {});
+    return;
+  }
+
+  const { category } = await ensureVoiceCreatorChannel(sourceChannel.guild);
+  const channelName = getTeamVoiceName(role);
+  const channels = await sourceChannel.guild.channels.fetch();
+  let teamVoice = channels.find((item) =>
+    item?.type === ChannelType.GuildVoice &&
+    item.parentId === category.id &&
+    item.name === channelName
+  );
+
+  if (!teamVoice) {
+    teamVoice = await sourceChannel.guild.channels.create({
+      name: channelName,
+      type: ChannelType.GuildVoice,
+      parent: category.id,
+      reason: `NKZ private team voice for ${role.name}`,
+      permissionOverwrites: [
+        {
+          id: sourceChannel.guild.roles.everyone.id,
+          deny: [PermissionFlagsBits.Connect],
+          allow: [PermissionFlagsBits.ViewChannel],
+        },
+        {
+          id: role.id,
+          allow: [
+            PermissionFlagsBits.ViewChannel,
+            PermissionFlagsBits.Connect,
+            PermissionFlagsBits.Speak,
+            PermissionFlagsBits.Stream,
+            PermissionFlagsBits.UseVAD,
+          ],
+        },
+      ],
+    });
+  }
+
+  clearVoiceDeleteTimer(teamVoice.id);
+  await member.voice.setChannel(teamVoice, `NKZ created team voice for ${role.name}`);
 }
 
 async function resolveGuildMember(guild, identity) {
@@ -275,21 +418,15 @@ app.post("/discord/bootstrap", requireInternalSecret, async (_req, res) => {
     }
 
     const guild = await client.guilds.fetch(DISCORD_GUILD_ID);
-    const channels = await guild.channels.fetch();
-    let category = channels.find((channel) =>
-      channel?.type === ChannelType.GuildCategory &&
-      channel.name.toLowerCase() === "ligas"
-    );
+    const { category, channel } = await ensureVoiceCreatorChannel(guild);
 
-    if (!category) {
-      category = await guild.channels.create({
-        name: "ligas",
-        type: ChannelType.GuildCategory,
-        reason: "NKZ bootstrap",
-      });
-    }
-
-    return res.json({ success: true, categoryId: category.id, categoryName: category.name });
+    return res.json({
+      success: true,
+      categoryId: category.id,
+      categoryName: category.name,
+      voiceCreatorChannelId: channel.id,
+      voiceCreatorChannelName: channel.name,
+    });
   } catch (error) {
     return res.status(500).json({ message: error?.message || "Could not bootstrap Discord guild." });
   }
@@ -363,6 +500,31 @@ client.once("ready", () => {
   diagnostics.readyAt = new Date().toISOString();
   addDiagnosticLog("info", `NKZ Discord bot online as ${client.user.tag}`);
   checkGuildAccess();
+  client.guilds.fetch(DISCORD_GUILD_ID)
+    .then((guild) => ensureVoiceCreatorChannel(guild))
+    .then(({ channel }) => addDiagnosticLog("info", `NKZ voice creator ready: ${channel.name} (${channel.id})`))
+    .catch((error) => addDiagnosticLog("warn", "Could not ensure NKZ voice creator:", error?.message || String(error)));
+});
+
+client.on("voiceStateUpdate", async (oldState, newState) => {
+  try {
+    const joinedChannel = newState.channel;
+    const leftChannel = oldState.channel;
+
+    if (joinedChannel?.type === ChannelType.GuildVoice) {
+      clearVoiceDeleteTimer(joinedChannel.id);
+
+      if (joinedChannel.name.toLowerCase() === VOICE_CREATOR_CHANNEL_NAME.toLowerCase()) {
+        await createPrivateTeamVoice(newState.member, joinedChannel);
+      }
+    }
+
+    if (leftChannel?.type === ChannelType.GuildVoice && leftChannel.id !== joinedChannel?.id) {
+      scheduleVoiceDeleteIfEmpty(leftChannel);
+    }
+  } catch (error) {
+    addDiagnosticLog("error", "Voice state handler failed:", error?.stack || error?.message || String(error));
+  }
 });
 
 client.on("error", (error) => {

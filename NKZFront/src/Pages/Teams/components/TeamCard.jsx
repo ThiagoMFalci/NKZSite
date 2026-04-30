@@ -20,33 +20,59 @@ export default function TeamCard({ team, selected, onSelect }) {
                 if (event.key === "Enter" || event.key === " ") onSelect(team);
             }}
         >
-            <div className="team-card-top">
-                <div className="team-mark">
-                    <span className="team-mark-fallback">{team.initials}</span>
-                    {team.profileImageUrl && (
-                        <img
-                            src={resolveImageUrl(team.profileImageUrl)}
-                            alt={team.name}
-                            onError={(event) => {
-                                event.currentTarget.style.display = "none";
-                            }}
-                        />
-                    )}
-                </div>
-                <div>
-                    <p className="teams-eyebrow">{team.tag}</p>
-                    <h2>{team.name}</h2>
-                </div>
+            <div className="team-card-cover">
+                {team.profileImageUrl && (
+                    <img
+                        src={resolveImageUrl(team.profileImageUrl)}
+                        alt={team.name}
+                        onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                        }}
+                    />
+                )}
+                <span className={`team-status-pill ${team.status?.key || "recruiting"}`}>
+                    {team.status?.label || "Recrutando"}
+                </span>
+                <strong>{team.tag}</strong>
             </div>
 
-            <span className={`team-status-badge ${team.status?.key || "recruiting"}`}>
-                {team.status?.label || "Recrutando"}
-            </span>
+            <div className="team-card-body">
+                <div className="team-card-top">
+                    <div className="team-mark">
+                        <span className="team-mark-fallback">{team.initials}</span>
+                        {team.profileImageUrl && (
+                            <img
+                                src={resolveImageUrl(team.profileImageUrl)}
+                                alt={team.name}
+                                onError={(event) => {
+                                    event.currentTarget.style.display = "none";
+                                }}
+                            />
+                        )}
+                    </div>
+                    <div>
+                        <p className="teams-eyebrow">{team.tag}</p>
+                        <h2>{team.name}</h2>
+                    </div>
+                </div>
 
-            <div className="team-card-stats">
-                <span><BsPeopleFill /> {team.playerCount} jogadores</span>
-                <span><RankEmblem tier={team.averageElo} label={team.averageElo} className="compact" /> {team.averageElo}</span>
-                <span><BsStars /> {team.points} pts</span>
+                <div className="team-card-highlight">
+                    <div>
+                        <span>Elenco</span>
+                        <strong>{team.playerCount}</strong>
+                    </div>
+                    <div>
+                        <span>Elo medio</span>
+                        <strong><RankEmblem tier={team.averageElo} label={team.averageElo} className="compact" /> {team.averageElo}</strong>
+                    </div>
+                </div>
+
+                <div className="team-card-stats">
+                    <span><BsPeopleFill /> {team.playerCount} jogadores</span>
+                    <span><BsStars /> {team.points} pts</span>
+                </div>
+
+                <div className="team-card-accent" />
             </div>
         </article>
     );

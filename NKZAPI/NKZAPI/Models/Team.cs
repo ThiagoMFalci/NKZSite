@@ -11,6 +11,7 @@ namespace NKZAPI.Models
         public Guid? OwnerId { get; set; }
         public bool IsRecruiting { get; set; } = true;
         public ICollection<Player>? Players { get; set; }
+        public int Points { get; set; }
         // Persisted image path/URL
         public string? ProfileImageUrl { get; set; }
 
