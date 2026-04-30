@@ -89,6 +89,7 @@ namespace NKZAPI.Services.LeagueServices
                 existing.Name = league.Name;
                 existing.Award = league.Award;
                 existing.EntryFee = league.EntryFee;
+                existing.ImageUrl = league.ImageUrl ?? existing.ImageUrl;
                 existing.MaxTeams = league.MaxTeams;
                 existing.MinimumElo = league.MinimumElo;
                 existing.MaximumElo = league.MaximumElo;
@@ -116,6 +117,69 @@ namespace NKZAPI.Services.LeagueServices
                 response.Success = false;
                 response.Message = $"An error occurred while updating the league: {ex.Message}";
             }
+            return response;
+        }
+
+        public async Task<Response<League>> UploadLeagueImageAsync(Guid leagueId, IFormFile image)
+        {
+            var response = new Response<League>();
+            try
+            {
+                var league = await _leagueRepository.GetLeagueByIdAsync(leagueId);
+                if (league == null)
+                {
+                    response.Success = false;
+                    response.Message = "League not found.";
+                    return response;
+                }
+
+                if (image == null || image.Length == 0)
+                {
+                    response.Success = false;
+                    response.Message = "No file uploaded.";
+                    return response;
+                }
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+                var maxFileSize = 5 * 1024 * 1024;
+                var fileExt = Path.GetExtension(image.FileName).ToLowerInvariant();
+                if (!image.ContentType.StartsWith("image/") || !allowedExtensions.Contains(fileExt))
+                {
+                    response.Success = false;
+                    response.Message = "Invalid file type. Only image files are allowed.";
+                    return response;
+                }
+
+                if (image.Length > maxFileSize)
+                {
+                    response.Success = false;
+                    response.Message = "File too large. Maximum allowed size is 5 MB.";
+                    return response;
+                }
+
+                var uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "images", "leagues");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{leagueId}{fileExt}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(stream);
+                }
+
+                var relativePath = Path.Combine("images", "leagues", fileName).Replace("\\", "/");
+                var updated = await _leagueRepository.UploadLeagueImageAsync(leagueId, relativePath);
+
+                response.Success = true;
+                response.Message = "League image uploaded successfully.";
+                response.Data = updated;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = ex.Message;
+            }
+
             return response;
         }
 
@@ -497,6 +561,156 @@ namespace NKZAPI.Services.LeagueServices
             return response;
         }
 
+        public async Task<Response<string>> ProposeMatchScheduleAsync(Guid matchId, LeagueMatchScheduleProposalDto proposal)
+        {
+            var response = new Response<string>();
+            var match = await _leagueRepository.GetLeagueMatchByIdAsync(matchId);
+            if (match == null)
+            {
+                response.Success = false;
+                response.Message = "Match not found.";
+                return response;
+            }
+
+            if (match.TeamAId == null || match.TeamBId == null)
+            {
+                response.Success = false;
+                response.Message = "A partida ainda nao possui dois times definidos.";
+                return response;
+            }
+
+            if (match.Status == "Completed")
+            {
+                response.Success = false;
+                response.Message = "Esta partida ja foi finalizada.";
+                return response;
+            }
+
+            if (proposal.ProposedScheduledAt == default)
+            {
+                response.Success = false;
+                response.Message = "Informe um horario valido.";
+                return response;
+            }
+
+            var callerTeam = await GetCallerMatchTeamAsync(match);
+            if (callerTeam == null)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            match.ProposedScheduledAt = proposal.ProposedScheduledAt.ToUniversalTime();
+            match.ProposedByTeamId = callerTeam.Id;
+            match.ScheduleStatus = "Pending";
+            await _leagueRepository.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Horario sugerido. Aguardando confirmacao do outro time.";
+            response.Data = match.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<string>> AcceptMatchScheduleAsync(Guid matchId)
+        {
+            var response = new Response<string>();
+            var match = await _leagueRepository.GetLeagueMatchByIdAsync(matchId);
+            if (match == null)
+            {
+                response.Success = false;
+                response.Message = "Match not found.";
+                return response;
+            }
+
+            if (match.ProposedScheduledAt == null || match.ProposedByTeamId == null || match.ScheduleStatus != "Pending")
+            {
+                response.Success = false;
+                response.Message = "Nao existe horario pendente para confirmar.";
+                return response;
+            }
+
+            if (match.Status == "Completed")
+            {
+                response.Success = false;
+                response.Message = "Esta partida ja foi finalizada.";
+                return response;
+            }
+
+            var callerTeam = await GetCallerMatchTeamAsync(match);
+            if (callerTeam == null)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            if (callerTeam.Id == match.ProposedByTeamId)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            match.ScheduledAt = match.ProposedScheduledAt;
+            match.ScheduleStatus = "Confirmed";
+            await _leagueRepository.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Horario confirmado.";
+            response.Data = match.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<string>> RejectMatchScheduleAsync(Guid matchId)
+        {
+            var response = new Response<string>();
+            var match = await _leagueRepository.GetLeagueMatchByIdAsync(matchId);
+            if (match == null)
+            {
+                response.Success = false;
+                response.Message = "Match not found.";
+                return response;
+            }
+
+            if (match.ProposedByTeamId == null || match.ScheduleStatus != "Pending")
+            {
+                response.Success = false;
+                response.Message = "Nao existe horario pendente para recusar.";
+                return response;
+            }
+
+            if (match.Status == "Completed")
+            {
+                response.Success = false;
+                response.Message = "Esta partida ja foi finalizada.";
+                return response;
+            }
+
+            var callerTeam = await GetCallerMatchTeamAsync(match);
+            if (callerTeam == null)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            if (callerTeam.Id == match.ProposedByTeamId)
+            {
+                response.Success = false;
+                response.Message = "Forbidden";
+                return response;
+            }
+
+            match.ScheduleStatus = "Rejected";
+            await _leagueRepository.SaveChangesAsync();
+
+            response.Success = true;
+            response.Message = "Horario recusado. Sugira outro horario se quiser.";
+            response.Data = match.Id.ToString();
+            return response;
+        }
+
         private async Task CompleteMatchCoreAsync(LeagueMatch match, Guid winnerId, int teamAScore, int teamBScore)
         {
             var loserId = winnerId == match.TeamAId ? match.TeamBId!.Value : match.TeamAId!.Value;
@@ -540,10 +754,51 @@ namespace NKZAPI.Services.LeagueServices
             }
         }
 
-        private static int GetTeamSeedScore(Team team)
+        private static double GetTeamSeedScore(Team team)
         {
             var players = team.Players ?? new List<Player>();
-            return players.Sum(player => Math.Max(0, player.SoloQueueLP + player.Wins * 3 - player.Losses));
+            return players.Sum(GetPlayerSeedScore);
+        }
+
+        private static double GetPlayerSeedScore(Player player)
+        {
+            var tierScore = GetTierScore(player.SoloQueueTier);
+            var rankScore = GetRankScore(player.SoloQueueRank);
+            var winRate = player.Wins + player.Losses > 0
+                ? (double)player.Wins / (player.Wins + player.Losses)
+                : 0;
+
+            return tierScore * 1000 + rankScore * 100 + Math.Max(0, player.SoloQueueLP) + winRate;
+        }
+
+        private static int GetTierScore(string? tier)
+        {
+            return (tier ?? "").Trim().ToUpperInvariant() switch
+            {
+                "IRON" => 1,
+                "BRONZE" => 2,
+                "SILVER" => 3,
+                "GOLD" => 4,
+                "PLATINUM" => 5,
+                "EMERALD" => 6,
+                "DIAMOND" => 7,
+                "MASTER" => 8,
+                "GRANDMASTER" => 9,
+                "CHALLENGER" => 10,
+                _ => 0
+            };
+        }
+
+        private static int GetRankScore(string? rank)
+        {
+            return (rank ?? "").Trim().ToUpperInvariant() switch
+            {
+                "IV" => 1,
+                "III" => 2,
+                "II" => 3,
+                "I" => 4,
+                _ => 0
+            };
         }
 
         private async Task UpdateStandingAsync(Guid leagueId, Guid teamId, bool won, int scoreA, int scoreB, bool isTeamA)
@@ -653,6 +908,23 @@ namespace NKZAPI.Services.LeagueServices
             var isOwner = team.OwnerId == callerId;
             var isCaptain = team.Players?.Any(player => player.UserId == callerId && player.IsCaptain) == true;
             return isAdmin || isOwner || isCaptain;
+        }
+
+        private async Task<Team?> GetCallerMatchTeamAsync(LeagueMatch match)
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                return null;
+            }
+
+            var teamA = match.TeamAId.HasValue ? await _teamRepository.GetTeamByIdAsync(match.TeamAId.Value) : null;
+            var teamB = match.TeamBId.HasValue ? await _teamRepository.GetTeamByIdAsync(match.TeamBId.Value) : null;
+
+            if (teamA != null && CanManageTeamForUser(teamA, callerId, user)) return teamA;
+            if (teamB != null && CanManageTeamForUser(teamB, callerId, user)) return teamB;
+            return null;
         }
 
         private async Task<string> SaveProofImageAsync(Guid matchId, Guid teamId, IFormFile image)

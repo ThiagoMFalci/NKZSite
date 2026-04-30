@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { BsPersonPlusFill } from "react-icons/bs";
+import { BsDiscord, BsPersonPlusFill } from "react-icons/bs";
 import { saveSession } from "../../utils/auth";
 import "./style.css";
 
@@ -18,7 +18,8 @@ function getApiMessage(error) {
 
 export default function Register() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "" });
+    const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "", discordUserId: "", code: "" });
+    const [awaitingDiscord, setAwaitingDiscord] = useState(false);
     const [loading, setLoading] = useState(false);
     const [feedback, setFeedback] = useState({ type: "", message: "" });
 
@@ -42,7 +43,7 @@ export default function Register() {
         event.preventDefault();
         setFeedback({ type: "", message: "" });
 
-        if (!formData.email || !formData.password || !formData.confirmPassword) {
+        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.discordUserId) {
             setFeedback({ type: "error", message: "Preencha todos os campos." });
             return;
         }
@@ -59,6 +60,7 @@ export default function Register() {
                 passwordHash: formData.password,
                 passwordSalt: formData.confirmPassword,
                 role: "User",
+                discordUserId: formData.discordUserId,
             });
 
             const success = response.data?.success ?? response.data?.Success ?? true;
@@ -71,8 +73,50 @@ export default function Register() {
                 return;
             }
 
+            setAwaitingDiscord(true);
+            setFeedback({
+                type: "success",
+                message: response.data?.message || response.data?.Message || "Conta criada. Confira seu privado no Discord.",
+            });
+        } catch (error) {
+            setFeedback({ type: "error", message: getApiMessage(error) });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleVerifyDiscord(event) {
+        event.preventDefault();
+        setFeedback({ type: "", message: "" });
+
+        if (!formData.code.trim()) {
+            setFeedback({ type: "error", message: "Informe o codigo recebido no Discord." });
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await axios.post(`${API_BASE_URL}/api/auth/User/VerifyDiscord`, {
+                email: formData.email,
+                code: formData.code,
+            });
             await loginAfterRegister();
             navigate("/dashboard");
+        } catch (error) {
+            setFeedback({ type: "error", message: getApiMessage(error) });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleResendCode() {
+        try {
+            setLoading(true);
+            setFeedback({ type: "", message: "" });
+            await axios.post(`${API_BASE_URL}/api/auth/User/ResendDiscordVerification`, JSON.stringify(formData.email), {
+                headers: { "Content-Type": "application/json" },
+            });
+            setFeedback({ type: "success", message: "Novo codigo enviado no privado do Discord." });
         } catch (error) {
             setFeedback({ type: "error", message: getApiMessage(error) });
         } finally {
@@ -89,7 +133,32 @@ export default function Register() {
                 <h1>Criar conta</h1>
                 <p className="auth-desc">Cadastre-se para vincular seu perfil e entrar na arena NKZ.</p>
 
-                <form className="auth-form" onSubmit={handleSubmit}>
+                <form className="auth-form" onSubmit={awaitingDiscord ? handleVerifyDiscord : handleSubmit}>
+                    {awaitingDiscord ? (
+                        <>
+                            <div className="discord-verify-panel">
+                                <BsDiscord />
+                                <div>
+                                    <strong>Confirme seu Discord</strong>
+                                    <span>Enviamos um codigo por mensagem privada. O bot so envia se voce estiver no servidor NKZ.</span>
+                                </div>
+                            </div>
+
+                            <label>
+                                Codigo do Discord
+                                <input
+                                    type="text"
+                                    name="code"
+                                    value={formData.code}
+                                    onChange={handleChange}
+                                    inputMode="numeric"
+                                    maxLength={6}
+                                    placeholder="000000"
+                                />
+                            </label>
+                        </>
+                    ) : (
+                        <>
                     <label>
                         Email
                         <input
@@ -126,13 +195,32 @@ export default function Register() {
                         />
                     </label>
 
+                    <label>
+                        Discord ID
+                        <input
+                            type="text"
+                            name="discordUserId"
+                            value={formData.discordUserId}
+                            onChange={handleChange}
+                            inputMode="numeric"
+                            placeholder="Ex: 123456789012345678"
+                        />
+                    </label>
+                        </>
+                    )}
+
                     {feedback.message && (
                         <div className={`auth-feedback ${feedback.type}`}>{feedback.message}</div>
                     )}
 
                     <button className="btn-primary auth-submit" type="submit" disabled={loading}>
-                        {loading ? "Criando..." : "Criar conta"}
+                        {awaitingDiscord ? (loading ? "Verificando..." : "Confirmar Discord") : (loading ? "Criando..." : "Criar conta")}
                     </button>
+                    {awaitingDiscord && (
+                        <button className="auth-link-button" type="button" disabled={loading} onClick={handleResendCode}>
+                            Reenviar codigo
+                        </button>
+                    )}
                 </form>
 
                 <p className="auth-switch">

@@ -1,4 +1,4 @@
-import { GiRank3 } from "react-icons/gi";
+import RankEmblem from "../../../Components/RankEmblem";
 
 export default function RankCard({ rank }) {
     const tier = rank.tier || "UNRANKED";
@@ -16,7 +16,7 @@ export default function RankCard({ rank }) {
                     {rank.emblemUrl ? (
                         <img src={rank.emblemUrl} alt={`${tier} ${division}`} />
                     ) : (
-                        <GiRank3 />
+                        <RankEmblem tier={tier} label={`${tier} ${division}`} className="large" />
                     )}
                 </div>
 

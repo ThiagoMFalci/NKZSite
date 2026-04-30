@@ -32,6 +32,8 @@ namespace NKZAPI.Repositories
                 Email = user.Email,
                 PasswordHash = Convert.ToBase64String(user.PasswordHash),
                 PasswordSalt = Convert.ToBase64String(user.PasswordSalt),
+                Role = user.Role,
+                DiscordUserId = user.DiscordUserId ?? "",
             };
             return dto;
         }

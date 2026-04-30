@@ -16,6 +16,9 @@ namespace NKZAPI.Models
         public int TeamAScore { get; set; }
         public int TeamBScore { get; set; }
         public DateTime? ScheduledAt { get; set; }
+        public DateTime? ProposedScheduledAt { get; set; }
+        public Guid? ProposedByTeamId { get; set; }
+        public string ScheduleStatus { get; set; } = "Open";
         public DateTime? CompletedAt { get; set; }
         public string Status { get; set; } = "Pending";
         public List<LeagueMatchReport> Reports { get; set; } = new();

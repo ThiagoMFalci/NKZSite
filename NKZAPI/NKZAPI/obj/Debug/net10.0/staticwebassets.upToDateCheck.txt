@@ -1,0 +1,6 @@
+wwwroot\images\league-proofs\3a55985f-0df6-4b47-b74f-829e41506b73-9030dcff-2257-4161-b454-15467f6a06f7-20260429155626.jpg
+wwwroot\images\leagues\0d6e906d-b2a3-4dff-a5f7-e8991ddbf505.jpeg
+wwwroot\images\profiles\04d502fb-3494-4acb-9a79-cf3576cdb21d.jpeg
+wwwroot\images\profiles\07b6f833-50fd-4501-8d8f-c650bafd6071.jpg
+wwwroot\images\profiles\a31a465e-90d2-4798-ab86-7d10826c5e7b.jpg
+wwwroot\images\teams\0b04587b-1d63-4347-9cbb-b7bc69a7a059.jpeg

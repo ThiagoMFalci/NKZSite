@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BsBoxArrowRight, BsCheck2, BsPersonDashFill, BsPersonPlusFill, BsShieldFillCheck, BsTrash, BsX } from "react-icons/bs";
+import RankEmblem from "../../../Components/RankEmblem";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -101,7 +102,7 @@ export default function TeamDetails({
                         <div className="team-detail-meta">
                             <span>{team.tag}</span>
                             <span>{team.playerCount}/5 jogadores</span>
-                            <span>{team.averageElo}</span>
+                            <span><RankEmblem tier={team.averageElo} label={team.averageElo} className="compact" /> {team.averageElo}</span>
                             <span>{team.points} pts</span>
                         </div>
                         <em className={`team-status-badge ${team.status?.key || "recruiting"}`}>
@@ -216,7 +217,7 @@ export default function TeamDetails({
                                     <strong>{player.summonerName}</strong>
                                     <span>{player.role}{player.isCaptain ? " - Capitao" : ""}</span>
                                 </div>
-                                <span className="player-elo">{player.elo}</span>
+                                <span className="player-elo"><RankEmblem tier={player.elo} label={player.elo} className="compact" /> {player.elo}</span>
                                 {canManage && player.userId !== team.ownerId && (
                                     <div className="player-actions">
                                         <button type="button" onClick={() => onToggleCaptain(player, !player.isCaptain)} disabled={loading}>

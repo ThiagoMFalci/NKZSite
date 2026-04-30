@@ -13,6 +13,7 @@ import "./style.css";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const DEFAULT_LEAGUE_FORM = {
     name: "",
+    image: null,
     award: "0",
     entryFee: "0",
     minimumElo: "UNRANKED",
@@ -71,6 +72,7 @@ function normalizeLeague(league) {
     return {
         id: league.id ?? league.Id,
         name: league.name ?? league.Name ?? "Liga",
+        imageUrl: league.imageUrl ?? league.ImageUrl ?? "",
         award: league.award ?? league.Award ?? 0,
         awardLabel: money(league.award ?? league.Award),
         entryFeeLabel: money(league.entryFee ?? league.EntryFee),
@@ -254,9 +256,9 @@ export default function LeaguesPage() {
         }
     }
 
-    function handleCreateChange(event) {
-        const { name, value } = event.target;
-        setCreateForm((current) => ({ ...current, [name]: value }));
+function handleCreateChange(event) {
+        const { name, value, files, type } = event.target;
+        setCreateForm((current) => ({ ...current, [name]: type === "file" ? files?.[0] || null : value }));
     }
 
     async function handleCreateLeague(event) {
@@ -286,7 +288,20 @@ export default function LeaguesPage() {
                 modality: createForm.modality,
             };
 
-            await axios.post(`${API_BASE_URL}/api/league`, payload, { headers: getAuthHeaders() });
+            const createResponse = await axios.post(`${API_BASE_URL}/api/league`, payload, { headers: getAuthHeaders() });
+            const leagueId = unwrapApiData(createResponse.data);
+
+            if (createForm.image && leagueId) {
+                const imagePayload = new FormData();
+                imagePayload.append("image", createForm.image);
+                await axios.post(`${API_BASE_URL}/api/league/${leagueId}/image`, imagePayload, {
+                    headers: {
+                        ...getAuthHeaders(),
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+            }
+
             setCreateFeedback({ type: "success", message: "Liga criada." });
             setCreateForm(DEFAULT_LEAGUE_FORM);
             setCreateOpen(false);

@@ -33,6 +33,8 @@
 }
 
 .league-hero,
+.league-champion-showcase,
+.league-stars-showcase,
 .league-setup-panel,
 .league-admin-panel,
 .league-panel,
@@ -41,6 +43,232 @@
     border: 1px solid var(--league-border);
     border-radius: 6px;
     box-shadow: 0 0 34px rgba(123, 47, 190, 0.08);
+}
+
+.league-champion-showcase {
+    align-items: center;
+    background:
+        radial-gradient(circle at 84% 50%, rgba(249, 115, 22, 0.18), transparent 30%),
+        radial-gradient(circle at 48% 0%, rgba(47, 134, 190, 0.14), transparent 34%),
+        linear-gradient(135deg, rgba(123, 47, 190, 0.2), rgba(15, 15, 27, 0.96) 46%, rgba(15, 15, 27, 0.96));
+    border-color: rgba(249, 115, 22, 0.42);
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    min-height: 150px;
+    padding: 1.35rem;
+}
+
+.league-champion-copy {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+}
+
+.league-champion-copy > svg {
+    color: var(--laranja);
+    filter: drop-shadow(0 0 18px rgba(249, 115, 22, 0.35));
+    flex: 0 0 auto;
+    height: 52px;
+    width: 52px;
+}
+
+.league-champion-copy h2,
+.league-stars-header h2 {
+    font-family: "Rajdhani", sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.league-champion-copy h2 {
+    color: var(--laranja);
+}
+
+.league-champion-copy span,
+.league-stars-header p {
+    color: var(--league-muted);
+}
+
+.league-champion-team {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+}
+
+.league-champion-team .team-logo,
+.champion-placeholder {
+    border-color: rgba(249, 115, 22, 0.75);
+    box-shadow: 0 0 26px rgba(249, 115, 22, 0.28);
+    height: 86px;
+    width: 86px;
+}
+
+.league-champion-team > strong {
+    background: linear-gradient(135deg, var(--laranja), #9b3cff);
+    border-radius: 999px;
+    color: #130d05;
+    font-weight: 900;
+    padding: 0.35rem 0.7rem;
+}
+
+.champion-placeholder {
+    align-items: center;
+    background: rgba(249, 115, 22, 0.08);
+    border: 1px solid rgba(249, 115, 22, 0.48);
+    border-radius: 8px;
+    color: var(--laranja);
+    display: inline-flex;
+    justify-content: center;
+}
+
+.champion-placeholder svg {
+    height: 42px;
+    width: 42px;
+}
+
+.league-stars-showcase {
+    background:
+        radial-gradient(circle at 50% 18%, rgba(123, 47, 190, 0.2), transparent 24%),
+        radial-gradient(circle at 88% 20%, rgba(249, 115, 22, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(15, 15, 27, 0.96));
+    border-color: rgba(123, 47, 190, 0.36);
+    display: grid;
+    gap: 1.2rem;
+    margin-bottom: 1rem;
+    padding: 1.35rem;
+}
+
+.league-stars-header {
+    align-items: center;
+    display: flex;
+    gap: 0.9rem;
+    justify-content: center;
+    text-align: center;
+}
+
+.league-stars-header > svg {
+    color: var(--laranja);
+    height: 34px;
+    width: 34px;
+}
+
+.league-stars-header h2 {
+    color: #9bd2f6;
+}
+
+.league-role-cards {
+    display: grid;
+    gap: 0.9rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.league-role-card {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(123, 47, 190, 0.22), transparent 44%),
+        radial-gradient(circle at 0% 100%, rgba(249, 115, 22, 0.08), transparent 38%),
+        rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(123, 47, 190, 0.32);
+    border-radius: 8px;
+    display: grid;
+    gap: 0.9rem;
+    min-width: 0;
+    padding: 0.9rem;
+}
+
+.league-role-card-head,
+.league-role-footer {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.league-role-card-head span {
+    color: var(--laranja);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.league-role-card-head svg {
+    color: #9bd2f6;
+}
+
+.league-role-player {
+    align-items: center;
+    display: flex;
+    gap: 0.7rem;
+    min-height: 54px;
+}
+
+.league-role-player .team-logo {
+    flex: 0 0 auto;
+    height: 48px;
+    width: 48px;
+}
+
+.league-role-player strong {
+    display: block;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.05;
+}
+
+.league-role-player span,
+.league-role-footer span,
+.mini-metric span {
+    color: var(--league-muted);
+    font-size: 0.76rem;
+}
+
+.league-role-metrics {
+    display: grid;
+    gap: 0.45rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mini-metric {
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 8px;
+    display: grid;
+    gap: 0.1rem;
+    min-height: 64px;
+    place-items: center;
+    text-align: center;
+}
+
+.mini-metric strong {
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.mini-metric.green strong {
+    color: #21c66b;
+}
+
+.mini-metric.red strong {
+    color: #ff5d5d;
+}
+
+.mini-metric.blue strong {
+    color: #55a8ff;
+}
+
+.league-role-footer {
+    border-top: 1px solid var(--league-line);
+    padding-top: 0.7rem;
+}
+
+.league-role-footer strong {
+    color: var(--laranja);
+    display: block;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.25rem;
 }
 
 .league-hero {
@@ -177,6 +405,28 @@
     color: #9bd2f6;
 }
 
+.my-team-name {
+    align-items: center;
+    color: var(--laranja);
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.3);
+}
+
+.my-team-name small {
+    background: rgba(249, 115, 22, 0.13);
+    border: 1px solid rgba(249, 115, 22, 0.36);
+    border-radius: 999px;
+    color: var(--laranja);
+    font-size: 0.58rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    padding: 0.25rem 0.42rem;
+    text-transform: uppercase;
+}
+
 .league-admin-panel {
     display: grid;
     gap: 1rem;
@@ -202,7 +452,7 @@
 .league-admin-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+    grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr) minmax(280px, 0.65fr);
 }
 
 .league-admin-card {
@@ -230,6 +480,73 @@
     color: var(--league-muted);
     font-size: 0.86rem;
     line-height: 1.45;
+}
+
+.league-banner-admin-card {
+    align-content: start;
+}
+
+.league-banner-uploader {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.league-banner-uploader input {
+    display: none;
+}
+
+.league-banner-preview {
+    align-items: center;
+    background:
+        radial-gradient(circle at 18% 20%, rgba(249, 115, 22, 0.24), transparent 34%),
+        linear-gradient(135deg, rgba(123, 47, 190, 0.32), rgba(47, 134, 190, 0.12) 48%, rgba(249, 115, 22, 0.16));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    display: flex;
+    height: 138px;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.league-banner-preview img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.league-banner-preview::after {
+    background: linear-gradient(180deg, transparent, rgba(7, 7, 13, 0.42));
+    content: "";
+    inset: 0;
+    position: absolute;
+}
+
+.league-banner-preview strong {
+    align-items: center;
+    color: rgba(245,245,245,0.74);
+    display: inline-flex;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.league-banner-uploader em {
+    align-items: center;
+    background: rgba(47, 134, 190, 0.12);
+    border: 1px solid rgba(47, 134, 190, 0.34);
+    border-radius: 4px;
+    color: #9bd2f6;
+    cursor: pointer;
+    display: inline-flex;
+    font-style: normal;
+    font-weight: 800;
+    justify-content: center;
+    letter-spacing: 0.08em;
+    min-height: 38px;
+    padding: 0 0.85rem;
+    text-transform: uppercase;
+    width: fit-content;
 }
 
 .league-admin-team-list {
@@ -532,6 +849,21 @@
     padding: 0.8rem;
 }
 
+.standing-row.my-team,
+.league-admin-team-row.my-team,
+.league-match-team.my-team,
+.calendar-match.my-team-match {
+    border-color: rgba(249, 115, 22, 0.42);
+    box-shadow: inset 3px 0 0 var(--laranja), 0 0 24px rgba(249, 115, 22, 0.08);
+}
+
+.standing-row.my-team,
+.calendar-match.my-team-match {
+    background:
+        linear-gradient(90deg, rgba(249, 115, 22, 0.12), transparent 46%),
+        rgba(0, 0, 0, 0.18);
+}
+
 .calendar-match,
 .history-row {
     background: rgba(0, 0, 0, 0.16);
@@ -548,6 +880,161 @@
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+.calendar-schedule-box {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 0.6rem;
+    padding: 0.7rem;
+}
+
+.calendar-schedule-badge {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    color: var(--league-muted);
+    font-size: 0.7rem;
+    font-weight: 900;
+    justify-self: start;
+    letter-spacing: 0.08em;
+    padding: 0.32rem 0.62rem;
+    text-transform: uppercase;
+}
+
+.calendar-schedule-badge.pending {
+    background: rgba(47, 134, 190, 0.12);
+    border-color: rgba(47, 134, 190, 0.38);
+    color: #9bd2f6;
+}
+
+.calendar-schedule-badge.confirmed {
+    background: rgba(33, 198, 107, 0.12);
+    border-color: rgba(33, 198, 107, 0.38);
+    color: #21c66b;
+}
+
+.calendar-schedule-badge.rejected {
+    background: rgba(255, 93, 93, 0.12);
+    border-color: rgba(255, 93, 93, 0.38);
+    color: #ff5d5d;
+}
+
+.calendar-schedule-badge.open {
+    background: rgba(249, 115, 22, 0.1);
+    border-color: rgba(249, 115, 22, 0.3);
+    color: var(--laranja);
+}
+
+.calendar-schedule-badge.completed {
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.calendar-schedule-status,
+.calendar-schedule-proposal {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.75rem;
+    justify-content: space-between;
+}
+
+.calendar-schedule-status span,
+.calendar-schedule-proposal span {
+    color: var(--league-muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.calendar-schedule-status strong {
+    color: var(--branco);
+    font-size: 0.9rem;
+}
+
+.calendar-schedule-proposal {
+    background: rgba(47, 134, 190, 0.08);
+    border: 1px solid rgba(47, 134, 190, 0.2);
+    border-radius: 5px;
+    padding: 0.62rem;
+}
+
+.calendar-schedule-proposal strong {
+    color: #9bd2f6;
+}
+
+.calendar-schedule-proposal em {
+    flex-basis: 100%;
+}
+
+.calendar-schedule-proposal.rejected {
+    background: rgba(249, 115, 22, 0.08);
+    border-color: rgba(249, 115, 22, 0.22);
+}
+
+.calendar-schedule-feedback {
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 0.58rem 0.65rem;
+}
+
+.calendar-schedule-feedback.success {
+    background: rgba(33, 198, 107, 0.1);
+    border: 1px solid rgba(33, 198, 107, 0.28);
+    color: #21c66b;
+}
+
+.calendar-schedule-feedback.error {
+    background: rgba(255, 93, 93, 0.1);
+    border: 1px solid rgba(255, 93, 93, 0.28);
+    color: #ff5d5d;
+}
+
+.calendar-schedule-actions,
+.calendar-schedule-form {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.calendar-schedule-form input {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--league-line);
+    border-radius: 5px;
+    color: var(--branco);
+    font-weight: 700;
+    min-height: 42px;
+    padding: 0 0.75rem;
+}
+
+.calendar-schedule-actions button,
+.calendar-schedule-form button {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 5px;
+    color: var(--branco);
+    cursor: pointer;
+    font-weight: 900;
+    min-height: 42px;
+    text-transform: uppercase;
+}
+
+.calendar-schedule-actions button:first-child,
+.calendar-schedule-form button {
+    background: linear-gradient(135deg, #21c66b, #159a52);
+    border-color: rgba(33, 198, 107, 0.45);
+    color: #06160d;
+}
+
+.calendar-schedule-actions button:disabled,
+.calendar-schedule-form button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 .bracket-section + .bracket-section {
@@ -735,7 +1222,7 @@
 }
 
 .history-scoreline .loser {
-    color: rgba(245, 245, 245, 0.58);
+    color: #ff5d5d;
 }
 
 .league-empty-state,
@@ -758,6 +1245,15 @@
     .league-setup-panel {
         align-items: stretch;
         grid-template-columns: 1fr;
+    }
+
+    .league-champion-showcase {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .league-role-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .league-admin-header {
@@ -802,8 +1298,29 @@
     }
 
     .league-panel,
+    .league-champion-showcase,
+    .league-stars-showcase,
     .league-hero {
         padding: 1rem;
+    }
+
+    .league-champion-copy {
+        align-items: flex-start;
+    }
+
+    .league-champion-copy > svg {
+        height: 40px;
+        width: 40px;
+    }
+
+    .league-role-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .league-stars-header {
+        align-items: flex-start;
+        justify-content: flex-start;
+        text-align: left;
     }
 
     .league-tabs {

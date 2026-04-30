@@ -6,6 +6,7 @@
         public List<Team> Teams { get; set; } = new List<Team>();
         public float Award { get; set; }
         public float EntryFee { get; set; }
+        public string? ImageUrl { get; set; }
         public int MaxTeams { get; set; }
         public string MinimumElo { get; set; } = "UNRANKED";
         public string MaximumElo { get; set; } = "CHALLENGER";

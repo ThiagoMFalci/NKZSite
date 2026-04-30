@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { BsArrowLeft, BsController, BsShieldFillCheck, BsStars } from "react-icons/bs";
-import { normalizeEloLabel } from "../../utils/elo";
+import { BsArrowLeft, BsController, BsStars } from "react-icons/bs";
+import RankEmblem from "../../Components/RankEmblem";
+import { calculateRankPoints, calculateWinRate, normalizeEloLabel } from "../../utils/elo";
 import { getAuthHeaders } from "../../utils/auth";
 import { getPlayerImageUrl } from "../../utils/images";
 import "../Players/style.css";
@@ -16,6 +17,7 @@ function unwrapApiData(responseData) {
 function normalizePlayer(player) {
     const tier = player?.soloQueueTier ?? player?.SoloQueueTier ?? "UNRANKED";
     const rank = player?.soloQueueRank ?? player?.SoloQueueRank ?? "";
+    const lp = player?.soloQueueLP ?? player?.SoloQueueLP ?? 0;
     const wins = player?.wins ?? player?.Wins ?? 0;
     const losses = player?.losses ?? player?.Losses ?? 0;
     const matches = player?.totalMatches ?? player?.TotalMatches ?? wins + losses;
@@ -28,11 +30,12 @@ function normalizePlayer(player) {
         nick: player?.summonerName ?? player?.SummonerName ?? "Invocador",
         profileImageUrl: getPlayerImageUrl(player),
         rank: `${normalizeEloLabel(tier)} ${rank}`.trim(),
+        tier,
         mainRole: player?.mainRole ?? player?.MainRole ?? "Flex",
         lookingForTeam: player?.lookingForTeam ?? player?.LookingForTeam ?? true,
         tags: String(player?.tags ?? player?.Tags ?? "").split(",").map((tag) => tag.trim()).filter(Boolean),
-        points: Math.max(0, (player?.soloQueueLP ?? player?.SoloQueueLP ?? 0) + wins * 3 - losses),
-        winRate: matches ? Math.round((wins / matches) * 100) : 0,
+        points: calculateRankPoints(tier, rank, lp),
+        winRate: matches ? calculateWinRate(wins, matches - wins) : calculateWinRate(wins, losses),
         champions: championStats.map((champion) => ({
             name: champion.championName ?? champion.ChampionName ?? champion.name ?? "Campeao",
             matches: champion.matches ?? champion.Matches ?? 0,
@@ -112,7 +115,7 @@ export default function PlayerProfilePage() {
                                 <p className="players-eyebrow">{player.mainRole}</p>
                                 <h1>{player.nick}</h1>
                                 <div className="player-profile-meta">
-                                    <span><BsShieldFillCheck /> {player.rank}</span>
+                                    <span><RankEmblem tier={player.tier} label={player.rank} className="compact" /> {player.rank}</span>
                                     <span><BsStars /> {player.points} pontos</span>
                                     <span><BsController /> {player.winRate}% win rate</span>
                                 </div>

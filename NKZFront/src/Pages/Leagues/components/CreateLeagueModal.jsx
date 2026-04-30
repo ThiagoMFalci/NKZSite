@@ -1,4 +1,5 @@
-import { BsX } from "react-icons/bs";
+import { useEffect, useState } from "react";
+import { BsImage, BsX } from "react-icons/bs";
 
 const ELO_OPTIONS = [
     "UNRANKED",
@@ -23,6 +24,19 @@ export default function CreateLeagueModal({
     onChange,
     onSubmit,
 }) {
+    const [imagePreview, setImagePreview] = useState("");
+
+    useEffect(() => {
+        if (!formData.image) {
+            setImagePreview("");
+            return undefined;
+        }
+
+        const preview = URL.createObjectURL(formData.image);
+        setImagePreview(preview);
+        return () => URL.revokeObjectURL(preview);
+    }, [formData.image]);
+
     if (!open) return null;
 
     return (
@@ -42,6 +56,24 @@ export default function CreateLeagueModal({
                 </div>
 
                 <form className="league-create-form" onSubmit={onSubmit}>
+                    <label className="league-image-picker">
+                        <span>Imagem da liga</span>
+                        <div className="league-image-preview">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="Preview da liga" />
+                            ) : (
+                                <strong><BsImage /> Capa da liga</strong>
+                            )}
+                        </div>
+                        <em>Escolher imagem</em>
+                        <input
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            onChange={onChange}
+                        />
+                    </label>
+
                     <label>
                         Nome da liga
                         <input

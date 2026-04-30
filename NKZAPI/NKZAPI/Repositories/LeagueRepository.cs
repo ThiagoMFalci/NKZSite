@@ -48,12 +48,25 @@ namespace NKZAPI.Repositories
             dbLeague.Name = league.Name;
             dbLeague.Award = league.Award;
             dbLeague.EntryFee = league.EntryFee;
+            dbLeague.ImageUrl = league.ImageUrl;
             dbLeague.MaxTeams = league.MaxTeams;
             dbLeague.MinimumElo = league.MinimumElo;
             dbLeague.MaximumElo = league.MaximumElo;
             dbLeague.StartDate = league.StartDate;
             dbLeague.EndDate = league.EndDate;
             dbLeague.Modality = league.Modality;
+            await _context.SaveChangesAsync();
+            return dbLeague;
+        }
+        public async Task<League> UploadLeagueImageAsync(Guid leagueId, string imageUrl)
+        {
+            var dbLeague = await _context.Leagues.FirstOrDefaultAsync(l => l.Id == leagueId);
+            if (dbLeague == null)
+            {
+                throw new DbUpdateConcurrencyException("The league was not found in the database.");
+            }
+
+            dbLeague.ImageUrl = imageUrl;
             await _context.SaveChangesAsync();
             return dbLeague;
         }

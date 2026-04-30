@@ -95,6 +95,9 @@ namespace NKZAPI.Migrations
                     b.Property<float>("EntryFee")
                         .HasColumnType("real");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<int>("MaxTeams")
                         .HasColumnType("integer");
 
@@ -150,11 +153,21 @@ namespace NKZAPI.Migrations
                     b.Property<int>("MatchNumber")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("ProposedByTeamId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ProposedScheduledAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("RoundKey")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("RoundName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScheduleStatus")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -539,6 +552,21 @@ namespace NKZAPI.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscordUserId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("DiscordVerificationCodeExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscordVerificationCodeHash")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("DiscordVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("DiscordVerifiedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")

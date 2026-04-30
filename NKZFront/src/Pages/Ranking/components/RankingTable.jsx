@@ -1,4 +1,5 @@
 import { BsTrophyFill } from "react-icons/bs";
+import RankEmblem from "../../../Components/RankEmblem";
 
 const EMPTY_MESSAGE = {
     players: "Nenhum jogador encontrado no ranking.",
@@ -32,7 +33,7 @@ export default function RankingTable({ rows, type = "players" }) {
                     </span>
                     <span><strong>{player.summonerName}</strong><small>Nivel {player.summonerLevel}</small></span>
                 </span>,
-                <span>{player.elo}</span>,
+                <span className="ranking-elo-cell"><RankEmblem tier={player.tier} label={player.elo} className="compact" /> {player.elo}</span>,
                 <span>{player.totalMatches}</span>,
                 <span>{player.winRate}%</span>,
                 <span className="ranking-points">{player.points}</span>,
@@ -44,7 +45,7 @@ export default function RankingTable({ rows, type = "players" }) {
             row: (team, index) => [
                 <span className="rank-position">{index < 3 ? <BsTrophyFill /> : index + 1}</span>,
                 <span><strong>{team.name}</strong><small>{team.tag}</small></span>,
-                <span>{team.elo}</span>,
+                <span className="ranking-elo-cell"><RankEmblem tier={team.tier} label={team.elo} className="compact" /> {team.elo}</span>,
                 <span>{team.players}/5</span>,
                 <span>{team.wins}</span>,
                 <span className="ranking-points">{team.points}</span>,

@@ -33,6 +33,8 @@ namespace NKZAPI.Controllers
                 Id = user.Id,
                 Email = user.Email,
                 Role = user.Role,
+                DiscordUserId = user.DiscordUserId,
+                DiscordVerified = user.DiscordVerified,
                 CreatedAt = user.CreatedAt
             }).ToList();
         }
@@ -40,6 +42,20 @@ namespace NKZAPI.Controllers
         public async Task<ActionResult<User>> CreateUserAsync([FromBody] UserDto user)
         {
             var response = await _authInterface.UserAddAsync(user);
+            return Ok(response);
+        }
+        [HttpPost("VerifyDiscord")]
+        public async Task<ActionResult> VerifyDiscordAsync([FromBody] DiscordVerificationDto verification)
+        {
+            var response = await _authInterface.VerifyDiscordAsync(verification);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [HttpPost("ResendDiscordVerification")]
+        public async Task<ActionResult> ResendDiscordVerificationAsync([FromBody] string email)
+        {
+            var response = await _authInterface.ResendDiscordVerificationAsync(email);
+            if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
         [HttpPost("Login")]

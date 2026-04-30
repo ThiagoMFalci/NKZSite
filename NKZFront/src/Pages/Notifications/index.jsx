@@ -20,15 +20,28 @@ function formatDate(value) {
     });
 }
 
+function formatDateTime(value) {
+    if (!value) return "Horario ainda nao definido";
+    return new Date(value).toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}
+
 function normalizePlayer(player) {
     if (!player) return null;
 
     return {
         id: player.id ?? player.Id,
+        userId: player.userId ?? player.UserId,
         name: player.summonerName ?? player.SummonerName ?? "Jogador",
         profileImageUrl: getPlayerImageUrl(player),
         role: player.role ?? player.Role ?? player.position ?? player.Position ?? "Flex",
         elo: `${player.soloQueueTier ?? player.SoloQueueTier ?? "Unranked"} ${player.soloQueueRank ?? player.SoloQueueRank ?? ""}`.trim(),
+        isCaptain: player.isCaptain ?? player.IsCaptain ?? false,
     };
 }
 
@@ -59,6 +72,7 @@ export default function NotificationsPage() {
     const [player, setPlayer] = useState(null);
     const [teams, setTeams] = useState([]);
     const [allPlayers, setAllPlayers] = useState([]);
+    const [leagues, setLeagues] = useState([]);
     const [playerInvitations, setPlayerInvitations] = useState([]);
     const [teamInvitations, setTeamInvitations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,17 +93,21 @@ export default function NotificationsPage() {
             setError("");
             setFeedback({ type: "", message: "" });
 
-            const [teamsResponse, playersResponse] = await Promise.all([
+            const [teamsResponse, playersResponse, leaguesResponse] = await Promise.all([
                 axios.get(`${API_BASE_URL}/api/team/ListTeams`, {
                     headers: getAuthHeaders(),
                 }),
                 axios.get(`${API_BASE_URL}/api/player`, {
                     headers: getAuthHeaders(),
                 }).catch(() => ({ data: [] })),
+                axios.get(`${API_BASE_URL}/api/league/ListLeagues`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => ({ data: [] })),
             ]);
             const normalizedTeams = (unwrapApiData(teamsResponse.data) || []).map(normalizeTeam).filter(Boolean);
             setTeams(normalizedTeams);
             setAllPlayers((unwrapApiData(playersResponse.data) || []).map(normalizePlayer).filter(Boolean));
+            setLeagues(unwrapApiData(leaguesResponse.data) || []);
 
             let currentPlayer = null;
             try {
@@ -111,7 +129,10 @@ export default function NotificationsPage() {
                 setPlayerInvitations([]);
             }
 
-            const ownedTeams = normalizedTeams.filter((team) => team.ownerId === currentUser.userId);
+            const ownedTeams = normalizedTeams.filter((team) => (
+                team.ownerId === currentUser.userId ||
+                team.players.some((teamPlayer) => teamPlayer.userId === currentUser.userId && teamPlayer.isCaptain)
+            ));
             const ownedInvitationLists = await Promise.all(
                 ownedTeams.map(async (team) => {
                     try {
@@ -214,8 +235,62 @@ export default function NotificationsPage() {
                 };
             });
 
-        return { receivedInvites, sentRequests, receivedRequests };
-    }, [playerInvitations, playerMap, teamInvitations, teamMap]);
+        const manageableTeamIds = new Set(teams
+            .filter((team) => (
+                team.ownerId === currentUser?.userId ||
+                team.players.some((teamPlayer) => teamPlayer.userId === currentUser?.userId && teamPlayer.isCaptain)
+            ))
+            .map((team) => team.id));
+
+        const scheduleNotifications = leagues.flatMap((league) => {
+            const leagueName = league.name ?? league.Name ?? "Liga";
+            const matches = league.matches ?? league.Matches ?? [];
+            return matches.map((match) => {
+                const teamAId = match.teamAId ?? match.TeamAId;
+                const teamBId = match.teamBId ?? match.TeamBId;
+                const status = match.status ?? match.Status ?? "Pending";
+                const scheduleStatus = match.scheduleStatus ?? match.ScheduleStatus ?? "Open";
+                const proposedByTeamId = match.proposedByTeamId ?? match.ProposedByTeamId;
+                const proposedAt = match.proposedScheduledAt ?? match.ProposedScheduledAt ?? match.scheduledAt ?? match.ScheduledAt;
+                const teamA = teamMap[teamAId];
+                const teamB = teamMap[teamBId];
+                const opponentId = manageableTeamIds.has(teamAId) ? teamBId : teamAId;
+                const opponent = teamMap[opponentId];
+                const proposedByMine = manageableTeamIds.has(proposedByTeamId);
+
+                return {
+                    id: match.id ?? match.Id,
+                    teamAId,
+                    teamBId,
+                    status,
+                    scheduleStatus,
+                    typeLabel: "Agendamento",
+                    title: `${teamA?.name || "Time A"} vs ${teamB?.name || "Time B"}`,
+                    avatarLabel: opponent?.name || leagueName,
+                    details: [
+                        leagueName,
+                        match.roundName ?? match.RoundName ?? `Semana ${match.weekNumber ?? match.WeekNumber ?? "-"}`,
+                        proposedAt ? `Horario: ${formatDateTime(proposedAt)}` : "Sem horario sugerido",
+                        scheduleStatus === "Pending"
+                            ? (proposedByMine ? "Aguardando resposta do adversario" : "Outro time sugeriu um horario")
+                            : scheduleStatus === "Confirmed"
+                                ? "Horario confirmado"
+                                : scheduleStatus === "Rejected"
+                                    ? "Horario recusado, envie uma nova sugestao"
+                                    : "Pendente de sugestao",
+                    ],
+                    dateLabel: proposedAt ? formatDateTime(proposedAt) : "Sem horario",
+                    canRespond: false,
+                };
+            });
+        }).filter((notification) => (
+            notification.id &&
+            notification.status !== "Completed" &&
+            (manageableTeamIds.has(notification.teamAId) || manageableTeamIds.has(notification.teamBId))
+        ));
+
+        return { receivedInvites, sentRequests, receivedRequests, scheduleNotifications };
+    }, [currentUser?.userId, leagues, player, playerInvitations, playerMap, teamInvitations, teamMap, teams]);
 
     async function handleRespond(invitationId, accept) {
         try {
@@ -264,6 +339,13 @@ export default function NotificationsPage() {
 
                 {!loading && !error && (
                     <div className="notifications-grid">
+                        <NotificationSection
+                            title="Agendamentos"
+                            description="Horarios de partidas das suas ligas: sugestoes recebidas, pendentes, recusadas e confirmadas."
+                            notifications={groupedNotifications.scheduleNotifications}
+                            onRespond={handleRespond}
+                            responding={responding}
+                        />
                         <NotificationSection
                             title="Convites recebidos"
                             description="Convites enviados por equipes para voce entrar no time."

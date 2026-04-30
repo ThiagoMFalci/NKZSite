@@ -10,6 +10,7 @@ using NKZAPI.Services.TeamServices;
 using NKZAPI.Services.UserServices;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using NKZAPI.Services.DiscordServices;
 using NKZAPI.Services.RiotService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -105,6 +106,7 @@ builder.Services.AddScoped<NKZAPI.Services.TournamentServices.ITournamentInterfa
 builder.Services.AddScoped<NKZAPI.Services.PlayerServices.IPlayerInterface, NKZAPI.Services.PlayerServices.PlayerServices>();
 
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<IDiscordVerificationService, DiscordBotClient>();
 builder.Services.AddScoped<IRiotService, RiotService>();
 
 // Required for services that need access to the current HttpContext (e.g. authorization checks inside services)

@@ -6,8 +6,10 @@ import {
     BsCalendarEvent,
     BsChevronDown,
     BsClockHistory,
+    BsController,
     BsDiagram3Fill,
     BsImage,
+    BsStars,
     BsShieldLockFill,
     BsShieldFillCheck,
     BsTrophyFill,
@@ -26,6 +28,13 @@ const TAB_ITEMS = [
     { id: "playoff", label: "Playoff", icon: BsDiagram3Fill },
 ];
 const ROUND_ORDER = ["U-R16", "U-QF", "U-SF", "U-F", "L-R1", "L-R2", "L-R3", "L-R4", "L-R5", "L-F", "GF"];
+const ROLE_SPOTLIGHTS = [
+    { key: "Top", label: "Topo" },
+    { key: "Jungle", label: "Selva" },
+    { key: "Mid", label: "Meio" },
+    { key: "ADC", label: "Atirador" },
+    { key: "Support", label: "Suporte" },
+];
 
 function unwrapApiData(responseData) {
     return responseData?.data ?? responseData?.Data ?? responseData ?? null;
@@ -73,6 +82,9 @@ function normalizeMatch(match) {
         teamAScore: match.teamAScore ?? match.TeamAScore ?? 0,
         teamBScore: match.teamBScore ?? match.TeamBScore ?? 0,
         scheduledAt: match.scheduledAt ?? match.ScheduledAt,
+        proposedScheduledAt: match.proposedScheduledAt ?? match.ProposedScheduledAt,
+        proposedByTeamId: match.proposedByTeamId ?? match.ProposedByTeamId,
+        scheduleStatus: match.scheduleStatus ?? match.ScheduleStatus ?? "Open",
         completedAt: match.completedAt ?? match.CompletedAt,
         status: match.status ?? match.Status ?? "Pending",
         reports: (match.reports ?? match.Reports ?? []).map((report) => ({
@@ -105,6 +117,7 @@ function normalizeLeague(league) {
     return {
         id: league.id ?? league.Id,
         name: league.name ?? league.Name ?? "Liga",
+        imageUrl: resolveAssetUrl(league.imageUrl ?? league.ImageUrl ?? ""),
         award: league.award ?? league.Award ?? 0,
         maxTeams: league.maxTeams ?? league.MaxTeams ?? 16,
         minimumElo: league.minimumElo ?? league.MinimumElo ?? "UNRANKED",
@@ -123,9 +136,34 @@ function formatDate(value) {
     return new Date(value).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+function formatDateTime(value) {
+    if (!value) return "A definir";
+    return new Date(value).toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}
+
+function toDateTimeLocalValue(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    const offset = date.getTimezoneOffset();
+    return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 16);
+}
+
 function formatElo(value) {
     const label = String(value || "UNRANKED").toLowerCase();
     return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function getScheduleStatusLabel(match) {
+    if (match.status === "Completed") return "Partida encerrada";
+    if (match.scheduleStatus === "Confirmed") return "Horario confirmado";
+    if (match.scheduleStatus === "Pending") return "Aguardando resposta";
+    if (match.scheduleStatus === "Rejected") return "Horario recusado";
+    return "Horario aberto";
 }
 
 function getKdaLabel(entry) {
@@ -142,6 +180,8 @@ export default function LeaguePage() {
     const [actionLoading, setActionLoading] = useState("");
     const [proofFiles, setProofFiles] = useState({});
     const [expandedReports, setExpandedReports] = useState({});
+    const [scheduleInputs, setScheduleInputs] = useState({});
+    const [scheduleFeedback, setScheduleFeedback] = useState({});
     const [feedback, setFeedback] = useState({ type: "", message: "" });
     const currentUser = getCurrentUser();
     const isAdmin = String(currentUser?.role || "").includes("Admin");
@@ -254,6 +294,21 @@ export default function LeaguePage() {
             .sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0))
     ), [league]);
 
+    const leagueChampion = useMemo(() => {
+        const grandFinal = (league?.matches || []).find((match) => match.roundKey === "GF" && match.status === "Completed" && match.winnerTeamId);
+        if (grandFinal?.winnerTeamId) return teamById.get(grandFinal.winnerTeamId) || null;
+        return standings[0]?.wins > 0 ? standings[0].team : null;
+    }, [league, standings, teamById]);
+
+    const roleSpotlights = useMemo(() => (
+        ROLE_SPOTLIGHTS.map((role) => {
+            const best = playerStats
+                .filter((row) => String(row.player.role || "").toLowerCase() === role.key.toLowerCase())
+                .sort((a, b) => b.kda - a.kda)[0];
+            return { ...role, entry: best || null };
+        })
+    ), [playerStats]);
+
     const ownedTeamInLeague = useMemo(() => (
         Boolean(ownedTeam?.id && league?.teams.some((team) => team.id === ownedTeam.id))
     ), [league, ownedTeam]);
@@ -345,6 +400,32 @@ export default function LeaguePage() {
         }
     }
 
+    async function handleUploadLeagueBanner(file) {
+        if (!file) return;
+
+        try {
+            setActionLoading("banner");
+            setFeedback({ type: "", message: "" });
+            const payload = new FormData();
+            payload.append("image", file);
+            await axios.post(`${API_BASE_URL}/api/league/${league.id}/image`, payload, {
+                headers: {
+                    ...getAuthHeaders(),
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            setFeedback({ type: "success", message: "Banner da liga atualizado." });
+            await loadLeague();
+        } catch (requestError) {
+            setFeedback({
+                type: "error",
+                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel atualizar o banner.",
+            });
+        } finally {
+            setActionLoading("");
+        }
+    }
+
     async function handleDeleteLeague() {
         if (!window.confirm(`Excluir a liga ${league.name}? Essa acao nao pode ser desfeita.`)) return;
 
@@ -420,9 +501,151 @@ export default function LeaguePage() {
         }
     }
 
+    async function handleProposeSchedule(match) {
+        const proposedScheduledAt = scheduleInputs[match.id];
+        if (!proposedScheduledAt) {
+            setFeedback({ type: "error", message: "Escolha um horario para sugerir." });
+            return;
+        }
+
+        try {
+            setActionLoading(`schedule-${match.id}`);
+            setFeedback({ type: "", message: "" });
+            const response = await axios.post(`${API_BASE_URL}/api/league/matches/${match.id}/schedule/propose`, {
+                proposedScheduledAt: new Date(proposedScheduledAt).toISOString(),
+            }, { headers: getAuthHeaders() });
+            setFeedback({
+                type: "success",
+                message: response.data?.message || response.data?.Message || "Horario sugerido.",
+            });
+            setScheduleFeedback((current) => ({
+                ...current,
+                [match.id]: { type: "success", message: response.data?.message || response.data?.Message || "Pedido enviado." },
+            }));
+            await loadLeague();
+        } catch (requestError) {
+            const message = requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel sugerir horario.";
+            setFeedback({
+                type: "error",
+                message,
+            });
+            setScheduleFeedback((current) => ({
+                ...current,
+                [match.id]: { type: "error", message },
+            }));
+        } finally {
+            setActionLoading("");
+        }
+    }
+
+    async function handleScheduleDecision(match, decision) {
+        try {
+            setActionLoading(`${decision}-${match.id}`);
+            setFeedback({ type: "", message: "" });
+            const response = await axios.post(`${API_BASE_URL}/api/league/matches/${match.id}/schedule/${decision}`, null, { headers: getAuthHeaders() });
+            setFeedback({
+                type: "success",
+                message: response.data?.message || response.data?.Message || "Horario atualizado.",
+            });
+            setScheduleFeedback((current) => ({
+                ...current,
+                [match.id]: { type: "success", message: response.data?.message || response.data?.Message || "Horario atualizado." },
+            }));
+            await loadLeague();
+        } catch (requestError) {
+            const message = requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel atualizar o horario.";
+            setFeedback({
+                type: "error",
+                message,
+            });
+            setScheduleFeedback((current) => ({
+                ...current,
+                [match.id]: { type: "error", message },
+            }));
+        } finally {
+            setActionLoading("");
+        }
+    }
+
     function renderTeamName(teamId) {
         const team = teamById.get(teamId);
         return team ? `${team.tag} ${team.name}` : "A definir";
+    }
+
+    function isOwnedTeamId(teamId) {
+        return Boolean(teamId && ownedTeam?.id && teamId === ownedTeam.id);
+    }
+
+    function renderTeamNameNode(teamId) {
+        const label = renderTeamName(teamId);
+        if (!isOwnedTeamId(teamId)) return label;
+        return <span className="my-team-name">{label}<small>Seu time</small></span>;
+    }
+
+    function renderScheduleControls(match) {
+        const isReady = match.teamAId && match.teamBId && match.status !== "Completed";
+        const canManageMatchTeam = isReady && ownedTeam?.id && (ownedTeam.id === match.teamAId || ownedTeam.id === match.teamBId);
+        const proposalFromOwnTeam = match.proposedByTeamId === ownedTeam?.id;
+        const otherCanAnswer = canManageMatchTeam && match.scheduleStatus === "Pending" && match.proposedByTeamId && !proposalFromOwnTeam;
+        const visualStatus = match.status === "Completed" ? "completed" : String(match.scheduleStatus || "Open").toLowerCase();
+        const matchFeedback = scheduleFeedback[match.id];
+
+        return (
+            <div className="calendar-schedule-box">
+                <div className={`calendar-schedule-badge ${visualStatus}`}>
+                    {getScheduleStatusLabel(match)}
+                </div>
+                <div className="calendar-schedule-status">
+                    <span>Horario</span>
+                        <strong>{match.scheduleStatus === "Confirmed" ? formatDateTime(match.scheduledAt) : "A combinar"}</strong>
+                    </div>
+
+                {match.scheduleStatus === "Pending" && match.proposedScheduledAt && (
+                    <div className="calendar-schedule-proposal">
+                        <span>Proposta de {renderTeamNameNode(match.proposedByTeamId)}</span>
+                        <strong>{formatDateTime(match.proposedScheduledAt)}</strong>
+                        {proposalFromOwnTeam && <em>Aguardando o outro time.</em>}
+                    </div>
+                )}
+
+                {match.scheduleStatus === "Rejected" && (
+                    <div className="calendar-schedule-proposal rejected">
+                        <span>Ultima proposta recusada</span>
+                        <strong>Envie uma nova sugestao.</strong>
+                    </div>
+                )}
+
+                {matchFeedback && (
+                    <div className={`calendar-schedule-feedback ${matchFeedback.type}`}>
+                        {matchFeedback.message}
+                    </div>
+                )}
+
+                {otherCanAnswer && (
+                    <div className="calendar-schedule-actions">
+                        <button type="button" disabled={actionLoading === `accept-${match.id}`} onClick={() => handleScheduleDecision(match, "accept")}>
+                            Confirmar
+                        </button>
+                        <button type="button" disabled={actionLoading === `reject-${match.id}`} onClick={() => handleScheduleDecision(match, "reject")}>
+                            Recusar
+                        </button>
+                    </div>
+                )}
+
+                {canManageMatchTeam && (
+                    <div className="calendar-schedule-form">
+                        <input
+                            type="datetime-local"
+                            value={scheduleInputs[match.id] ?? toDateTimeLocalValue(match.proposedScheduledAt || match.scheduledAt)}
+                            onChange={(event) => setScheduleInputs((current) => ({ ...current, [match.id]: event.target.value }))}
+                        />
+                        <button type="button" disabled={actionLoading === `schedule-${match.id}`} onClick={() => handleProposeSchedule(match)}>
+                            {match.scheduleStatus === "Pending" && !proposalFromOwnTeam ? "Contrapropor" : "Sugerir horario"}
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
     }
 
     function renderMatchCard(match) {
@@ -443,9 +666,9 @@ export default function LeaguePage() {
                     const score = index === 0 ? match.teamAScore : match.teamBScore;
                     const won = match.winnerTeamId === teamId;
                     return (
-                        <div key={`${match.id}-${index}`} className={`league-match-team ${won ? "winner" : ""}`}>
+                        <div key={`${match.id}-${index}`} className={`league-match-team ${won ? "winner" : ""} ${isOwnedTeamId(teamId) ? "my-team" : ""}`}>
                             <TeamLogo team={team} />
-                            <span>{team ? team.name : "A definir"}</span>
+                            <span>{team ? renderTeamNameNode(team.id) : "A definir"}</span>
                             <strong>{match.status === "Completed" ? score : "-"}</strong>
                         </div>
                     );
@@ -464,7 +687,7 @@ export default function LeaguePage() {
                     <div className="league-match-reports">
                         {match.reports.map((report) => (
                             <a key={report.id} href={report.proofImageUrl} target="_blank" rel="noreferrer">
-                                <BsImage /> {renderTeamName(report.teamId)} indicou {renderTeamName(report.reportedWinnerTeamId)}
+                                <BsImage /> {renderTeamNameNode(report.teamId)} indicou {renderTeamNameNode(report.reportedWinnerTeamId)}
                             </a>
                         ))}
                     </div>
@@ -515,6 +738,65 @@ export default function LeaguePage() {
         <main className="league-page">
             <div className="league-bg-grid" />
             <div className="league-container">
+                <section className="league-champion-showcase">
+                    <div className="league-champion-copy">
+                        <BsTrophyFill />
+                        <div>
+                            <p className="league-eyebrow">Campeao da liga</p>
+                            <h2>{leagueChampion?.name || "A definir"}</h2>
+                            <span>{leagueChampion ? `${leagueChampion.tag} - ${league.name}` : "O campeao aparece aqui quando a grande final for encerrada."}</span>
+                        </div>
+                    </div>
+                    <div className="league-champion-team">
+                        {leagueChampion ? (
+                            <>
+                                <TeamLogo team={leagueChampion} />
+                                <strong>{leagueChampion.tag}</strong>
+                            </>
+                        ) : (
+                            <div className="champion-placeholder">
+                                <BsTrophyFill />
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                <section className="league-stars-showcase">
+                    <header className="league-stars-header">
+                        <BsStars />
+                        <div>
+                            <h2>Destaques por rota</h2>
+                            <p>Modelo pronto para usar estatisticas reais das partidas da liga.</p>
+                        </div>
+                    </header>
+                    <div className="league-role-cards">
+                        {roleSpotlights.map((spotlight) => (
+                            <article key={spotlight.key} className="league-role-card">
+                                <div className="league-role-card-head">
+                                    <span>{spotlight.label}</span>
+                                    <BsController />
+                                </div>
+                                <div className="league-role-player">
+                                    <PlayerAvatar player={spotlight.entry?.player} />
+                                    <div>
+                                        <strong>{spotlight.entry?.player.nick || "A definir"}</strong>
+                                        <span>{spotlight.entry ? spotlight.entry.team.name : "Sem dados do torneio"}</span>
+                                    </div>
+                                </div>
+                                <div className="league-role-metrics">
+                                    <MiniMetric label="Kills" value={spotlight.entry?.kills ?? "-"} tone="green" />
+                                    <MiniMetric label="Deaths" value={spotlight.entry?.deaths ?? "-"} tone="red" />
+                                    <MiniMetric label="Assists" value={spotlight.entry?.assists ?? "-"} tone="blue" />
+                                </div>
+                                <div className="league-role-footer">
+                                    <span>KDA <strong>{spotlight.entry ? spotlight.entry.kda.toFixed(2) : "-"}</strong></span>
+                                    <span>Jogos <strong>{spotlight.entry?.games ?? "-"}</strong></span>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                </section>
+
                 <section className="league-hero">
                     <div>
                         <p className="league-eyebrow">Liga</p>
@@ -570,15 +852,36 @@ export default function LeaguePage() {
                         </div>
 
                         <div className="league-admin-grid">
+                            <div className="league-admin-card league-banner-admin-card">
+                                <strong><BsImage /> Banner da liga</strong>
+                                <span>Personalize a faixa que aparece nos cards e ajuda a liga a se destacar na vitrine.</span>
+                                <label className="league-banner-uploader">
+                                    <div className="league-banner-preview">
+                                        {league.imageUrl ? (
+                                            <img src={league.imageUrl} alt={league.name} />
+                                        ) : (
+                                            <strong><BsTrophyFill /> Sem banner</strong>
+                                        )}
+                                    </div>
+                                    <em>{actionLoading === "banner" ? "Enviando..." : "Trocar banner"}</em>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        disabled={actionLoading === "banner"}
+                                        onChange={(event) => handleUploadLeagueBanner(event.target.files?.[0])}
+                                    />
+                                </label>
+                            </div>
+
                             <div className="league-admin-card">
                                 <strong><BsShieldLockFill /> Times inscritos</strong>
                                 <span>{league.matches.length ? "O playoff ja foi gerado, entao a lista esta travada." : "Voce pode expulsar times antes do chaveamento."}</span>
                                 <div className="league-admin-team-list">
                                     {league.teams.length ? league.teams.map((team) => (
-                                        <article key={team.id} className="league-admin-team-row">
+                                        <article key={team.id} className={`league-admin-team-row ${isOwnedTeamId(team.id) ? "my-team" : ""}`}>
                                             <TeamLogo team={team} />
                                             <div>
-                                                <strong>{team.name}</strong>
+                                                <strong>{isOwnedTeamId(team.id) ? renderTeamNameNode(team.id) : team.name}</strong>
                                                 <span>{team.tag} - {team.players.length}/5 jogadores</span>
                                             </div>
                                             <button
@@ -640,11 +943,11 @@ export default function LeaguePage() {
                         <PanelTitle icon={BsTrophyFill} title="Classificacao atual" subtitle="Vitorias, derrotas, mapas jogados e penalidades." />
                         <div className="standings-list">
                             {standings.map((standing, index) => (
-                                <article key={standing.teamId} className="standing-row">
+                                <article key={standing.teamId} className={`standing-row ${isOwnedTeamId(standing.teamId) ? "my-team" : ""}`}>
                                     <strong className="standing-place">{index + 1}</strong>
                                     <TeamLogo team={standing.team} />
                                     <div className="standing-team">
-                                        <strong>{standing.team.name}</strong>
+                                        <strong>{isOwnedTeamId(standing.teamId) ? renderTeamNameNode(standing.teamId) : standing.team.name}</strong>
                                         <span>{standing.team.tag}</span>
                                     </div>
                                     <StatPill value={standing.wins} label="Vitorias" tone="green" />
@@ -669,10 +972,11 @@ export default function LeaguePage() {
                                     </header>
                                     <div className="calendar-matches">
                                         {week.matches.map((match) => (
-                                            <div key={match.id} className="calendar-match">
+                                            <div key={match.id} className={`calendar-match ${isOwnedTeamId(match.teamAId) || isOwnedTeamId(match.teamBId) ? "my-team-match" : ""}`}>
                                                 <span>{match.roundName}</span>
-                                                <strong>{renderTeamName(match.teamAId)} vs {renderTeamName(match.teamBId)}</strong>
-                                                <em>{match.status === "Completed" ? `Vencedor: ${renderTeamName(match.winnerTeamId)}` : match.status}</em>
+                                                <strong>{renderTeamNameNode(match.teamAId)} vs {renderTeamNameNode(match.teamBId)}</strong>
+                                                <em>{match.status === "Completed" ? <>Vencedor: {renderTeamNameNode(match.winnerTeamId)}</> : match.status}</em>
+                                                {renderScheduleControls(match)}
                                             </div>
                                         ))}
                                     </div>
@@ -711,14 +1015,14 @@ export default function LeaguePage() {
                                     <span>{formatDate(match.completedAt)}</span>
                                     <div className="history-scoreline">
                                         <strong className={match.winnerTeamId === match.teamAId ? "winner" : "loser"}>
-                                            {renderTeamName(match.teamAId)} {match.teamAScore}
+                                            {renderTeamNameNode(match.teamAId)} {match.teamAScore}
                                         </strong>
                                         <span>x</span>
                                         <strong className={match.winnerTeamId === match.teamBId ? "winner" : "loser"}>
-                                            {match.teamBScore} {renderTeamName(match.teamBId)}
+                                            {match.teamBScore} {renderTeamNameNode(match.teamBId)}
                                         </strong>
                                     </div>
-                                    <em>Vencedor: {renderTeamName(match.winnerTeamId)}</em>
+                                    <em>Vencedor: {renderTeamNameNode(match.winnerTeamId)}</em>
                                 </article>
                             )) : <EmptyState text="Nenhuma partida finalizada ainda." />}
                         </div>
@@ -787,6 +1091,15 @@ function PlayerAvatar({ player }) {
 function StatPill({ value, label, tone }) {
     return (
         <div className={`stat-pill ${tone}`}>
+            <strong>{value}</strong>
+            <span>{label}</span>
+        </div>
+    );
+}
+
+function MiniMetric({ value, label, tone }) {
+    return (
+        <div className={`mini-metric ${tone}`}>
             <strong>{value}</strong>
             <span>{label}</span>
         </div>
