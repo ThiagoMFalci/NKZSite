@@ -31,6 +31,51 @@ export const RANK_SCORE = {
     I: 4,
 };
 
+export const RANK_POINTS = {
+    IRON: {
+        IV: 1,
+        III: 2,
+        II: 3,
+        I: 4,
+    },
+    BRONZE: {
+        IV: 5,
+        III: 6,
+        II: 7,
+        I: 8,
+    },
+    SILVER: {
+        IV: 10,
+        III: 11,
+        II: 12,
+        I: 13,
+    },
+    GOLD: {
+        IV: 20,
+        III: 21,
+        II: 22,
+        I: 23,
+    },
+    PLATINUM: {
+        IV: 30,
+        III: 31,
+        II: 32,
+        I: 33,
+    },
+    EMERALD: {
+        IV: 40,
+        III: 41,
+        II: 42,
+        I: 43,
+    },
+    DIAMOND: {
+        IV: 55,
+        III: 60,
+        II: 70,
+        I: 80,
+    },
+};
+
 export function normalizeEloLabel(value) {
     const elo = String(value || "Unranked").trim();
     if (!elo) return "Unranked";
@@ -47,9 +92,15 @@ export function calculateWinRate(wins = 0, losses = 0) {
 }
 
 export function calculateRankPoints(tier, rank, lp = 0) {
-    const tierValue = getEloScore(tier);
-    const rankValue = RANK_SCORE[String(rank || "").toUpperCase()] || 0;
-    return tierValue * 1000 + rankValue * 100 + Math.max(0, Number(lp) || 0);
+    const normalizedTier = String(tier || "").split(" ")[0].toUpperCase();
+    const normalizedRank = String(rank || "").toUpperCase();
+    const leaguePoints = Math.max(0, Number(lp) || 0);
+
+    if (normalizedTier === "MASTER") return leaguePoints >= 300 ? 150 : 100;
+    if (normalizedTier === "GRANDMASTER") return 175;
+    if (normalizedTier === "CHALLENGER") return 200;
+
+    return RANK_POINTS[normalizedTier]?.[normalizedRank] || 0;
 }
 
 export function matchesSelectedElos(value, selectedElos = []) {

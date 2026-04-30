@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("NKZAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6822536c5337fa0511e80381ac6ccfbbaa305c33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cb3a1253327f4c6d47c700f2e08d318e41a1d1e9")]
 [assembly: System.Reflection.AssemblyProductAttribute("NKZAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("NKZAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

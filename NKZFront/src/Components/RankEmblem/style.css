@@ -4,6 +4,8 @@
     flex: 0 0 auto;
     height: 30px;
     justify-content: center;
+    line-height: 0;
+    vertical-align: middle;
     width: 30px;
 }
 
@@ -26,6 +28,6 @@
 }
 
 .rank-emblem-real.compact {
-    height: 32px;
-    width: 32px;
+    height: 28px;
+    width: 28px;
 }

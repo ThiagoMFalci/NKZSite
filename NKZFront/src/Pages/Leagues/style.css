@@ -341,10 +341,6 @@
     color: var(--laranja);
 }
 
-.league-card-stats .rank-emblem-real {
-    margin-left: -0.18rem;
-}
-
 .league-slots {
     height: 4px;
     background: rgba(245,245,245,0.08);
