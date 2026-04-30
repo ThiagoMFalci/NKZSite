@@ -107,6 +107,7 @@ builder.Services.AddScoped<NKZAPI.Services.PlayerServices.IPlayerInterface, NKZA
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<IDiscordVerificationService, DiscordBotClient>();
+builder.Services.AddHttpClient<IDiscordTeamRoleService, DiscordTeamRoleService>();
 builder.Services.AddScoped<IRiotService, RiotService>();
 
 // Required for services that need access to the current HttpContext (e.g. authorization checks inside services)

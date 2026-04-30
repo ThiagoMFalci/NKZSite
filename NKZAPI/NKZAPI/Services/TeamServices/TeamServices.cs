@@ -6,6 +6,7 @@ using System.Linq;
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Http;
+using NKZAPI.Services.DiscordServices;
 
 namespace NKZAPI.Services.TeamServices
 {
@@ -14,11 +15,13 @@ namespace NKZAPI.Services.TeamServices
         private readonly TeamRepository _teamRepository;
         private readonly Microsoft.AspNetCore.Http.IHttpContextAccessor _httpContextAccessor;
         private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
-        public TeamServices(TeamRepository teamRepository, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
+        private readonly IDiscordTeamRoleService _discordTeamRoleService;
+        public TeamServices(TeamRepository teamRepository, Microsoft.AspNetCore.Http.IHttpContextAccessor httpContextAccessor, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env, IDiscordTeamRoleService discordTeamRoleService)
         {
             _teamRepository = teamRepository;
             _httpContextAccessor = httpContextAccessor;
             _env = env;
+            _discordTeamRoleService = discordTeamRoleService;
         }
 
         private async Task<bool> IsCallerTeamCaptainAsync(Guid teamId, Guid callerId)
@@ -161,6 +164,7 @@ namespace NKZAPI.Services.TeamServices
             player.TeamId = null;
             player.IsCaptain = false;
             await _teamRepository.UpdatePlayerAsync(player);
+            await TrySyncTeamRoleAsync(team.Id);
 
             response.Success = true;
             response.Message = "Player expelled from team.";
@@ -344,6 +348,7 @@ namespace NKZAPI.Services.TeamServices
                 response.Success = true;
                 response.Message = "Invitation accepted and player associated with team.";
                 response.Data = player.Id.ToString();
+                await TrySyncTeamRoleAsync(invitation.TeamId);
                 return response;
             }
             else
@@ -452,6 +457,8 @@ namespace NKZAPI.Services.TeamServices
                 };
 
                 var added = await _teamRepository.AddTeamWithOwnerPlayerAsync(teamEntity, id);
+                await TrySyncTeamRoleAsync(added.Id);
+                await TryEnsureLeagueCategoryAsync();
 
                 response.Success = true;
                 response.Message = "Team created and owner added to roster.";
@@ -530,6 +537,7 @@ namespace NKZAPI.Services.TeamServices
                 try
                 {
                     await _teamRepository.UpdateTeamAsync(existing);
+                    await TrySyncTeamRoleAsync(existing.Id);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -631,6 +639,7 @@ namespace NKZAPI.Services.TeamServices
             player.TeamId = teamId;
             player.IsCaptain = false; // default to non-captain when adding to team
             await _teamRepository.UpdatePlayerAsync(player);
+            await TrySyncTeamRoleAsync(teamId);
 
             response.Success = true;
             response.Data = player;
@@ -687,6 +696,7 @@ namespace NKZAPI.Services.TeamServices
             player.TeamId = null;
             player.IsCaptain = false;
             await _teamRepository.UpdatePlayerAsync(player);
+            await TrySyncTeamRoleAsync(teamId);
 
             response.Success = true;
             response.Message = "Player dissociated from team.";
@@ -740,6 +750,31 @@ namespace NKZAPI.Services.TeamServices
             return response;
         }
 
+        private async Task TrySyncTeamRoleAsync(Guid teamId)
+        {
+            try
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team != null) await _discordTeamRoleService.SyncTeamRoleAsync(team);
+            }
+            catch
+            {
+                // Discord role sync should never block the site action.
+            }
+        }
+
+        private async Task TryEnsureLeagueCategoryAsync()
+        {
+            try
+            {
+                await _discordTeamRoleService.EnsureLeagueCategoryAsync();
+            }
+            catch
+            {
+                // Discord bootstrap should never block the site action.
+            }
+        }
+
         public async Task<Response<Team>> UpdateRecruitingAsync(Guid teamId, bool isRecruiting)
         {
             var response = new Response<Team>();
@@ -780,6 +815,7 @@ namespace NKZAPI.Services.TeamServices
             response.Success = true;
             response.Message = isRecruiting ? "Team is recruiting." : "Team is not recruiting.";
             response.Data = updated;
+            await TrySyncTeamRoleAsync(teamId);
             return response;
         }
 

@@ -227,6 +227,21 @@
     color: var(--laranja);
 }
 
+.player-discord-tag {
+    align-items: center;
+    color: #8fcaf0 !important;
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    margin-top: 0.25rem;
+}
+
+.player-discord-tag svg,
+.player-profile-meta span svg {
+    flex: 0 0 auto;
+}
+
 .player-champions {
     background: rgba(255,255,255,0.025);
     border: 1px solid rgba(255,255,255,0.06);

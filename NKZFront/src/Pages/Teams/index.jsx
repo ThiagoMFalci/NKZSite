@@ -66,6 +66,8 @@ function normalizePlayer(player, index) {
         soloQueueTier: player.soloQueueTier ?? player.SoloQueueTier,
         isCaptain: player.isCaptain ?? player.IsCaptain ?? false,
         profileImageUrl: player.profileImageUrl ?? player.ProfileImageUrl ?? "",
+        discordUsername: player.discordUsername ?? player.DiscordUsername ?? "",
+        discordUserId: player.discordUserId ?? player.DiscordUserId ?? "",
         wins: player.wins ?? player.Wins ?? 0,
         losses: player.losses ?? player.Losses ?? 0,
     };
@@ -83,10 +85,6 @@ function getTournamentTeamIds(tournaments) {
 function getTeamStatus(players, teamId, tournamentTeamIds = new Set()) {
     if (tournamentTeamIds.has(teamId)) {
         return { key: "in-tournament", label: "Em campeonato" };
-    }
-
-    if (players.length >= 5) {
-        return { key: "full", label: "Completo" };
     }
 
     return { key: "recruiting", label: "Recrutando" };
@@ -221,8 +219,8 @@ export default function TeamsPage() {
             const matchesElo = matchesSelectedElos(team.averageElo, selectedElos);
             const matchesRecruiting =
                 recruitingFilter === "all" ||
-                (recruitingFilter === "recruiting" && team.isRecruiting && team.status?.key !== "full" && team.status?.key !== "in-tournament") ||
-                (recruitingFilter === "closed" && (!team.isRecruiting || team.status?.key === "full" || team.status?.key === "in-tournament"));
+                (recruitingFilter === "recruiting" && team.isRecruiting && team.status?.key !== "in-tournament") ||
+                (recruitingFilter === "closed" && (!team.isRecruiting || team.status?.key === "in-tournament"));
             return matchesName && matchesElo && matchesRecruiting;
         });
         return sortByElo(filtered, eloSort, (team) => team.averageElo);

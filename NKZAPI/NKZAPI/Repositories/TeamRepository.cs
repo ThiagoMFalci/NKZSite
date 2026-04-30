@@ -17,20 +17,25 @@ namespace NKZAPI.Repositories
                 .Include(t => t.Players)
                 .Where(t => t.Players.Any(p => p.Id == PlayerId))
                 .ToListAsync();
+            await HydrateDiscordAsync(teams);
             return teams;
         }
         public async Task<List<Team>> GetAllTeamsAsync()
         {
-            return await _context.Teams
+            var teams = await _context.Teams
                 .Include(t => t.Players)
                 .ToListAsync();
+            await HydrateDiscordAsync(teams);
+            return teams;
         }
 
         public async Task<Team?> GetTeamByIdAsync(Guid id)
         {
-            return await _context.Teams
+            var team = await _context.Teams
                 .Include(t => t.Players)
                 .FirstOrDefaultAsync(t => t.Id == id);
+            await HydrateDiscordAsync(team == null ? new List<Team>() : new List<Team> { team });
+            return team;
         }
 
         public async Task<Team> AddTeamAsync(Team team)
@@ -63,6 +68,7 @@ namespace NKZAPI.Repositories
             await _context.SaveChangesAsync();
 
             await transaction.CommitAsync();
+            await HydrateDiscordAsync(new List<Team> { entry.Entity });
             return entry.Entity;
         }
 
@@ -180,6 +186,35 @@ namespace NKZAPI.Repositories
         {
             _context.Players.Remove(player);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task HydrateDiscordAsync(List<Team> teams)
+        {
+            var players = teams
+                .SelectMany(team => team.Players ?? Array.Empty<Player>())
+                .Where(player => player.UserId.HasValue)
+                .ToList();
+
+            var userIds = players
+                .Select(player => player.UserId!.Value)
+                .Distinct()
+                .ToList();
+
+            if (!userIds.Any()) return;
+
+            var users = await _context.Users
+                .Where(user => userIds.Contains(user.Id))
+                .Select(user => new { user.Id, user.DiscordUserId, user.DiscordUsername })
+                .ToDictionaryAsync(user => user.Id);
+
+            foreach (var player in players)
+            {
+                if (player.UserId.HasValue && users.TryGetValue(player.UserId.Value, out var user))
+                {
+                    player.DiscordUserId = user.DiscordUserId;
+                    player.DiscordUsername = user.DiscordUsername;
+                }
+            }
         }
     }
 }

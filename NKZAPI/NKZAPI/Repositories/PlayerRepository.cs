@@ -16,20 +16,24 @@ namespace NKZAPI.Repositories
 
         public async Task<List<Player>> GetAllPlayersAsync()
         {
-            return await _playerRepository.Players
+            var players = await _playerRepository.Players
                 .Include(p => p.ChampionStats)
                 .Include(p => p.RoleStats)
                 .Include(p => p.MatchHistory)
                 .ToListAsync();
+            await HydrateDiscordAsync(players);
+            return players;
         }
 
         public async Task<Player?> GetPlayerByIdAsync(Guid id)
         {
-            return await _playerRepository.Players
+            var player = await _playerRepository.Players
                 .Include(p => p.ChampionStats)
                 .Include(p => p.RoleStats)
                 .Include(p => p.MatchHistory)
                 .FirstOrDefaultAsync(p => p.Id == id);
+            await HydrateDiscordAsync(player == null ? new List<Player>() : new List<Player> { player });
+            return player;
         }
 
 
@@ -43,7 +47,7 @@ namespace NKZAPI.Repositories
 
         public async Task<User?> GetUserWithPlayersAsync(Guid id)
         {
-            return await _playerRepository.Users
+            var user = await _playerRepository.Users
                 .Include(u => u.Player)
                     .ThenInclude(p => p.ChampionStats)
                 .Include(u => u.Player)
@@ -51,6 +55,15 @@ namespace NKZAPI.Repositories
                 .Include(u => u.Player)
                     .ThenInclude(p => p.MatchHistory)
                 .FirstOrDefaultAsync(u => u.Id == id);
+            if (user?.Player != null)
+            {
+                foreach (var player in user.Player)
+                {
+                    player.DiscordUserId = user.DiscordUserId;
+                    player.DiscordUsername = user.DiscordUsername;
+                }
+            }
+            return user;
         }
 
         public async Task<bool> UserExistsAsync(Guid id)
@@ -106,6 +119,31 @@ namespace NKZAPI.Repositories
         public async Task SaveChangesAsync()
         {
             await _playerRepository.SaveChangesAsync();
+        }
+
+        private async Task HydrateDiscordAsync(List<Player> players)
+        {
+            var userIds = players
+                .Where(player => player.UserId.HasValue)
+                .Select(player => player.UserId!.Value)
+                .Distinct()
+                .ToList();
+
+            if (!userIds.Any()) return;
+
+            var users = await _playerRepository.Users
+                .Where(user => userIds.Contains(user.Id))
+                .Select(user => new { user.Id, user.DiscordUserId, user.DiscordUsername })
+                .ToDictionaryAsync(user => user.Id);
+
+            foreach (var player in players)
+            {
+                if (player.UserId.HasValue && users.TryGetValue(player.UserId.Value, out var user))
+                {
+                    player.DiscordUserId = user.DiscordUserId;
+                    player.DiscordUsername = user.DiscordUsername;
+                }
+            }
         }
         public async Task<Player> AddPlayerAsync(Guid UserId, Player player)
         {
