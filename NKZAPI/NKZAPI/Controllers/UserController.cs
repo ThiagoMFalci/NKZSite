@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.AuthServices;
@@ -43,12 +44,14 @@ namespace NKZAPI.Controllers
                 CreatedAt = user.CreatedAt
             }).ToList();
         }
+        [EnableRateLimiting("AuthPolicy")]
         [HttpPost("CreateUsers")]
         public async Task<ActionResult<User>> CreateUserAsync([FromBody] UserDto user)
         {
             var response = await _authInterface.UserAddAsync(user);
             return Ok(response);
         }
+        [EnableRateLimiting("VerificationPolicy")]
         [HttpPost("VerifyDiscord")]
         public async Task<ActionResult> VerifyDiscordAsync([FromBody] DiscordVerificationDto verification)
         {
@@ -56,6 +59,23 @@ namespace NKZAPI.Controllers
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
+        [EnableRateLimiting("VerificationPolicy")]
+        [HttpPost("VerifyEmail")]
+        public async Task<ActionResult> VerifyEmailAsync([FromBody] EmailVerificationDto verification)
+        {
+            var response = await _authInterface.VerifyEmailAsync(verification);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [EnableRateLimiting("VerificationPolicy")]
+        [HttpPost("ResendEmailVerification")]
+        public async Task<ActionResult> ResendEmailVerificationAsync([FromBody] string email)
+        {
+            var response = await _authInterface.ResendEmailVerificationAsync(email);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [EnableRateLimiting("VerificationPolicy")]
         [HttpPost("ResendDiscordVerification")]
         public async Task<ActionResult> ResendDiscordVerificationAsync([FromBody] string email)
         {
@@ -76,6 +96,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpPost("wallet/deposit")]
         public async Task<ActionResult> CreateWalletDepositAsync([FromBody] WalletDepositDto deposit)
         {
@@ -86,6 +107,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
 
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpPost("wallet/mercadopago/webhook")]
         public async Task<ActionResult> WalletMercadoPagoWebhookAsync()
         {
@@ -105,6 +127,7 @@ namespace NKZAPI.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpGet("wallet/mercadopago/webhook")]
         public async Task<ActionResult> WalletMercadoPagoWebhookGetAsync()
         {
@@ -115,13 +138,39 @@ namespace NKZAPI.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
+        [EnableRateLimiting("AuthPolicy")]
         [HttpPost("Login")]
         public async Task<ActionResult<User>> Login(UserLoginDto userLogin)
         {
             var response = await _authInterface.Login(userLogin);
             return Ok(response);
         }
+        [EnableRateLimiting("VerificationPolicy")]
+        [HttpPost("VerifyTwoFactor")]
+        public async Task<ActionResult> VerifyTwoFactor(TwoFactorVerifyDto verification)
+        {
+            var response = await _authInterface.VerifyTwoFactorAsync(verification);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [EnableRateLimiting("VerificationPolicy")]
+        [HttpPost("ForgotPassword")]
+        public async Task<ActionResult> ForgotPassword(ForgotPasswordDto request)
+        {
+            var response = await _authInterface.ForgotPasswordAsync(request);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
+        [EnableRateLimiting("VerificationPolicy")]
+        [HttpPost("ResetPassword")]
+        public async Task<ActionResult> ResetPassword(ResetPasswordDto request)
+        {
+            var response = await _authInterface.ResetPasswordAsync(request);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
+        }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPut("UpdateUsers")]
         public async Task<ActionResult<UserDto>> UpdateUsers([FromBody] UserDto user, Guid id)
         {
@@ -138,6 +187,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("DeleteUsers")]
         public async Task<ActionResult> DeleteUsers(Guid id)
         {

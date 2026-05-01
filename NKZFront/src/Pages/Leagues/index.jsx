@@ -123,7 +123,7 @@ export default function LeaguesPage() {
         try {
             setLoading(true);
             setError("");
-            const response = await axios.get(`${API_BASE_URL}/api/league/ListLeagues`);
+            const response = await axios.get(`${API_BASE_URL}/api/league/ListLeagues`, { headers: getAuthHeaders() });
             const data = unwrapApiData(response.data);
             if (isMounted()) setLeagues((Array.isArray(data) ? data : []).map(normalizeLeague));
         } catch (requestError) {
@@ -191,7 +191,7 @@ export default function LeaguesPage() {
     async function refreshSelectedLeague(leagueId = selectedLeague?.id) {
         if (!leagueId) return;
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/league/${leagueId}`);
+            const response = await axios.get(`${API_BASE_URL}/api/league/${leagueId}`, { headers: getAuthHeaders() });
             const updated = normalizeLeague(unwrapApiData(response.data));
             setSelectedLeague(updated);
             setLeagues((current) => current.map((league) => league.id === updated.id ? updated : league));

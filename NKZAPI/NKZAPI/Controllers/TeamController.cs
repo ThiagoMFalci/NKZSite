@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.PlayerServices;
@@ -22,6 +23,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{teamId:guid}/players/{playerId:guid}/expel")]
         public async Task<ActionResult> ExpelPlayerAsync(Guid teamId, Guid playerId)
         {
@@ -44,6 +46,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
         [Authorize]
+        [EnableRateLimiting("UploadPolicy")]
         [HttpPost("{teamId:guid}/image")]
         public async Task<ActionResult> UploadTeamImageAsync(Guid teamId, IFormFile image)
         {
@@ -65,13 +68,15 @@ namespace NKZAPI.Controllers
 
             return Ok(response);
         }
+        [Authorize]
         [HttpGet("ListTeams")]
-        public async Task<ActionResult<List<Team>>> ListTeamsAsync()
+        public async Task<ActionResult<List<TeamPublicDto>>> ListTeamsAsync()
         {
             var teams = await _teamServices.GetAllTeamsAsync();
-            return Ok(teams);
+            return Ok(teams.Select(team => team.ToPublicDto()).ToList());
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{id:guid}")]
         public async Task<ActionResult> CreateTeamAsync(Guid id, [FromBody] TeamDto team)
         {
@@ -88,14 +93,16 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<Team>> GetTeamByIdAsync(Guid id)
+        public async Task<ActionResult<TeamPublicDto>> GetTeamByIdAsync(Guid id)
         {
             var team = await _teamServices.GetTeamByIdAsync(id);
             if (team == null) return NotFound();
-            return Ok(team);
+            return Ok(team.ToPublicDto());
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateTeamAsync(Guid id, [FromBody] TeamDto team)
         {
@@ -117,6 +124,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteTeamAsync(Guid id)
         {
@@ -139,6 +147,7 @@ namespace NKZAPI.Controllers
             return Ok(deleteResponse);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{teamId:guid}/players")]
         public async Task<ActionResult<Player>> AddPlayerToTeamAsync(Guid teamId, [FromBody] Guid playerId)
         {
@@ -158,6 +167,7 @@ namespace NKZAPI.Controllers
             return Ok(addResponse);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{teamId:guid}/invitations")]
         public async Task<ActionResult> CreateInvitationAsync(Guid teamId, [FromBody] Invitation invitation)
         {
@@ -191,6 +201,7 @@ namespace NKZAPI.Controllers
             return Ok(list);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("invitations/{invitationId:guid}/respond")]
         public async Task<ActionResult> RespondToInvitationAsync(Guid invitationId, [FromBody] JsonElement body)
         {
@@ -226,6 +237,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{teamId:guid}/players/{playerId:guid}")]
         public async Task<ActionResult> RemovePlayerFromTeamAsync(Guid teamId, Guid playerId)
         {
@@ -245,6 +257,7 @@ namespace NKZAPI.Controllers
             return Ok(removeResponse);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPatch("{teamId:guid}/recruiting/{isRecruiting:bool}")]
         public async Task<ActionResult> UpdateRecruitingAsync(Guid teamId, bool isRecruiting)
         {
@@ -265,6 +278,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{teamId:guid}/players/{playerId:guid}/IsCaptain/{i:bool}")]
         public async Task<ActionResult> IsCaptain(Guid teamId, Guid playerId, bool i)
         {

@@ -24,6 +24,17 @@
     pointer-events: none;
 }
 
+.dashboard-page::before {
+    background:
+        radial-gradient(circle at 16% 8%, rgba(249, 115, 22, 0.12), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(47, 134, 190, 0.12), transparent 30%),
+        linear-gradient(180deg, rgba(123, 47, 190, 0.06), transparent 38%);
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
 .dashboard-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -37,8 +48,10 @@
 
 .dashboard-riot-link {
     align-items: end;
-    background: rgba(13, 13, 24, 0.96);
-    border: 1px solid var(--dashboard-border);
+    background:
+        linear-gradient(135deg, rgba(47, 134, 190, 0.12), rgba(13, 13, 24, 0.96) 42%),
+        rgba(13, 13, 24, 0.96);
+    border: 1px solid rgba(47, 134, 190, 0.26);
     border-radius: 4px;
     box-shadow: 0 0 28px rgba(123, 47, 190, 0.08);
     display: grid;
@@ -127,8 +140,10 @@
 
 .dashboard-refresh-panel {
     align-items: center;
-    background: rgba(13, 13, 24, 0.96);
-    border: 1px solid rgba(123, 47, 190, 0.25);
+    background:
+        radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.14), transparent 42%),
+        linear-gradient(135deg, rgba(47, 134, 190, 0.14), rgba(13, 13, 24, 0.96) 48%);
+    border: 1px solid rgba(47, 134, 190, 0.28);
     border-radius: 4px;
     display: grid;
     gap: 0.85rem;
@@ -163,7 +178,9 @@
 
 .dashboard-card,
 .dashboard-user-header {
-    background: rgba(13, 13, 24, 0.96);
+    background:
+        linear-gradient(145deg, rgba(255,255,255,0.035), transparent 34%),
+        rgba(13, 13, 24, 0.96);
     border: 1px solid var(--dashboard-border);
     border-radius: 4px;
     box-shadow: 0 0 28px rgba(123, 47, 190, 0.08);
@@ -171,6 +188,11 @@
 
 .dashboard-user-header {
     align-items: center;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(249, 115, 22, 0.12), transparent 34%),
+        radial-gradient(circle at 100% 100%, rgba(47, 134, 190, 0.12), transparent 36%),
+        linear-gradient(135deg, rgba(123, 47, 190, 0.14), rgba(13, 13, 24, 0.96) 48%);
+    border-color: rgba(123, 47, 190, 0.36);
     display: grid;
     gap: 1.35rem;
     grid-template-columns: 104px minmax(0, 1fr);
@@ -183,7 +205,8 @@
     height: 104px;
     border: 1px solid rgba(249, 115, 22, 0.35);
     border-radius: 4px;
-    background: rgba(249, 115, 22, 0.08);
+    background:
+        linear-gradient(135deg, rgba(249, 115, 22, 0.16), rgba(123, 47, 190, 0.16));
     color: var(--laranja);
     display: flex;
     align-items: center;
@@ -309,6 +332,10 @@
 }
 
 .dashboard-competitive-card {
+    background:
+        linear-gradient(135deg, rgba(123, 47, 190, 0.13), transparent 34%),
+        rgba(13, 13, 24, 0.96);
+    border-color: rgba(123, 47, 190, 0.34);
     margin-bottom: 1rem;
     padding: 1.35rem;
 }
@@ -325,6 +352,10 @@
 }
 
 .dashboard-captain-card {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(47, 134, 190, 0.12), transparent 36%),
+        rgba(13, 13, 24, 0.96);
+    border-color: rgba(47, 134, 190, 0.26);
     margin-bottom: 1rem;
     padding: 1.25rem;
 }
@@ -338,7 +369,8 @@
 
 .captain-panel-grid div,
 .captain-team-list article {
-    background: rgba(255,255,255,0.035);
+    background:
+        linear-gradient(135deg, rgba(47, 134, 190, 0.08), rgba(255,255,255,0.025));
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 4px;
     display: grid;
@@ -623,11 +655,53 @@
     overflow: hidden;
 }
 
-.stat-card-icon {
-    color: var(--roxo);
-    font-size: 1.35rem;
-    margin-bottom: 0.9rem;
+.stat-card::before {
+    content: "";
+    inset: 0;
+    opacity: 0.72;
+    pointer-events: none;
+    position: absolute;
 }
+
+.stat-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.stat-totalMatches::before {
+    background: radial-gradient(circle at 100% 0%, rgba(47, 134, 190, 0.18), transparent 48%);
+}
+
+.stat-wins::before {
+    background: radial-gradient(circle at 100% 0%, rgba(33, 198, 107, 0.16), transparent 48%);
+}
+
+.stat-losses::before {
+    background: radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.16), transparent 48%);
+}
+
+.stat-winRate::before {
+    background: radial-gradient(circle at 100% 0%, rgba(123, 47, 190, 0.2), transparent 48%);
+}
+
+.stat-card-icon {
+    align-items: center;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px;
+    color: var(--roxo);
+    display: inline-flex;
+    font-size: 1.35rem;
+    height: 38px;
+    justify-content: center;
+    margin-bottom: 0.9rem;
+    width: 38px;
+}
+
+.stat-totalMatches .stat-card-icon { color: #8fcaf0; }
+.stat-wins .stat-card-icon { color: #21c66b; }
+.stat-losses .stat-card-icon { color: #f97316; }
+.stat-winRate .stat-card-icon { color: #b981ff; }
 
 .stat-card span {
     color: var(--dashboard-muted);
@@ -772,6 +846,9 @@
 }
 
 .dashboard-history-card {
+    background:
+        linear-gradient(145deg, rgba(47, 134, 190, 0.08), transparent 32%),
+        rgba(13, 13, 24, 0.96);
     padding: 1.25rem;
 }
 
@@ -792,8 +869,11 @@
 
 .history-row {
     align-items: center;
-    background: rgba(255,255,255,0.035);
+    background:
+        linear-gradient(90deg, rgba(249, 115, 22, 0.08), rgba(255,255,255,0.028) 34%);
     border: 1px solid rgba(255,255,255,0.06);
+    border-left-color: rgba(249, 115, 22, 0.38);
+    border-left-width: 3px;
     border-radius: 4px;
     display: grid;
     gap: 0.65rem;
@@ -803,6 +883,18 @@
 
 .history-row.compact {
     grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.history-row:has(em.win) {
+    background:
+        linear-gradient(90deg, rgba(33, 198, 107, 0.09), rgba(255,255,255,0.028) 34%);
+    border-left-color: rgba(33, 198, 107, 0.5);
+}
+
+.history-row:has(em.loss) {
+    background:
+        linear-gradient(90deg, rgba(249, 115, 22, 0.1), rgba(255,255,255,0.028) 34%);
+    border-left-color: rgba(249, 115, 22, 0.52);
 }
 
 .history-row strong {

@@ -19,12 +19,17 @@ function getApiMessage(error) {
 export default function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ email: "", password: "" });
+    const [twoFactor, setTwoFactor] = useState({ required: false, token: "", code: "" });
     const [loading, setLoading] = useState(false);
     const [feedback, setFeedback] = useState({ type: "", message: "" });
 
     function handleChange(event) {
         const { name, value } = event.target;
         setFormData((current) => ({ ...current, [name]: value }));
+    }
+
+    function handleTwoFactorChange(event) {
+        setTwoFactor((current) => ({ ...current, code: event.target.value }));
     }
 
     async function handleSubmit(event) {
@@ -45,7 +50,20 @@ export default function Login() {
             });
 
             const success = response.data?.success ?? response.data?.Success ?? true;
-            const token = response.data?.data ?? response.data?.Data;
+            const data = response.data?.data ?? response.data?.Data;
+            const requiresTwoFactor = data?.requiresTwoFactor ?? data?.RequiresTwoFactor;
+
+            if (success && requiresTwoFactor) {
+                setTwoFactor({
+                    required: true,
+                    token: data?.twoFactorToken ?? data?.TwoFactorToken ?? "",
+                    code: "",
+                });
+                setFeedback({ type: "success", message: response.data?.message || response.data?.Message || "Codigo enviado para seu email." });
+                return;
+            }
+
+            const token = typeof data === "string" ? data : "";
 
             if (!success || !token) {
                 setFeedback({
@@ -64,16 +82,68 @@ export default function Login() {
         }
     }
 
+    async function handleTwoFactorSubmit(event) {
+        event.preventDefault();
+        setFeedback({ type: "", message: "" });
+
+        if (!twoFactor.code.trim()) {
+            setFeedback({ type: "error", message: "Informe o codigo enviado para seu email." });
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await axios.post(`${API_BASE_URL}/api/auth/User/VerifyTwoFactor`, {
+                email: formData.email,
+                code: twoFactor.code,
+                twoFactorToken: twoFactor.token,
+            });
+
+            const success = response.data?.success ?? response.data?.Success ?? true;
+            const token = response.data?.data ?? response.data?.Data;
+            if (!success || !token) {
+                setFeedback({ type: "error", message: response.data?.message || response.data?.Message || "Codigo invalido." });
+                return;
+            }
+
+            saveSession(token);
+            navigate("/dashboard");
+        } catch (error) {
+            setFeedback({ type: "error", message: getApiMessage(error) });
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <main className="auth-page">
             <div className="auth-grid" />
             <section className="auth-card">
                 <div className="auth-icon"><BsShieldLockFill /></div>
                 <p className="auth-eyebrow">Conta NKZ</p>
-                <h1>Entrar</h1>
-                <p className="auth-desc">Acesse sua conta para acompanhar seu desempenho competitivo.</p>
+                <h1>{twoFactor.required ? "Verificacao" : "Entrar"}</h1>
+                <p className="auth-desc">
+                    {twoFactor.required
+                        ? "Digite o codigo enviado para seu email para concluir o acesso."
+                        : "Acesse sua conta para acompanhar seu desempenho competitivo."}
+                </p>
 
-                <form className="auth-form" onSubmit={handleSubmit}>
+                <form className="auth-form" onSubmit={twoFactor.required ? handleTwoFactorSubmit : handleSubmit}>
+                    {twoFactor.required ? (
+                        <label>
+                            Codigo de email
+                            <input
+                                type="text"
+                                name="code"
+                                value={twoFactor.code}
+                                onChange={handleTwoFactorChange}
+                                inputMode="numeric"
+                                maxLength={6}
+                                placeholder="000000"
+                            />
+                        </label>
+                    ) : (
+                        <>
                     <label>
                         Email
                         <input
@@ -97,18 +167,30 @@ export default function Login() {
                             placeholder="Sua senha"
                         />
                     </label>
+                        </>
+                    )}
 
                     {feedback.message && (
                         <div className={`auth-feedback ${feedback.type}`}>{feedback.message}</div>
                     )}
 
                     <button className="btn-primary auth-submit" type="submit" disabled={loading}>
-                        {loading ? "Entrando..." : "Entrar"}
+                        {twoFactor.required ? (loading ? "Verificando..." : "Confirmar codigo") : (loading ? "Entrando..." : "Entrar")}
                     </button>
                 </form>
 
                 <p className="auth-switch">
-                    Ainda nao tem conta? <Link to="/register">Criar conta</Link>
+                    {twoFactor.required ? (
+                        <button className="auth-link-button" type="button" onClick={() => setTwoFactor({ required: false, token: "", code: "" })}>
+                            Voltar ao login
+                        </button>
+                    ) : (
+                        <>
+                            <Link to="/forgot-password">Esqueci minha senha</Link>
+                            <span className="auth-switch-separator"> | </span>
+                            Ainda nao tem conta? <Link to="/register">Criar conta</Link>
+                        </>
+                    )}
                 </p>
             </section>
         </main>

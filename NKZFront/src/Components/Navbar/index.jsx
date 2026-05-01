@@ -159,6 +159,11 @@ export default function Index() {
     function renderUserMenu(mobile = false) {
         return (
             <div className={mobile ? "mobile-user-menu" : "user-menu"}>
+                <button className="wallet-chip" type="button" onClick={() => navigateAndClose("/wallet")} aria-label="Adicionar saldo">
+                    <FaWallet />
+                    <span>{Number(walletBalance || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                    <FaPlus />
+                </button>
                 <button
                     className="user-menu-button"
                     onClick={() => setUserMenuOpen((open) => !open)}
@@ -184,11 +189,6 @@ export default function Index() {
                         </span>
                     )}
                     <FaChevronDown className={`user-menu-arrow ${userMenuOpen ? "open" : ""}`} />
-                </button>
-                <button className="wallet-chip" type="button" onClick={() => navigateAndClose("/wallet")} aria-label="Adicionar saldo">
-                    <FaWallet />
-                    <span>{Number(walletBalance || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
-                    <FaPlus />
                 </button>
 
                 <div className={`user-menu-dropdown ${userMenuOpen ? "open" : ""}`}>

@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.LeagueServices;
@@ -18,13 +19,15 @@ namespace NKZAPI.Controllers
             _leagueServices = leagueServices;
         }
 
+        [Authorize]
         [HttpGet("ListLeagues")]
-        public async Task<ActionResult<List<League>>> ListLeaguesAsync()
+        public async Task<ActionResult<List<LeaguePublicDto>>> ListLeaguesAsync()
         {
             var leagues = await _leagueServices.GetAllLeaguesAsync();
-            return Ok(leagues);
+            return Ok(leagues.Select(league => league.ToPublicDto(User)).ToList());
         }
         [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost]
         public async Task<ActionResult> CreateLeagueAsync([FromBody] League league)
         {
@@ -34,6 +37,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("UploadPolicy")]
         [HttpPost("{leagueId:guid}/image")]
         public async Task<ActionResult> UploadLeagueImageAsync(Guid leagueId, IFormFile image)
         {
@@ -45,14 +49,16 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<League>> GetLeagueByIdAsync(Guid id)
+        public async Task<ActionResult<LeaguePublicDto>> GetLeagueByIdAsync(Guid id)
         {
             var league = await _leagueServices.GetLeagueByIdAsync(id);
             if (league == null) return NotFound();
-            return Ok(league);
+            return Ok(league.ToPublicDto(User));
         }
         [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdateLeagueAsync(Guid id, [FromBody] League league)
         {
@@ -62,6 +68,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
         [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteLeagueAsync(Guid id)
         {
@@ -71,6 +78,7 @@ namespace NKZAPI.Controllers
             return Ok("League deleted successfully");
         }
         [Authorize]
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpPost("{leagueId:guid}/teams/{teamId:guid}")]
         public async Task<ActionResult> AddTeamToLeagueAsync(Guid leagueId, Guid teamId)
         {
@@ -82,6 +90,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpPost("payments/{paymentId:guid}/confirm")]
         public async Task<ActionResult> ConfirmLeaguePaymentAsync(Guid paymentId)
         {
@@ -90,6 +99,7 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
 
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpPost("payments/mercadopago/webhook")]
         public async Task<ActionResult> MercadoPagoWebhookAsync()
         {
@@ -115,6 +125,7 @@ namespace NKZAPI.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
+        [EnableRateLimiting("PaymentPolicy")]
         [HttpGet("payments/mercadopago/webhook")]
         public async Task<ActionResult> MercadoPagoWebhookGetAsync()
         {
@@ -126,6 +137,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{leagueId:guid}/teams/{teamId:guid}")]
         public async Task<ActionResult> RemoveTeamFromLeagueAsync(Guid leagueId, Guid teamId)
         {
@@ -136,21 +148,24 @@ namespace NKZAPI.Controllers
             return Ok(response);
         }
 
+        [Authorize]
         [HttpGet("{leagueId:guid}/teams")]
-        public async Task<ActionResult<List<Team>>> GetTeamsInLeagueAsync(Guid leagueId)
+        public async Task<ActionResult<List<TeamPublicDto>>> GetTeamsInLeagueAsync(Guid leagueId)
         {
             var teams = await _leagueServices.GetTeamsInLeagueAsync(leagueId);
-            return Ok(teams);
+            return Ok(teams.Select(team => team.ToPublicDto()).ToList());
         }
 
+        [Authorize]
         [HttpGet("byTeam/{teamId:guid}")]
-        public async Task<ActionResult<List<League>>> GetLeaguesByTeamIdAsync(Guid teamId)
+        public async Task<ActionResult<List<LeaguePublicDto>>> GetLeaguesByTeamIdAsync(Guid teamId)
         {
             var leagues = await _leagueServices.GetLeaguesByTeamIdAsync(teamId);
-            return Ok(leagues);
+            return Ok(leagues.Select(league => league.ToPublicDto(User)).ToList());
         }
 
         [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{leagueId:guid}/playoff/generate")]
         public async Task<ActionResult> GeneratePlayoffAsync(Guid leagueId)
         {
@@ -160,6 +175,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("matches/{matchId:guid}/complete")]
         public async Task<ActionResult> CompleteMatchAsync(Guid matchId, [FromBody] LeagueMatchResultDto result)
         {
@@ -169,6 +185,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("UploadPolicy")]
         [HttpPost("matches/{matchId:guid}/report")]
         public async Task<ActionResult> SubmitMatchReportAsync(Guid matchId, [FromForm] Guid reportedWinnerTeamId, [FromForm] IFormFile proofImage)
         {
@@ -180,6 +197,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{leagueId:guid}/queue/{teamId:guid}")]
         public async Task<ActionResult> JoinRankingQueueAsync(Guid leagueId, Guid teamId)
         {
@@ -191,6 +209,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{leagueId:guid}/queue/{teamId:guid}")]
         public async Task<ActionResult> LeaveRankingQueueAsync(Guid leagueId, Guid teamId)
         {
@@ -202,6 +221,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("matches/{matchId:guid}/schedule/propose")]
         public async Task<ActionResult> ProposeMatchScheduleAsync(Guid matchId, [FromBody] LeagueMatchScheduleProposalDto proposal)
         {
@@ -213,6 +233,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("matches/{matchId:guid}/schedule/accept")]
         public async Task<ActionResult> AcceptMatchScheduleAsync(Guid matchId)
         {
@@ -224,6 +245,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("matches/{matchId:guid}/schedule/reject")]
         public async Task<ActionResult> RejectMatchScheduleAsync(Guid matchId)
         {

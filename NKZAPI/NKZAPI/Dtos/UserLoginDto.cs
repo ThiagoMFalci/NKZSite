@@ -5,10 +5,13 @@ namespace NKZAPI.Dtos
     public class UserLoginDto
     {
         [Required(ErrorMessage = "O Campo Email é obrigatorio!"), EmailAddress(ErrorMessage = "Email invalido!")]
-        public string Email { get; set; }
+        [StringLength(254)]
+        public string Email { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "O Campo Senha é obrigatorio!")]
-        public string Password { get; set; }
-        [Compare("Password", ErrorMessage ="Senhas não são iguais!")]
-        public string PasswordSalt { get; set; }
+        [StringLength(128, MinimumLength = 6)]
+        public string Password { get; set; } = string.Empty;
+
+        public string? PasswordSalt { get; set; }
     }
 }

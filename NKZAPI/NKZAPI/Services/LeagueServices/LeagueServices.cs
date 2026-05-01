@@ -372,6 +372,11 @@ namespace NKZAPI.Services.LeagueServices
                     await AddTeamToLeagueAfterApprovalAsync(payment.LeagueId, payment.TeamId);
                     response.Message = "Pagamento aprovado. Time inscrito na liga.";
                 }
+                else if (payment.Status == "Rejected")
+                {
+                    await RefundRejectedLeaguePaymentWalletCreditAsync(payment);
+                    response.Message = "Pagamento rejeitado. Credito da carteira devolvido, se havia sido usado.";
+                }
                 else
                 {
                     response.Message = $"Pagamento atualizado: {payment.Status}.";
@@ -388,6 +393,41 @@ namespace NKZAPI.Services.LeagueServices
             }
 
             return response;
+        }
+
+        private async Task RefundRejectedLeaguePaymentWalletCreditAsync(LeaguePayment payment)
+        {
+            if (!payment.CreatedByUserId.HasValue || payment.WalletCreditUsed <= 0) return;
+
+            var alreadyRefunded = await _context.WalletTransactions.AnyAsync(transaction =>
+                transaction.LeaguePaymentId == payment.Id &&
+                transaction.UserId == payment.CreatedByUserId.Value &&
+                transaction.Type == "Refund");
+
+            if (alreadyRefunded) return;
+
+            var debitExists = await _context.WalletTransactions.AnyAsync(transaction =>
+                transaction.LeaguePaymentId == payment.Id &&
+                transaction.UserId == payment.CreatedByUserId.Value &&
+                transaction.Type == "Debit" &&
+                transaction.Amount < 0);
+
+            if (!debitExists) return;
+
+            var user = await _context.Users.FirstOrDefaultAsync(item => item.Id == payment.CreatedByUserId.Value);
+            if (user == null) return;
+
+            user.WalletBalance += payment.WalletCreditUsed;
+            _context.WalletTransactions.Add(new WalletTransaction
+            {
+                UserId = user.Id,
+                Amount = payment.WalletCreditUsed,
+                Type = "Refund",
+                Description = "Credito devolvido por pagamento de liga rejeitado",
+                LeagueId = payment.LeagueId,
+                TeamId = payment.TeamId,
+                LeaguePaymentId = payment.Id
+            });
         }
 
         private async Task RefundLeaguePaymentsToWalletAsync(Guid leagueId)
@@ -1276,6 +1316,7 @@ namespace NKZAPI.Services.LeagueServices
             var paymentResponse = await CreateOrReuseLeaguePaymentAsync(league, team, callerId, remaining, entryFee, walletCreditUsed);
             if (walletCreditUsed > 0 && paymentResponse.Success)
             {
+                var pendingPayment = await _leagueRepository.GetPendingLeaguePaymentAsync(league.Id, team.Id);
                 account.WalletBalance -= walletCreditUsed;
                 _context.WalletTransactions.Add(new WalletTransaction
                 {
@@ -1284,7 +1325,8 @@ namespace NKZAPI.Services.LeagueServices
                     Type = "Debit",
                     Description = $"Credito usado na inscricao da liga {league.Name}",
                     LeagueId = league.Id,
-                    TeamId = team.Id
+                    TeamId = team.Id,
+                    LeaguePaymentId = pendingPayment?.Id
                 });
                 await _context.SaveChangesAsync();
             }

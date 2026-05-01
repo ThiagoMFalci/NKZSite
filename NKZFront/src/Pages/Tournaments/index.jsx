@@ -95,7 +95,7 @@ export default function TournamentsPage() {
         try {
             setLoading(true);
             setError("");
-            const response = await axios.get(`${API_BASE_URL}/api/Tournament`);
+            const response = await axios.get(`${API_BASE_URL}/api/Tournament`, { headers: getAuthHeaders() });
             const data = unwrapApiData(response.data);
             if (isMounted()) setTournaments((Array.isArray(data) ? data : []).map(normalizeTournament));
         } catch (requestError) {
@@ -148,7 +148,7 @@ export default function TournamentsPage() {
     async function handleSelectTournament(tournament) {
         setFeedback({ type: "", message: "" });
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/Tournament/${tournament.id}`);
+            const response = await axios.get(`${API_BASE_URL}/api/Tournament/${tournament.id}`, { headers: getAuthHeaders() });
             setSelectedTournament(normalizeTournament(unwrapApiData(response.data)));
         } catch {
             setSelectedTournament(tournament);
@@ -169,7 +169,7 @@ export default function TournamentsPage() {
     async function refreshSelectedTournament(tournamentId = selectedTournament?.id) {
         if (!tournamentId) return;
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/Tournament/${tournamentId}`);
+            const response = await axios.get(`${API_BASE_URL}/api/Tournament/${tournamentId}`, { headers: getAuthHeaders() });
             const updated = normalizeTournament(unwrapApiData(response.data));
             setSelectedTournament(updated);
             setTournaments((current) => current.map((tournament) => tournament.id === updated.id ? updated : tournament));

@@ -276,9 +276,6 @@ export default function PlayersPage() {
                                         <p className="players-eyebrow">{player.role}</p>
                                         <h2>{player.nick}</h2>
                                         <span>Nivel {player.level}</span>
-                                        {player.discordUsername && (
-                                            <span className="player-discord-tag"><BsDiscord /> {player.discordUsername}</span>
-                                        )}
                                     </div>
                                     <em className={`player-looking-badge ${player.lookingForTeam ? "active" : ""}`}>
                                         {player.lookingForTeam ? "Procurando time" : "Fechado"}
@@ -289,6 +286,9 @@ export default function PlayersPage() {
                                     <span><RankEmblem tier={player.tier} label={player.rank} className="compact" /> {player.rank}</span>
                                     <span><BsStars /> {player.points} pontos</span>
                                     <span><BsController /> {player.winRate}% win rate</span>
+                                    {player.discordUsername && (
+                                        <span className="player-discord-tag"><BsDiscord /> {player.discordUsername}</span>
+                                    )}
                                 </div>
 
                                 <div className="player-champions">

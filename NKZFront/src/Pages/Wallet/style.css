@@ -37,10 +37,26 @@
 .wallet-hero {
     align-items: center;
     display: flex;
-    gap: 1rem;
+    gap: 1.25rem;
     justify-content: space-between;
     margin-bottom: 1rem;
-    padding: 1.5rem;
+    overflow: hidden;
+    padding: 1.35rem;
+    position: relative;
+}
+
+.wallet-hero::before {
+    background: linear-gradient(90deg, rgba(47, 134, 190, 0.22), rgba(123, 47, 190, 0.12), rgba(249, 115, 22, 0.18));
+    content: "";
+    inset: 0;
+    opacity: 0.55;
+    pointer-events: none;
+    position: absolute;
+}
+
+.wallet-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 .wallet-eyebrow {
@@ -71,27 +87,46 @@
 }
 
 .wallet-balance-card {
+    align-items: center;
     background:
-        radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.18), transparent 44%),
-        rgba(249, 115, 22, 0.08);
-    border: 1px solid rgba(249, 115, 22, 0.3);
+        radial-gradient(circle at 100% 0%, rgba(249, 115, 22, 0.2), transparent 48%),
+        linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(47, 134, 190, 0.08));
+    border: 1px solid rgba(249, 115, 22, 0.34);
     border-radius: 6px;
     display: grid;
-    gap: 0.35rem;
-    min-width: 250px;
-    padding: 1rem;
-    text-align: right;
+    gap: 0.1rem 0.8rem;
+    grid-template-columns: 42px auto;
+    min-width: 245px;
+    padding: 0.85rem 1rem;
+    text-align: left;
 }
 
 .wallet-balance-card svg {
+    align-items: center;
+    background: rgba(249, 115, 22, 0.14);
+    border: 1px solid rgba(249, 115, 22, 0.24);
+    border-radius: 5px;
     color: #f97316;
-    justify-self: end;
+    grid-row: span 2;
+    height: 42px;
+    justify-self: start;
+    padding: 0.65rem;
+    width: 42px;
+}
+
+.wallet-balance-card span {
+    color: rgba(245,245,245,0.56);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .wallet-balance-card strong {
     color: #f97316;
     font-family: "Rajdhani", sans-serif;
-    font-size: 2rem;
+    font-size: 1.8rem;
+    line-height: 1;
 }
 
 .wallet-grid {

@@ -12,6 +12,7 @@ import NotificationsPage from './Pages/Notifications'
 import WalletPage from './Pages/Wallet'
 import Login from './Pages/Auth/Login'
 import Register from './Pages/Auth/Register'
+import ForgotPassword from './Pages/Auth/ForgotPassword'
 import NotFound from './Pages/NotFound'
 import Navbar from './Components/Navbar'
 import Footer from './Components/Footer'
@@ -47,6 +48,7 @@ function App() {
                     <Route path="/wallet" element={<ProtectedRoute><WalletPage/></ProtectedRoute>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/register" element={<Register/>}/>
+                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="*" element={<ProtectedRoute><NotFound/></ProtectedRoute>}/>
                 </Routes>
 

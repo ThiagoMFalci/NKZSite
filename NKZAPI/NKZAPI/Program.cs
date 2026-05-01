@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using NKZAPI.Controllers;
@@ -11,8 +12,10 @@ using NKZAPI.Services.UserServices;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using NKZAPI.Services.DiscordServices;
+using NKZAPI.Services.EmailServices;
 using NKZAPI.Services.RiotService;
 using NKZAPI.Services.WalletServices;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,97 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
+static string GetClientPartitionKey(HttpContext context)
+{
+    var userId = context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        ?? context.User?.FindFirst("Id")?.Value;
+
+    if (!string.IsNullOrWhiteSpace(userId)) return $"user:{userId}";
+
+    var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+    var ip = forwardedFor?.Split(',').FirstOrDefault()?.Trim()
+        ?? context.Connection.RemoteIpAddress?.ToString()
+        ?? "unknown";
+
+    return $"ip:{ip}";
+}
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            GetClientPartitionKey(context),
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 240,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+
+    options.AddPolicy("AuthPolicy", context => RateLimitPartition.GetFixedWindowLimiter(
+        GetClientPartitionKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 8,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+
+    options.AddPolicy("VerificationPolicy", context => RateLimitPartition.GetFixedWindowLimiter(
+        GetClientPartitionKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 5,
+            Window = TimeSpan.FromMinutes(5),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+
+    options.AddPolicy("RiotPolicy", context => RateLimitPartition.GetFixedWindowLimiter(
+        GetClientPartitionKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 4,
+            Window = TimeSpan.FromMinutes(2),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+
+    options.AddPolicy("UploadPolicy", context => RateLimitPartition.GetFixedWindowLimiter(
+        GetClientPartitionKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 12,
+            Window = TimeSpan.FromMinutes(5),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+
+    options.AddPolicy("PaymentPolicy", context => RateLimitPartition.GetFixedWindowLimiter(
+        GetClientPartitionKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+
+    options.AddPolicy("GeneralWritePolicy", context => RateLimitPartition.GetFixedWindowLimiter(
+        GetClientPartitionKey(context),
+        _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 60,
+            Window = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+            AutoReplenishment = true
+        }));
+});
 
 var configuredOriginsArray = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
@@ -109,6 +203,7 @@ builder.Services.AddScoped<NKZAPI.Services.PlayerServices.IPlayerInterface, NKZA
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<IDiscordVerificationService, DiscordBotClient>();
 builder.Services.AddHttpClient<IDiscordTeamRoleService, DiscordTeamRoleService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IRiotService, RiotService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 
@@ -138,6 +233,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseCors("FrontendCors");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

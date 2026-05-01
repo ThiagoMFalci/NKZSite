@@ -88,7 +88,7 @@ function normalizeRoleKey(role = "") {
 }
 
 function normalizeRecentMatches(matches = []) {
-    return (Array.isArray(matches) ? matches : []).slice(0, 5).map((match, index) => {
+    return (Array.isArray(matches) ? matches : []).slice(0, 5).reverse().map((match, index) => {
         const champion = match.championName ?? match.ChampionName ?? match.champion ?? match.Champion ?? "Campeao";
         const result = match.result ?? match.Result ?? (match.win ?? match.Win ? "Vitoria" : "Derrota");
         return {
