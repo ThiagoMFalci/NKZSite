@@ -265,5 +265,12 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<NKZAPI.Data.NKZAPIContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 await NKZAPI.Data.AdminSeed.SeedAsync(app.Services, app.Configuration);
 app.Run();
