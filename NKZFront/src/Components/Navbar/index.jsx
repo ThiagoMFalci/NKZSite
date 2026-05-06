@@ -16,6 +16,7 @@ const navLinks = [
     { label: "Campeonatos", href: "/tournaments" },
     { label: "Ligas", href: "/leagues" },
     { label: "Ranking", href: "/ranking" },
+    { label: "Assinaturas", href: "/subscriptions" },
 ];
 
 function unwrapApiData(responseData) {
@@ -202,6 +203,11 @@ export default function Index() {
                     <button onClick={() => navigateAndClose("/dashboard")}>
                         <FaUserShield /> Dashboard
                     </button>
+                    {currentUser?.role === "Admin" && (
+                        <button onClick={() => navigateAndClose("/admin")}>
+                            <FaUserShield /> Admin
+                        </button>
+                    )}
                     <button onClick={handleLogout}>Deslogar</button>
                 </div>
             </div>

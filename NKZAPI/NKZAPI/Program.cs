@@ -14,10 +14,35 @@ using Microsoft.Extensions.DependencyInjection;
 using NKZAPI.Services.DiscordServices;
 using NKZAPI.Services.EmailServices;
 using NKZAPI.Services.RiotService;
+using NKZAPI.Services.SubscriptionServices;
 using NKZAPI.Services.WalletServices;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
+
+static void LoadDotEnv(string path)
+{
+    if (!File.Exists(path)) return;
+
+    foreach (var rawLine in File.ReadAllLines(path))
+    {
+        var line = rawLine.Trim();
+        if (line.Length == 0 || line.StartsWith("#")) continue;
+
+        var separatorIndex = line.IndexOf('=');
+        if (separatorIndex <= 0) continue;
+
+        var key = line[..separatorIndex].Trim();
+        var value = line[(separatorIndex + 1)..].Trim().Trim('"');
+        if (!string.IsNullOrWhiteSpace(key) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(key)))
+        {
+            Environment.SetEnvironmentVariable(key, value);
+        }
+    }
+}
+
+LoadDotEnv(Path.Combine(builder.Environment.ContentRootPath, ".env"));
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -206,6 +231,7 @@ builder.Services.AddHttpClient<IDiscordTeamRoleService, DiscordTeamRoleService>(
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IRiotService, RiotService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 
 // Required for services that need access to the current HttpContext (e.g. authorization checks inside services)
 builder.Services.AddHttpContextAccessor();
@@ -239,4 +265,5 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+await NKZAPI.Data.AdminSeed.SeedAsync(app.Services, app.Configuration);
 app.Run();

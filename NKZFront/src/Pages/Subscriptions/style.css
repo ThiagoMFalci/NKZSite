@@ -1,0 +1,250 @@
+.subscriptions-page {
+    background: #07070d;
+    color: #f5f5f5;
+    min-height: calc(100vh - 64px);
+    overflow: hidden;
+    position: relative;
+}
+
+.subscriptions-bg {
+    background-image:
+        linear-gradient(rgba(123, 47, 190, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 134, 190, 0.06) 1px, transparent 1px);
+    background-size: 64px 64px;
+    inset: 0;
+    opacity: 0.5;
+    pointer-events: none;
+    position: absolute;
+}
+
+.subscriptions-container {
+    margin: 0 auto;
+    max-width: 1240px;
+    padding: 4rem 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.subscriptions-hero,
+.subscriptions-benefits article,
+.plan-card,
+.subscriptions-feedback {
+    background: rgba(14, 14, 24, 0.94);
+    border: 1px solid rgba(123, 47, 190, 0.3);
+    border-radius: 6px;
+}
+
+.subscriptions-hero {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    padding: 1.4rem;
+    position: relative;
+}
+
+.subscriptions-hero::before,
+.plan-card.featured::before {
+    background: linear-gradient(90deg, rgba(47, 134, 190, 0.24), rgba(123, 47, 190, 0.16), rgba(249, 115, 22, 0.2));
+    content: "";
+    inset: 0;
+    opacity: 0.56;
+    pointer-events: none;
+    position: absolute;
+}
+
+.subscriptions-hero > *,
+.plan-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.subscriptions-eyebrow {
+    color: #f97316;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+}
+
+.subscriptions-hero h1,
+.plan-card h2 {
+    font-family: "Rajdhani", sans-serif;
+    letter-spacing: 0.06em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.subscriptions-hero h1 {
+    font-size: clamp(2.1rem, 4vw, 3.3rem);
+}
+
+.subscriptions-hero span,
+.plan-card p,
+.subscriptions-benefits span,
+.subscription-status small {
+    color: rgba(245,245,245,0.6);
+}
+
+.subscription-status {
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    display: grid;
+    gap: 0.15rem 0.8rem;
+    grid-template-columns: 44px auto;
+    min-width: 270px;
+    padding: 0.9rem 1rem;
+}
+
+.subscription-status svg {
+    color: #f97316;
+    grid-row: span 3;
+    height: 38px;
+    width: 38px;
+}
+
+.subscription-status.active {
+    border-color: rgba(33, 198, 107, 0.38);
+}
+
+.subscription-status strong {
+    color: white;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+}
+
+.subscriptions-benefits {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 1rem;
+}
+
+.subscriptions-benefits article {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem;
+}
+
+.subscriptions-benefits svg {
+    color: #9bd2f6;
+    font-size: 1.25rem;
+}
+
+.plans-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.plan-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 430px;
+    overflow: hidden;
+    padding: 1.2rem;
+    position: relative;
+}
+
+.plan-card.featured {
+    border-color: rgba(249, 115, 22, 0.52);
+}
+
+.plan-ribbon {
+    align-self: flex-start;
+    background: rgba(249, 115, 22, 0.16);
+    border: 1px solid rgba(249, 115, 22, 0.35);
+    border-radius: 4px;
+    color: #f97316;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    padding: 0.35rem 0.5rem;
+    text-transform: uppercase;
+}
+
+.plan-topline {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.plan-topline span {
+    color: #9bd2f6;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.plan-price {
+    color: #f97316;
+    font-family: "Rajdhani", sans-serif;
+    font-size: 2.3rem;
+}
+
+.plan-benefits {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: auto;
+}
+
+.plan-benefits span {
+    align-items: center;
+    color: rgba(245,245,245,0.75);
+    display: flex;
+    gap: 0.45rem;
+}
+
+.plan-benefits svg {
+    color: #21c66b;
+}
+
+.plan-card button {
+    background: linear-gradient(135deg, #7b2fbe, #a53df0);
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    padding: 0.95rem;
+    text-transform: uppercase;
+}
+
+.plan-card button:disabled {
+    cursor: not-allowed;
+    filter: grayscale(0.55);
+    opacity: 0.62;
+}
+
+.plans-empty,
+.subscriptions-feedback {
+    color: rgba(245,245,245,0.72);
+    grid-column: 1 / -1;
+    padding: 1rem;
+}
+
+.subscriptions-feedback {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 980px) {
+    .subscriptions-hero,
+    .subscriptions-benefits,
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .subscriptions-hero {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
