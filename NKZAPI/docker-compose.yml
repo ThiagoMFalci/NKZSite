@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nkzdb}
+      POSTGRES_USER: ${POSTGRES_USER:-nkzdb_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-troque-esta-senha}
+    volumes:
+      - nkzapi_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nkzdb_user} -d ${POSTGRES_DB:-nkzdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      PORT: 8080
+      ConnectionStrings__ConnectionString: Host=postgres;Port=5432;Database=${POSTGRES_DB:-nkzdb};Username=${POSTGRES_USER:-nkzdb_user};Password=${POSTGRES_PASSWORD:-troque-esta-senha}
+      AppSettings__Token: ${AppSettings__Token:-troque-por-uma-chave-muito-grande-com-mais-de-64-caracteres}
+      Riot__ApiKey: ${Riot__ApiKey:-SUA_CHAVE_DA_RIOT}
+    ports:
+      - "127.0.0.1:8081:8080"
+
+volumes:
+  nkzapi_postgres_data:
