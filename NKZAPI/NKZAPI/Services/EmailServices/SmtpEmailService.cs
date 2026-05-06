@@ -1,5 +1,6 @@
-using System.Net;
-using System.Net.Mail;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace NKZAPI.Services.EmailServices
 {
@@ -18,16 +19,14 @@ namespace NKZAPI.Services.EmailServices
 
         public async Task SendAsync(string to, string subject, string body)
         {
-            var host = _configuration["Email:Smtp:Host"];
-            var username = _configuration["Email:Smtp:Username"];
-            var password = _configuration["Email:Smtp:Password"];
-            var from = _configuration["Email:Smtp:From"] ?? username;
-            var fromName = _configuration["Email:Smtp:FromName"] ?? "NKZ Academy";
-            var port = int.TryParse(_configuration["Email:Smtp:Port"], out var configuredPort) ? configuredPort : 587;
-            var enableSsl = !bool.TryParse(_configuration["Email:Smtp:EnableSsl"], out var configuredSsl) || configuredSsl;
-            var timeoutSeconds = int.TryParse(_configuration["Email:Smtp:TimeoutSeconds"], out var configuredTimeout)
-                ? Math.Clamp(configuredTimeout, 5, 60)
-                : 15;
+            var host = GetConfig("Email:Smtp:Host", "Smtp:Host", "SmtpHost");
+            var username = GetConfig("Email:Smtp:Username", "Email:Smtp:User", "Smtp:User", "SmtpUser");
+            var password = GetConfig("Email:Smtp:Password", "Smtp:Password", "SmtpPassword");
+            var from = GetConfig("Email:Smtp:From", "Smtp:From", "SmtpFrom") ?? username;
+            var fromName = GetConfig("Email:Smtp:FromName", "Email:Smtp:DisplayName", "Smtp:DisplayName", "SmtpDisplayName") ?? "NKZ Academy";
+            var port = GetIntConfig(587, "Email:Smtp:Port", "Smtp:Port", "SmtpPort");
+            var enableSsl = GetBoolConfig(true, "Email:Smtp:EnableSsl", "Smtp:EnableSsl", "SmtpEnableSsl");
+            var timeoutSeconds = Math.Clamp(GetIntConfig(20, "Email:Smtp:TimeoutSeconds", "Smtp:TimeoutSeconds", "SmtpTimeoutSeconds"), 5, 120);
 
             if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(from))
             {
@@ -40,23 +39,66 @@ namespace NKZAPI.Services.EmailServices
                 throw new InvalidOperationException("Servico de email nao configurado.");
             }
 
-            using var client = new SmtpClient(host, port)
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(fromName, from));
+            message.To.Add(MailboxAddress.Parse(to));
+            message.Subject = subject;
+            message.Body = new BodyBuilder
             {
-                EnableSsl = enableSsl,
-                Credentials = new NetworkCredential(username, password),
-                Timeout = timeoutSeconds * 1000,
+                TextBody = body
+            }.ToMessageBody();
+
+            using var client = new SmtpClient
+            {
+                Timeout = timeoutSeconds * 1000
             };
 
-            using var message = new MailMessage
-            {
-                From = new MailAddress(from, fromName),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = false,
-            };
-            message.To.Add(to);
+            var socketOptions = GetSecureSocketOptions(port, enableSsl);
 
-            await client.SendMailAsync(message).WaitAsync(TimeSpan.FromSeconds(timeoutSeconds));
+            try
+            {
+                using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
+                await client.ConnectAsync(host, port, socketOptions, timeout.Token);
+                await client.AuthenticateAsync(username, password, timeout.Token);
+                await client.SendAsync(message, timeout.Token);
+                await client.DisconnectAsync(true, timeout.Token);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Falha ao enviar email SMTP para {Email}. Host: {Host}; Port: {Port}; Ssl: {EnableSsl}.", to, host, port, enableSsl);
+                throw new InvalidOperationException("Nao foi possivel enviar email via SMTP. Verifique host, porta, usuario, senha, remetente e SSL.");
+            }
+        }
+
+        private string? GetConfig(params string[] keys)
+        {
+            foreach (var key in keys)
+            {
+                var value = _configuration[key];
+                if (!string.IsNullOrWhiteSpace(value)) return value;
+            }
+
+            return null;
+        }
+
+        private int GetIntConfig(int defaultValue, params string[] keys)
+        {
+            return int.TryParse(GetConfig(keys), out var value) ? value : defaultValue;
+        }
+
+        private bool GetBoolConfig(bool defaultValue, params string[] keys)
+        {
+            return bool.TryParse(GetConfig(keys), out var value) ? value : defaultValue;
+        }
+
+        private static SecureSocketOptions GetSecureSocketOptions(int port, bool enableSsl)
+        {
+            if (!enableSsl)
+            {
+                return SecureSocketOptions.None;
+            }
+
+            return port == 465 ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.StartTls;
         }
     }
 }

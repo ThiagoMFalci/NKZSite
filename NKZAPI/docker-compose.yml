@@ -40,6 +40,14 @@ services:
       Email__Smtp__FromName: ${Email__Smtp__FromName:-NKZ Academy}
       Email__Smtp__EnableSsl: ${Email__Smtp__EnableSsl:-true}
       Email__Smtp__TimeoutSeconds: ${Email__Smtp__TimeoutSeconds:-15}
+      SmtpHost: ${SmtpHost:-}
+      SmtpPort: ${SmtpPort:-}
+      SmtpUser: ${SmtpUser:-}
+      SmtpPassword: ${SmtpPassword:-}
+      SmtpFrom: ${SmtpFrom:-}
+      SmtpDisplayName: ${SmtpDisplayName:-}
+      SmtpEnableSsl: ${SmtpEnableSsl:-}
+      SmtpTimeoutSeconds: ${SmtpTimeoutSeconds:-}
       DiscordBot__BaseUrl: ${DiscordBot__BaseUrl:-}
       DiscordBot__Secret: ${DiscordBot__Secret:-}
       DiscordBot__TimeoutSeconds: ${DiscordBot__TimeoutSeconds:-10}

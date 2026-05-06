@@ -6,6 +6,7 @@ import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL || "";
+const REQUIRE_DISCORD_VERIFICATION = import.meta.env.VITE_REQUIRE_DISCORD_VERIFICATION === "true";
 
 function getApiMessage(error) {
     return (
@@ -33,7 +34,7 @@ export default function Register() {
         event.preventDefault();
         setFeedback({ type: "", message: "" });
 
-        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.discordUsername) {
+        if (!formData.email || !formData.password || !formData.confirmPassword || (REQUIRE_DISCORD_VERIFICATION && !formData.discordUsername)) {
             setFeedback({ type: "error", message: "Preencha todos os campos." });
             return;
         }
@@ -91,8 +92,14 @@ export default function Register() {
                 code: formData.emailCode,
             });
             setAwaitingEmail(false);
-            setAwaitingDiscord(true);
-            setFeedback({ type: "success", message: "Email confirmado. Agora confirme o codigo do Discord." });
+            if (REQUIRE_DISCORD_VERIFICATION) {
+                setAwaitingDiscord(true);
+                setFeedback({ type: "success", message: "Email confirmado. Agora confirme o codigo do Discord." });
+                return;
+            }
+
+            setFeedback({ type: "success", message: "Email confirmado. Entre com email e senha para acessar." });
+            setTimeout(() => navigate("/login"), 900);
         } catch (error) {
             setFeedback({ type: "error", message: getApiMessage(error) });
         } finally {
@@ -248,29 +255,31 @@ export default function Register() {
                                 />
                             </label>
 
-                            <label>
-                                Usuario do Discord
-                                <input
-                                    type="text"
-                                    name="discordUsername"
-                                    value={formData.discordUsername}
-                                    onChange={handleChange}
-                                    autoComplete="username"
-                                    placeholder="Ex: shorainopureiya"
-                                />
-                                <span className="auth-hint">
-                                    Use o nome de usuario, sem @. Voce precisa estar no{" "}
-                                    <a
-                                        className="auth-inline-link"
-                                        href={DISCORD_INVITE_URL || undefined}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        servidor NKZ
-                                    </a>{" "}
-                                    para receber o codigo.
-                                </span>
-                            </label>
+                            {REQUIRE_DISCORD_VERIFICATION && (
+                                <label>
+                                    Usuario do Discord
+                                    <input
+                                        type="text"
+                                        name="discordUsername"
+                                        value={formData.discordUsername}
+                                        onChange={handleChange}
+                                        autoComplete="username"
+                                        placeholder="Ex: shorainopureiya"
+                                    />
+                                    <span className="auth-hint">
+                                        Use o nome de usuario, sem @. Voce precisa estar no{" "}
+                                        <a
+                                            className="auth-inline-link"
+                                            href={DISCORD_INVITE_URL || undefined}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            servidor NKZ
+                                        </a>{" "}
+                                        para receber o codigo.
+                                    </span>
+                                </label>
+                            )}
                         </>
                     )}
 
