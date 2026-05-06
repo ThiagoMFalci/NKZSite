@@ -18,14 +18,16 @@ namespace NKZAPI.Services.AuthServices
         private readonly IDiscordVerificationService _discordVerificationService;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(NKZAPIContext context, IPasswordInterface passInterface, IDiscordVerificationService discordVerificationService, IEmailService emailService, IConfiguration configuration)
+        public AuthService(NKZAPIContext context, IPasswordInterface passInterface, IDiscordVerificationService discordVerificationService, IEmailService emailService, IConfiguration configuration, ILogger<AuthService> logger)
         {
             _context = context;
             _passInterface = passInterface;
             _discordVerificationService = discordVerificationService;
             _emailService = emailService;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<Response<UserDto>> UserAddAsync(UserDto User)
@@ -33,6 +35,15 @@ namespace NKZAPI.Services.AuthServices
             var response = new Response<UserDto>();
             try
             {
+                var normalizedEmail = NormalizeEmail(User.Email);
+                if (string.IsNullOrWhiteSpace(normalizedEmail))
+                {
+                    response.Data = null;
+                    response.Message = "Email invalido.";
+                    response.Success = false;
+                    return response;
+                }
+
                 if (!VerifyIfUserExists(User))
                 {
                     response.Data = null;
@@ -59,7 +70,7 @@ namespace NKZAPI.Services.AuthServices
 
                 if (requireDiscordVerification)
                 {
-                    delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, User.Email, discordCode);
+                    delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, normalizedEmail, discordCode);
                     if (string.IsNullOrWhiteSpace(delivery.DiscordUserId))
                     {
                         response.Data = null;
@@ -80,7 +91,7 @@ namespace NKZAPI.Services.AuthServices
 
                 var user = new User
                 {
-                    Email = User.Email,
+                    Email = normalizedEmail,
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt,
                     Player = new List<Player>(),
@@ -134,7 +145,8 @@ namespace NKZAPI.Services.AuthServices
 
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userLogin.Email);
+                var normalizedEmail = NormalizeEmail(userLogin.Email);
+                var user = await FindUserByEmailAsync(normalizedEmail);
                 if (user == null)
                 {
                     response.Data = null;
@@ -205,7 +217,7 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> VerifyTwoFactorAsync(TwoFactorVerifyDto verification)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.Email);
+            var user = await FindUserByEmailAsync(NormalizeEmail(verification.Email));
             if (user == null)
             {
                 response.Success = false;
@@ -241,7 +253,7 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> VerifyEmailAsync(EmailVerificationDto verification)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.Email);
+            var user = await FindUserByEmailAsync(NormalizeEmail(verification.Email));
             if (user == null)
             {
                 response.Success = false;
@@ -284,7 +296,7 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> ResendEmailVerificationAsync(string email)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await FindUserByEmailAsync(NormalizeEmail(email));
             if (user == null)
             {
                 response.Success = false;
@@ -313,9 +325,11 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> ForgotPasswordAsync(ForgotPasswordDto request)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var normalizedEmail = NormalizeEmail(request.Email);
+            var user = await FindUserByEmailAsync(normalizedEmail);
             if (user == null)
             {
+                _logger.LogInformation("Password reset requested for non-existing email {Email}.", normalizedEmail);
                 response.Message = "Se o email existir, enviaremos um codigo de recuperacao.";
                 return response;
             }
@@ -325,6 +339,7 @@ namespace NKZAPI.Services.AuthServices
             user.PasswordResetCodeExpiresAt = DateTime.UtcNow.AddMinutes(20);
             await _context.SaveChangesAsync();
             await SendEmailCodeAsync(user.Email, code, "Recuperacao de senha NKZ", "Use este codigo para redefinir sua senha:");
+            _logger.LogInformation("Password reset code sent to {Email}.", user.Email);
 
             response.Message = "Se o email existir, enviaremos um codigo de recuperacao.";
             return response;
@@ -333,7 +348,7 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> ResetPasswordAsync(ResetPasswordDto request)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            var user = await FindUserByEmailAsync(NormalizeEmail(request.Email));
             if (user == null)
             {
                 response.Success = false;
@@ -372,7 +387,7 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> VerifyDiscordAsync(DiscordVerificationDto verification)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.Email);
+            var user = await FindUserByEmailAsync(NormalizeEmail(verification.Email));
             if (user == null)
             {
                 response.Success = false;
@@ -415,7 +430,7 @@ namespace NKZAPI.Services.AuthServices
         public async Task<Response<string>> ResendDiscordVerificationAsync(string email)
         {
             var response = new Response<string>();
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await FindUserByEmailAsync(NormalizeEmail(email));
             if (user == null)
             {
                 response.Success = false;
@@ -450,8 +465,19 @@ namespace NKZAPI.Services.AuthServices
 
         public bool VerifyIfUserExists(UserDto User)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == User.Email);
+            var normalizedEmail = NormalizeEmail(User.Email);
+            var user = _context.Users.FirstOrDefault(u => u.Email.ToLower() == normalizedEmail);
             return user == null;
+        }
+
+        private Task<User?> FindUserByEmailAsync(string email)
+        {
+            return _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+        }
+
+        private static string NormalizeEmail(string? email)
+        {
+            return (email ?? "").Trim().ToLowerInvariant();
         }
 
         private static string NormalizeDiscordIdentity(string? username, string? userId)
