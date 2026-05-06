@@ -9,7 +9,6 @@ import "./style.css";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 const navLinks = [
-    { label: "Home", href: "/"},
     { label: "Dashboard", href: "/dashboard"},
     { label: "Times", href: "/teams" },
     { label: "Jogadores", href: "/players" },
