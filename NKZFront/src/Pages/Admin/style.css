@@ -2,7 +2,14 @@
     background: #07070d;
     color: #f5f5f5;
     min-height: calc(100vh - 64px);
+    overflow-x: hidden;
     position: relative;
+}
+
+.admin-page *,
+.admin-page *::before,
+.admin-page *::after {
+    box-sizing: border-box;
 }
 
 .admin-bg {
@@ -19,7 +26,7 @@
 .admin-container {
     margin: 0 auto;
     max-width: 1360px;
-    padding: 3rem 1.5rem;
+    padding: clamp(1rem, 3vw, 3rem) clamp(0.9rem, 2vw, 1.5rem);
     position: relative;
     z-index: 1;
 }
@@ -75,6 +82,7 @@
     letter-spacing: 0.06em;
     margin: 0;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
 }
 
 .admin-hero h1 {
@@ -84,6 +92,7 @@
 .admin-hero span,
 .admin-panel p {
     color: rgba(245,245,245,0.6);
+    line-height: 1.6;
 }
 
 .admin-hero button,
@@ -96,15 +105,22 @@
     cursor: pointer;
     font-weight: 900;
     letter-spacing: 0.08em;
+    line-height: 1.1;
+    min-height: 44px;
     padding: 0.85rem 1rem;
+    text-align: center;
     text-transform: uppercase;
+    white-space: normal;
 }
 
 .admin-tabs {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    scrollbar-width: thin;
 }
 
 .admin-tabs button {
@@ -113,9 +129,11 @@
     border-radius: 5px;
     color: rgba(245,245,245,0.7);
     cursor: pointer;
+    flex: 0 0 auto;
     font-weight: 900;
     padding: 0.75rem 1rem;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .admin-tabs button.active {
@@ -127,7 +145,7 @@
 .admin-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .admin-metric {
@@ -153,17 +171,20 @@
 
 .admin-metric strong {
     font-family: "Rajdhani", sans-serif;
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    overflow-wrap: anywhere;
 }
 
 .admin-split {
     display: grid;
     gap: 1rem;
-    grid-template-columns: 440px minmax(0, 1fr);
+    grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr);
+    align-items: start;
 }
 
 .admin-panel {
-    padding: 1.2rem;
+    min-width: 0;
+    padding: clamp(1rem, 2vw, 1.35rem);
 }
 
 .admin-form {
@@ -188,7 +209,10 @@
     border-radius: 5px;
     color: white;
     font: inherit;
+    min-width: 0;
+    outline: none;
     padding: 0.8rem;
+    width: 100%;
 }
 
 .admin-form textarea {
@@ -199,11 +223,13 @@
 .admin-form-row {
     display: grid;
     gap: 0.7rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    min-width: 0;
 }
 
 .admin-checks {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 
@@ -232,15 +258,17 @@
     border-radius: 5px;
     display: grid;
     gap: 0.8rem;
+    min-width: 0;
     padding: 0.8rem;
 }
 
 .admin-list article {
-    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-columns: minmax(180px, 1fr) minmax(72px, auto) repeat(2, minmax(104px, auto));
 }
 
 .admin-list strong {
     display: block;
+    overflow-wrap: anywhere;
 }
 
 .admin-list em {
@@ -255,14 +283,19 @@
 }
 
 .admin-table article {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: stretch;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .admin-table span {
+    background: rgba(255,255,255,0.025);
+    border-radius: 4px;
     display: grid;
     gap: 0.25rem;
     min-width: 0;
     overflow-wrap: anywhere;
+    padding: 0.55rem;
+    word-break: break-word;
 }
 
 .admin-feedback,
@@ -274,7 +307,6 @@
 @media (max-width: 980px) {
     .admin-hero,
     .admin-split,
-    .admin-grid,
     .admin-table article {
         grid-template-columns: 1fr;
     }
@@ -282,5 +314,57 @@
     .admin-hero {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .admin-list article {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-list button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-container {
+        padding-inline: 0.75rem;
+    }
+
+    .admin-hero {
+        padding: 1rem;
+    }
+
+    .admin-tabs {
+        margin-inline: -0.75rem;
+        padding-inline: 0.75rem;
+    }
+
+    .admin-tabs button {
+        padding: 0.72rem 0.85rem;
+    }
+
+    .admin-panel h2 {
+        font-size: clamp(1.65rem, 9vw, 2.35rem);
+    }
+
+    .admin-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-checks {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+
+    .admin-checks label {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 5px;
+        padding: 0.7rem;
+    }
+
+    .admin-table article {
+        gap: 0.55rem;
     }
 }
