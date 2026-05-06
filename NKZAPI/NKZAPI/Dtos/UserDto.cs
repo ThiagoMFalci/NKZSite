@@ -6,15 +6,25 @@ namespace NKZAPI.Dtos
     public class UserDto
     {
         [Required(ErrorMessage = "O Campo Email é obrigatorio"), EmailAddress(ErrorMessage = "Email invalido!")]
-        public string Email { get; set; }
-        [Required(ErrorMessage = "O Campo Senha é obrigatorio")]
-        public string PasswordHash { get; set; }
-        [Required(ErrorMessage = "O Campo Senha é obrigatorio")]
-        public string PasswordSalt { get; set; }
-        [Required(ErrorMessage = "O Player é obrigatorio")]
+        [StringLength(254)]
+        public string Email { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "O Campo Senha é obrigatorio")]
+        [StringLength(128, MinimumLength = 6)]
+        public string PasswordHash { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "O Campo Senha é obrigatorio")]
+        [Compare(nameof(PasswordHash), ErrorMessage = "As senhas nao conferem.")]
+        public string PasswordSalt { get; set; } = string.Empty;
+
+        [RegularExpression("^(User|Admin)$")]
         public string Role { get; set; } = "User";
+
+        [StringLength(32)]
         public string DiscordUserId { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(32, MinimumLength = 2)]
         public string DiscordUsername { get; set; } = string.Empty;
 
 

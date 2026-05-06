@@ -187,6 +187,21 @@ namespace NKZAPI.Services.TeamServices
 
             var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
 
+            if (invitation.Type != "Invite" && invitation.Type != "Request")
+            {
+                response.Success = false;
+                response.Message = "Invitation type must be Invite or Request.";
+                return response;
+            }
+
+            var invitedPlayer = await _teamRepository.GetPlayerByIdAsync(invitation.PlayerId);
+            if (invitedPlayer == null)
+            {
+                response.Success = false;
+                response.Message = "Player not found.";
+                return response;
+            }
+
             // If Type == "Invite" then only team owner or admin can create
             if (invitation.Type == "Invite")
             {
@@ -209,7 +224,7 @@ namespace NKZAPI.Services.TeamServices
             // If Type == "Request" then only player themselves can create
             if (invitation.Type == "Request")
             {
-                if (invitation.SenderId != callerId && !isAdmin)
+                if (invitedPlayer.UserId != callerId && !isAdmin)
                 {
                     response.Success = false;
                     response.Message = "Forbidden";
@@ -244,7 +259,10 @@ namespace NKZAPI.Services.TeamServices
             }
 
             invitation.Id = Guid.NewGuid();
+            invitation.SenderId = callerId;
+            invitation.Status = "Pending";
             invitation.CreatedAt = DateTime.UtcNow;
+            invitation.ExpiresAt = DateTime.UtcNow.AddDays(7);
 
             var created = await _teamRepository.AddInvitationAsync(invitation);
 
@@ -321,6 +339,15 @@ namespace NKZAPI.Services.TeamServices
                 return response;
             }
 
+            if (invitation.ExpiresAt.HasValue && invitation.ExpiresAt.Value < DateTime.UtcNow)
+            {
+                invitation.Status = "Expired";
+                await _teamRepository.UpdateInvitationAsync(invitation);
+                response.Success = false;
+                response.Message = "Invitation expired.";
+                return response;
+            }
+
             if (accept)
             {
                 // check player exists and not in other team
@@ -363,6 +390,20 @@ namespace NKZAPI.Services.TeamServices
 
         public async Task<List<Invitation>> GetInvitationsForPlayerAsync(Guid playerId)
         {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var callerIdClaim = user?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? user?.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+            {
+                return new List<Invitation>();
+            }
+
+            var isAdmin = user?.IsInRole("Admin") == true || user?.Claims.Any(c => c.Type == "role" && c.Value == "Admin") == true;
+            var player = await _teamRepository.GetPlayerByIdAsync(playerId);
+            if (player?.UserId != callerId && !isAdmin)
+            {
+                return new List<Invitation>();
+            }
+
             return await _teamRepository.GetInvitationsForPlayerAsync(playerId);
         }
 

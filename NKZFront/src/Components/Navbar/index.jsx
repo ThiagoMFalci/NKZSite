@@ -16,6 +16,7 @@ const navLinks = [
     { label: "Campeonatos", href: "/tournaments" },
     { label: "Ligas", href: "/leagues" },
     { label: "Ranking", href: "/ranking" },
+    { label: "Assinaturas", href: "/subscriptions" },
 ];
 
 function unwrapApiData(responseData) {
@@ -159,6 +160,11 @@ export default function Index() {
     function renderUserMenu(mobile = false) {
         return (
             <div className={mobile ? "mobile-user-menu" : "user-menu"}>
+                <button className="wallet-chip" type="button" onClick={() => navigateAndClose("/wallet")} aria-label="Adicionar saldo">
+                    <FaWallet />
+                    <span>{Number(walletBalance || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
+                    <FaPlus />
+                </button>
                 <button
                     className="user-menu-button"
                     onClick={() => setUserMenuOpen((open) => !open)}
@@ -185,11 +191,6 @@ export default function Index() {
                     )}
                     <FaChevronDown className={`user-menu-arrow ${userMenuOpen ? "open" : ""}`} />
                 </button>
-                <button className="wallet-chip" type="button" onClick={() => navigateAndClose("/wallet")} aria-label="Adicionar saldo">
-                    <FaWallet />
-                    <span>{Number(walletBalance || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</span>
-                    <FaPlus />
-                </button>
 
                 <div className={`user-menu-dropdown ${userMenuOpen ? "open" : ""}`}>
                     <button onClick={() => navigateAndClose("/notifications")}>
@@ -202,6 +203,11 @@ export default function Index() {
                     <button onClick={() => navigateAndClose("/dashboard")}>
                         <FaUserShield /> Dashboard
                     </button>
+                    {currentUser?.role === "Admin" && (
+                        <button onClick={() => navigateAndClose("/admin")}>
+                            <FaUserShield /> Admin
+                        </button>
+                    )}
                     <button onClick={handleLogout}>Deslogar</button>
                 </div>
             </div>

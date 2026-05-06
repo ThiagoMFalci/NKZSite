@@ -31,11 +31,33 @@ namespace NKZAPI.Data
         public DbSet<LeagueStanding> LeagueStandings { get; set; }
         public DbSet<WalletPayment> WalletPayments { get; set; }
         public DbSet<WalletTransaction> WalletTransactions { get; set; }
+        public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+        public DbSet<UserSubscription> UserSubscriptions { get; set; }
         public DbSet<Tournament> Tournaments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<SubscriptionPlan>()
+                .Property(item => item.Price)
+                .HasPrecision(12, 2);
+
+            modelBuilder.Entity<UserSubscription>()
+                .Property(item => item.Amount)
+                .HasPrecision(12, 2);
+
+            modelBuilder.Entity<UserSubscription>()
+                .HasOne(item => item.User)
+                .WithMany()
+                .HasForeignKey(item => item.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UserSubscription>()
+                .HasOne(item => item.SubscriptionPlan)
+                .WithMany()
+                .HasForeignKey(item => item.SubscriptionPlanId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
 

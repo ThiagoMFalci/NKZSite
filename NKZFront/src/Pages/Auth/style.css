@@ -221,6 +221,20 @@
     text-decoration: none;
 }
 
+.auth-switch-separator {
+    color: rgba(245,245,245,0.24);
+    margin: 0 0.35rem;
+}
+
+.email-verify-panel {
+    background: rgba(47, 134, 190, 0.1);
+    border-color: rgba(47, 134, 190, 0.28);
+}
+
+.email-verify-panel svg {
+    color: #8fcaf0;
+}
+
 .auth-switch a:hover {
     color: white;
 }

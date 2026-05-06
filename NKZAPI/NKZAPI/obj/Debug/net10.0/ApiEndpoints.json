@@ -43,6 +43,22 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "ForgotPassword",
+    "RelativePath": "api/auth/User/ForgotPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "NKZAPI.Dtos.ForgotPasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
     "Method": "ListUsersAsync",
     "RelativePath": "api/auth/User/ListUsers",
     "HttpMethod": "GET",
@@ -105,6 +121,38 @@
   },
   {
     "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "ResendEmailVerificationAsync",
+    "RelativePath": "api/auth/User/ResendEmailVerification",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "ResetPassword",
+    "RelativePath": "api/auth/User/ResetPassword",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "NKZAPI.Dtos.ResetPasswordDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
     "Method": "UpdateUsers",
     "RelativePath": "api/auth/User/UpdateUsers",
     "HttpMethod": "PUT",
@@ -148,6 +196,84 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "VerifyEmailAsync",
+    "RelativePath": "api/auth/User/VerifyEmail",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verification",
+        "Type": "NKZAPI.Dtos.EmailVerificationDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "VerifyTwoFactor",
+    "RelativePath": "api/auth/User/VerifyTwoFactor",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verification",
+        "Type": "NKZAPI.Dtos.TwoFactorVerifyDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "GetWalletAsync",
+    "RelativePath": "api/auth/User/wallet",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "CreateWalletDepositAsync",
+    "RelativePath": "api/auth/User/wallet/deposit",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deposit",
+        "Type": "NKZAPI.Dtos.WalletDepositDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "WalletMercadoPagoWebhookAsync",
+    "RelativePath": "api/auth/User/wallet/mercadopago/webhook",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.UserController",
+    "Method": "WalletMercadoPagoWebhookGetAsync",
+    "RelativePath": "api/auth/User/wallet/mercadopago/webhook",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -545,6 +671,42 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "ConfirmLeaguePaymentAsync",
+    "RelativePath": "api/league/payments/{paymentId}/confirm",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "paymentId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "MercadoPagoWebhookAsync",
+    "RelativePath": "api/league/payments/mercadopago/webhook",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "NKZAPI.Controllers.LeagueController",
+    "Method": "MercadoPagoWebhookGetAsync",
+    "RelativePath": "api/league/payments/mercadopago/webhook",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

@@ -10,8 +10,11 @@ import LeaguePage from './Pages/LeaguePage'
 import TournamentsPage from './Pages/Tournaments'
 import NotificationsPage from './Pages/Notifications'
 import WalletPage from './Pages/Wallet'
+import SubscriptionsPage from './Pages/Subscriptions'
+import AdminPage from './Pages/Admin'
 import Login from './Pages/Auth/Login'
 import Register from './Pages/Auth/Register'
+import ForgotPassword from './Pages/Auth/ForgotPassword'
 import NotFound from './Pages/NotFound'
 import Navbar from './Components/Navbar'
 import Footer from './Components/Footer'
@@ -45,8 +48,11 @@ function App() {
                     <Route path="/tournaments" element={<ProtectedRoute><TournamentsPage/></ProtectedRoute>}/>
                     <Route path="/notifications" element={<ProtectedRoute><NotificationsPage/></ProtectedRoute>}/>
                     <Route path="/wallet" element={<ProtectedRoute><WalletPage/></ProtectedRoute>}/>
+                    <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage/></ProtectedRoute>}/>
+                    <Route path="/admin" element={<ProtectedRoute><AdminPage/></ProtectedRoute>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/register" element={<Register/>}/>
+                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="*" element={<ProtectedRoute><NotFound/></ProtectedRoute>}/>
                 </Routes>
 

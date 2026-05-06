@@ -3,6 +3,7 @@ using NKZAPI.Data;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.DiscordServices;
+using NKZAPI.Services.EmailServices;
 using NKZAPI.Services.PassService;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,12 +16,14 @@ namespace NKZAPI.Services.AuthServices
         private readonly NKZAPIContext _context;
         private readonly IPasswordInterface _passInterface;
         private readonly IDiscordVerificationService _discordVerificationService;
+        private readonly IEmailService _emailService;
 
-        public AuthService(NKZAPIContext context, IPasswordInterface passInterface, IDiscordVerificationService discordVerificationService)
+        public AuthService(NKZAPIContext context, IPasswordInterface passInterface, IDiscordVerificationService discordVerificationService, IEmailService emailService)
         {
             _context = context;
             _passInterface = passInterface;
             _discordVerificationService = discordVerificationService;
+            _emailService = emailService;
         }
 
         public async Task<Response<UserDto>> UserAddAsync(UserDto User)
@@ -46,8 +49,9 @@ namespace NKZAPI.Services.AuthServices
                 }
 
                 _passInterface.CreatePassHash(User.PasswordHash, out byte[] passwordHash, out byte[] passwordSalt);
-                var code = GenerateCode();
-                var delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, User.Email, code);
+                var discordCode = GenerateCode();
+                var emailCode = GenerateCode();
+                var delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, User.Email, discordCode);
                 if (string.IsNullOrWhiteSpace(delivery.DiscordUserId))
                 {
                     response.Data = null;
@@ -75,10 +79,14 @@ namespace NKZAPI.Services.AuthServices
                     DiscordUserId = delivery.DiscordUserId,
                     DiscordUsername = string.IsNullOrWhiteSpace(delivery.DiscordUsername) ? discordIdentity : delivery.DiscordUsername,
                     DiscordVerified = false,
-                    DiscordVerificationCodeHash = HashCode(code),
+                    DiscordVerificationCodeHash = HashCode(discordCode),
                     DiscordVerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                    EmailVerified = false,
+                    EmailVerificationCodeHash = HashCode(emailCode),
+                    EmailVerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(20),
                 };
 
+                await SendEmailCodeAsync(user.Email, emailCode, "Confirme seu email NKZ", "Use este codigo para confirmar seu email na NKZ:");
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
@@ -91,7 +99,7 @@ namespace NKZAPI.Services.AuthServices
                     DiscordUserId = user.DiscordUserId,
                     DiscordUsername = user.DiscordUsername ?? "",
                 };
-                response.Message = "Conta criada. Enviamos um codigo no privado do Discord para confirmacao.";
+                response.Message = "Conta criada. Enviamos codigos para seu email e para o privado do Discord.";
             }
             catch (Exception ex)
             {
@@ -103,9 +111,9 @@ namespace NKZAPI.Services.AuthServices
             return response;
         }
 
-        public async Task<Response<string>> Login(UserLoginDto userLogin)
+        public async Task<Response<object>> Login(UserLoginDto userLogin)
         {
-            var response = new Response<string>();
+            var response = new Response<object>();
 
             try
             {
@@ -126,6 +134,14 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
+                if (!user.EmailVerified)
+                {
+                    response.Data = null;
+                    response.Message = "Confirme seu email antes de entrar.";
+                    response.Success = false;
+                    return response;
+                }
+
                 if (!user.DiscordVerified && !string.IsNullOrWhiteSpace(user.DiscordUserId))
                 {
                     response.Data = null;
@@ -134,8 +150,21 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
-                response.Message = "Login successful";
-                response.Data = _passInterface.CreateToken(user);
+                var twoFactorCode = GenerateCode();
+                var twoFactorToken = GenerateSecureToken();
+                user.TwoFactorCodeHash = HashCode(twoFactorCode);
+                user.TwoFactorSessionHash = HashCode(twoFactorToken);
+                user.TwoFactorCodeExpiresAt = DateTime.UtcNow.AddMinutes(10);
+                await _context.SaveChangesAsync();
+                await SendEmailCodeAsync(user.Email, twoFactorCode, "Codigo de acesso NKZ", "Use este codigo para concluir seu login na NKZ:");
+
+                response.Message = "Codigo de verificacao enviado para o email.";
+                response.Data = new TwoFactorChallengeDto
+                {
+                    RequiresTwoFactor = true,
+                    TwoFactorToken = twoFactorToken,
+                    Email = user.Email,
+                };
                 response.Success = true;
             }
             catch (Exception ex)
@@ -145,6 +174,173 @@ namespace NKZAPI.Services.AuthServices
                 response.Success = false;
             }
 
+            return response;
+        }
+
+        public async Task<Response<string>> VerifyTwoFactorAsync(TwoFactorVerifyDto verification)
+        {
+            var response = new Response<string>();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.Email);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            if (user.TwoFactorCodeExpiresAt == null || user.TwoFactorCodeExpiresAt < DateTime.UtcNow)
+            {
+                response.Success = false;
+                response.Message = "Codigo expirado. Entre novamente.";
+                return response;
+            }
+
+            if (!FixedTimeEquals(user.TwoFactorCodeHash, HashCode(verification.Code)) ||
+                !FixedTimeEquals(user.TwoFactorSessionHash, HashCode(verification.TwoFactorToken)))
+            {
+                response.Success = false;
+                response.Message = "Codigo invalido.";
+                return response;
+            }
+
+            user.TwoFactorCodeHash = null;
+            user.TwoFactorSessionHash = null;
+            user.TwoFactorCodeExpiresAt = null;
+            await _context.SaveChangesAsync();
+
+            response.Message = "Login successful";
+            response.Data = _passInterface.CreateToken(user);
+            return response;
+        }
+
+        public async Task<Response<string>> VerifyEmailAsync(EmailVerificationDto verification)
+        {
+            var response = new Response<string>();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == verification.Email);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            if (user.EmailVerified)
+            {
+                response.Message = "Email already verified.";
+                response.Data = user.Id.ToString();
+                return response;
+            }
+
+            if (user.EmailVerificationCodeExpiresAt == null || user.EmailVerificationCodeExpiresAt < DateTime.UtcNow)
+            {
+                response.Success = false;
+                response.Message = "Codigo expirado. Solicite um novo codigo.";
+                return response;
+            }
+
+            if (!FixedTimeEquals(user.EmailVerificationCodeHash, HashCode(verification.Code)))
+            {
+                response.Success = false;
+                response.Message = "Codigo invalido.";
+                return response;
+            }
+
+            user.EmailVerified = true;
+            user.EmailVerifiedAt = DateTime.UtcNow;
+            user.EmailVerificationCodeHash = null;
+            user.EmailVerificationCodeExpiresAt = null;
+            await _context.SaveChangesAsync();
+
+            response.Message = "Email verificado.";
+            response.Data = user.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<string>> ResendEmailVerificationAsync(string email)
+        {
+            var response = new Response<string>();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            if (user.EmailVerified)
+            {
+                response.Message = "Email already verified.";
+                response.Data = user.Id.ToString();
+                return response;
+            }
+
+            var code = GenerateCode();
+            user.EmailVerificationCodeHash = HashCode(code);
+            user.EmailVerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(20);
+            await _context.SaveChangesAsync();
+            await SendEmailCodeAsync(user.Email, code, "Confirme seu email NKZ", "Use este codigo para confirmar seu email na NKZ:");
+
+            response.Message = "Novo codigo enviado para seu email.";
+            response.Data = user.Id.ToString();
+            return response;
+        }
+
+        public async Task<Response<string>> ForgotPasswordAsync(ForgotPasswordDto request)
+        {
+            var response = new Response<string>();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+            {
+                response.Message = "Se o email existir, enviaremos um codigo de recuperacao.";
+                return response;
+            }
+
+            var code = GenerateCode();
+            user.PasswordResetCodeHash = HashCode(code);
+            user.PasswordResetCodeExpiresAt = DateTime.UtcNow.AddMinutes(20);
+            await _context.SaveChangesAsync();
+            await SendEmailCodeAsync(user.Email, code, "Recuperacao de senha NKZ", "Use este codigo para redefinir sua senha:");
+
+            response.Message = "Se o email existir, enviaremos um codigo de recuperacao.";
+            return response;
+        }
+
+        public async Task<Response<string>> ResetPasswordAsync(ResetPasswordDto request)
+        {
+            var response = new Response<string>();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+            {
+                response.Success = false;
+                response.Message = "User not found";
+                return response;
+            }
+
+            if (user.PasswordResetCodeExpiresAt == null || user.PasswordResetCodeExpiresAt < DateTime.UtcNow)
+            {
+                response.Success = false;
+                response.Message = "Codigo expirado. Solicite um novo codigo.";
+                return response;
+            }
+
+            if (!FixedTimeEquals(user.PasswordResetCodeHash, HashCode(request.Code)))
+            {
+                response.Success = false;
+                response.Message = "Codigo invalido.";
+                return response;
+            }
+
+            _passInterface.CreatePassHash(request.NewPassword, out var passwordHash, out var passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetCodeHash = null;
+            user.PasswordResetCodeExpiresAt = null;
+            user.TwoFactorCodeHash = null;
+            user.TwoFactorSessionHash = null;
+            user.TwoFactorCodeExpiresAt = null;
+            await _context.SaveChangesAsync();
+
+            response.Message = "Senha atualizada.";
             return response;
         }
 
@@ -249,6 +445,24 @@ namespace NKZAPI.Services.AuthServices
         private static string GenerateCode()
         {
             return RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        }
+
+        private static string GenerateSecureToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        }
+
+        private async Task SendEmailCodeAsync(string email, string code, string subject, string intro)
+        {
+            var body = $"""
+            {intro}
+
+            {code}
+
+            O codigo expira em poucos minutos. Se voce nao pediu isso, ignore esta mensagem.
+            """;
+
+            await _emailService.SendAsync(email, subject, body);
         }
 
         private static string HashCode(string code)

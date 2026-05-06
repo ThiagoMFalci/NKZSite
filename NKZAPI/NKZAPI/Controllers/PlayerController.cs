@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
 using NKZAPI.Services.PlayerServices;
@@ -19,6 +20,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("RiotPolicy")]
         [HttpPut("{userId:guid}/sync/{summonerName}")]
         public async Task<ActionResult> SyncPlayerFromRiot(Guid userId, string summonerName, [FromQuery] string region = "br1")
         {
@@ -36,6 +38,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("RiotPolicy")]
         [HttpPost("{userId:guid}/refresh")]
         public async Task<ActionResult> RefreshPlayerFromRiot(Guid userId, [FromQuery] string region = "br1")
         {
@@ -53,6 +56,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{userId:guid}")]
         public async Task<ActionResult> AddPlayer(Guid userId, [FromBody] CreatePlayerDto player)
         {
@@ -84,19 +88,26 @@ namespace NKZAPI.Controllers
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
+        [Authorize]
         [HttpGet("{playerId:guid}")]
         public async Task<ActionResult> GetPlayerById(Guid playerId)
         {
             var response = await _playerInterface.GetPlayerByIdAsync(playerId);
             if (!response.Success) return BadRequest(response);
-            return Ok(response);
+            return Ok(new Response<PlayerPublicDto>
+            {
+                Success = true,
+                Message = response.Message,
+                Data = response.Data?.ToPublicDto()
+            });
         }
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> GetAllPlayers()
         {
             var response = await _playerInterface.GetAllPlayersAsync();
             if (!response.Success) return BadRequest(response);
-            return Ok(response.Data);
+            return Ok(response.Data?.Select(player => player.ToPublicDto()).ToList() ?? new List<PlayerPublicDto>());
         }
         [Authorize]
         [HttpDelete("{playerId:guid}")]
@@ -121,15 +132,30 @@ namespace NKZAPI.Controllers
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
+        [Authorize]
         [HttpGet("user/{userId:guid}")]
         public async Task<ActionResult> GetPlayerByUserId(Guid userId)
         {
+            var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
+            if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))
+                return Unauthorized(new { message = "Token invalido ou sem identificador de usuario." });
+
+            var isAdmin = User.IsInRole("Admin") || User.Claims.Any(c => c.Type == "role" && c.Value == "Admin");
+            if (callerId != userId && !isAdmin)
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Voce nao pode consultar dados privados de outro usuario." });
+
             var response = await _playerInterface.GetPlayerByUserIdAsync(userId);
             if (!response.Success) return BadRequest(response);
-            return Ok(response);
+            return Ok(new Response<PlayerPublicDto>
+            {
+                Success = true,
+                Message = response.Message,
+                Data = response.Data?.ToPublicDto()
+            });
         }
 
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPut("{userId:guid}/competitive-profile")]
         public async Task<ActionResult> UpdateCompetitiveProfile(Guid userId, [FromBody] PlayerCompetitiveProfileDto profile)
         {
@@ -141,6 +167,7 @@ namespace NKZAPI.Controllers
         }
 
         [Authorize]
+        [EnableRateLimiting("UploadPolicy")]
         [HttpPost("{userId}/profile-image")]
         public async Task<ActionResult> UploadProfileImage(Guid userId, IFormFile image)
         {

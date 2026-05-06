@@ -13,6 +13,15 @@
         public string? DiscordVerificationCodeHash { get; set; }
         public DateTime? DiscordVerificationCodeExpiresAt { get; set; }
         public DateTime? DiscordVerifiedAt { get; set; }
+        public bool EmailVerified { get; set; }
+        public string? EmailVerificationCodeHash { get; set; }
+        public DateTime? EmailVerificationCodeExpiresAt { get; set; }
+        public DateTime? EmailVerifiedAt { get; set; }
+        public string? TwoFactorCodeHash { get; set; }
+        public string? TwoFactorSessionHash { get; set; }
+        public DateTime? TwoFactorCodeExpiresAt { get; set; }
+        public string? PasswordResetCodeHash { get; set; }
+        public DateTime? PasswordResetCodeExpiresAt { get; set; }
         public decimal WalletBalance { get; set; }
     }
 }

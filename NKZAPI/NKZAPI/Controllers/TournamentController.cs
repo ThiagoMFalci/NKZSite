@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NKZAPI.Models;
 using NKZAPI.Services.TournamentServices;
 using NKZAPI.Services.TeamServices;
@@ -22,6 +23,7 @@ namespace NKZAPI.Controllers
             _teamService = teamService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -30,6 +32,7 @@ namespace NKZAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -38,6 +41,7 @@ namespace NKZAPI.Controllers
             return Ok(result);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Tournament tournament)
         {
@@ -54,6 +58,7 @@ namespace NKZAPI.Controllers
             return CreatedAtAction(nameof(Get), new { id = Guid.Parse(result.Data) }, result);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] Tournament tournament)
         {
@@ -73,6 +78,7 @@ namespace NKZAPI.Controllers
             return Ok(result);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -91,6 +97,7 @@ namespace NKZAPI.Controllers
             return NoContent();
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpPost("{tournamentId}/teams/{teamId}")]
         public async Task<IActionResult> AddTeamToTournament(Guid tournamentId, Guid teamId)
         {
@@ -113,6 +120,7 @@ namespace NKZAPI.Controllers
             return Ok(result);
         }
         [Authorize]
+        [EnableRateLimiting("GeneralWritePolicy")]
         [HttpDelete("{tournamentId}/teams/{teamId}")]
         public async Task<IActionResult> RemoveTeamFromTournament(Guid tournamentId, Guid teamId)
         {

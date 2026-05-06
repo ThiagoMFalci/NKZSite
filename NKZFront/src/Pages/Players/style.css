@@ -230,11 +230,11 @@
 .player-discord-tag {
     align-items: center;
     color: #8fcaf0 !important;
-    display: inline-flex;
+    display: flex;
     font-size: 0.8rem;
     font-weight: 700;
     gap: 0.35rem;
-    margin-top: 0.25rem;
+    margin-top: 0.1rem;
 }
 
 .player-discord-tag svg,

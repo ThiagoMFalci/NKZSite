@@ -4,6 +4,7 @@ import RankingFilter from "./components/RankingFilter";
 import RankingTable from "./components/RankingTable";
 import { calculateRankPoints, calculateWinRate, getEloScore, matchesSelectedElos, normalizeEloLabel, sortByElo } from "../../utils/elo";
 import { getPlayerImageUrl } from "../../utils/images";
+import { getAuthHeaders } from "../../utils/auth";
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
@@ -141,9 +142,9 @@ export default function RankingPage() {
                 setLoading(true);
                 setError("");
                 const [playersResponse, teamsResponse, tournamentsResponse] = await Promise.all([
-                    axios.get(`${API_BASE_URL}/api/player`),
-                    axios.get(`${API_BASE_URL}/api/team/ListTeams`).catch(() => ({ data: [] })),
-                    axios.get(`${API_BASE_URL}/api/Tournament`).catch(() => ({ data: [] })),
+                    axios.get(`${API_BASE_URL}/api/player`, { headers: getAuthHeaders() }),
+                    axios.get(`${API_BASE_URL}/api/team/ListTeams`, { headers: getAuthHeaders() }).catch(() => ({ data: [] })),
+                    axios.get(`${API_BASE_URL}/api/Tournament`, { headers: getAuthHeaders() }).catch(() => ({ data: [] })),
                 ]);
                 const data = unwrapApiData(playersResponse.data);
 

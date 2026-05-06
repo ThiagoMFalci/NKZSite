@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using NKZAPI.Data;
 using NKZAPI.Dtos;
 using NKZAPI.Models;
+using System.Data;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -52,9 +53,9 @@ namespace NKZAPI.Services.WalletServices
 
         public async Task<Response<string>> CreateDepositAsync(Guid userId, WalletDepositDto deposit)
         {
-            if (deposit.Amount <= 0)
+            if (deposit.Amount < 5 || deposit.Amount > 5000)
             {
-                return new Response<string> { Success = false, Message = "Informe um valor maior que zero." };
+                return new Response<string> { Success = false, Message = "A recarga deve ficar entre R$ 5,00 e R$ 5.000,00." };
             }
 
             var accessToken = _configuration["MercadoPago:AccessToken"];
@@ -98,6 +99,9 @@ namespace NKZAPI.Services.WalletServices
             }
 
             var info = await GetMercadoPagoPaymentAsync(paymentId);
+
+            await using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
             var payment = Guid.TryParse(info.ExternalReference, out var internalId)
                 ? await _context.WalletPayments.FirstOrDefaultAsync(item => item.Id == internalId)
                 : await _context.WalletPayments.FirstOrDefaultAsync(item => item.ProviderPaymentId == info.PaymentId);
@@ -129,6 +133,7 @@ namespace NKZAPI.Services.WalletServices
             }
 
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
             return new Response<string> { Success = true, Message = $"Pagamento atualizado: {payment.Status}.", Data = payment.Id.ToString() };
         }
 
