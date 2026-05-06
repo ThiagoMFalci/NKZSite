@@ -28,6 +28,28 @@ services:
       ConnectionStrings__ConnectionString: Host=postgres;Port=5432;Database=${POSTGRES_DB:-nkzdb};Username=${POSTGRES_USER:-nkzdb_user};Password=${POSTGRES_PASSWORD:-troque-esta-senha}
       AppSettings__Token: ${AppSettings__Token:-troque-por-uma-chave-muito-grande-com-mais-de-64-caracteres}
       Riot__ApiKey: ${Riot__ApiKey:-SUA_CHAVE_DA_RIOT}
+      Cors__AllowedOrigins: ${Cors__AllowedOrigins:-http://localhost:5173}
+      Api__BaseUrl: ${Api__BaseUrl:-http://localhost:8081}
+      Frontend__BaseUrl: ${Frontend__BaseUrl:-http://localhost:5173}
+      MercadoPago__AccessToken: ${MercadoPago__AccessToken:-}
+      Email__Smtp__Host: ${Email__Smtp__Host:-}
+      Email__Smtp__Port: ${Email__Smtp__Port:-587}
+      Email__Smtp__Username: ${Email__Smtp__Username:-}
+      Email__Smtp__Password: ${Email__Smtp__Password:-}
+      Email__Smtp__From: ${Email__Smtp__From:-}
+      Email__Smtp__FromName: ${Email__Smtp__FromName:-NKZ Academy}
+      Email__Smtp__EnableSsl: ${Email__Smtp__EnableSsl:-true}
+      Email__Smtp__TimeoutSeconds: ${Email__Smtp__TimeoutSeconds:-15}
+      DiscordBot__BaseUrl: ${DiscordBot__BaseUrl:-}
+      DiscordBot__Secret: ${DiscordBot__Secret:-}
+      DiscordBot__TimeoutSeconds: ${DiscordBot__TimeoutSeconds:-10}
+      Auth__RequireEmailVerification: ${Auth__RequireEmailVerification:-true}
+      Auth__RequireDiscordVerification: ${Auth__RequireDiscordVerification:-true}
+      Auth__RequireTwoFactor: ${Auth__RequireTwoFactor:-true}
+      AdminSeed__Email: ${AdminSeed__Email:-}
+      AdminSeed__Password: ${AdminSeed__Password:-}
+      AdminSeed__DiscordUsername: ${AdminSeed__DiscordUsername:-admin}
+      AdminSeed__ResetPassword: ${AdminSeed__ResetPassword:-false}
     ports:
       - "127.0.0.1:8081:8080"
 

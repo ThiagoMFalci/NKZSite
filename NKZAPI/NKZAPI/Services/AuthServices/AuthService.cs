@@ -17,13 +17,15 @@ namespace NKZAPI.Services.AuthServices
         private readonly IPasswordInterface _passInterface;
         private readonly IDiscordVerificationService _discordVerificationService;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
-        public AuthService(NKZAPIContext context, IPasswordInterface passInterface, IDiscordVerificationService discordVerificationService, IEmailService emailService)
+        public AuthService(NKZAPIContext context, IPasswordInterface passInterface, IDiscordVerificationService discordVerificationService, IEmailService emailService, IConfiguration configuration)
         {
             _context = context;
             _passInterface = passInterface;
             _discordVerificationService = discordVerificationService;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         public async Task<Response<UserDto>> UserAddAsync(UserDto User)
@@ -39,8 +41,10 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
+                var requireDiscordVerification = GetFlag("Auth:RequireDiscordVerification", true);
+                var requireEmailVerification = GetFlag("Auth:RequireEmailVerification", true);
                 var discordIdentity = NormalizeDiscordIdentity(User.DiscordUsername, User.DiscordUserId);
-                if (string.IsNullOrWhiteSpace(discordIdentity))
+                if (requireDiscordVerification && string.IsNullOrWhiteSpace(discordIdentity))
                 {
                     response.Data = null;
                     response.Message = "Informe seu usuario do Discord para criar a conta.";
@@ -51,22 +55,27 @@ namespace NKZAPI.Services.AuthServices
                 _passInterface.CreatePassHash(User.PasswordHash, out byte[] passwordHash, out byte[] passwordSalt);
                 var discordCode = GenerateCode();
                 var emailCode = GenerateCode();
-                var delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, User.Email, discordCode);
-                if (string.IsNullOrWhiteSpace(delivery.DiscordUserId))
-                {
-                    response.Data = null;
-                    response.Message = "Nao foi possivel localizar este Discord no servidor NKZ.";
-                    response.Success = false;
-                    return response;
-                }
+                DiscordVerificationDeliveryDto? delivery = null;
 
-                var discordExists = await _context.Users.AnyAsync(u => u.DiscordUserId == delivery.DiscordUserId);
-                if (discordExists)
+                if (requireDiscordVerification)
                 {
-                    response.Data = null;
-                    response.Message = "Este Discord ja esta vinculado a outra conta.";
-                    response.Success = false;
-                    return response;
+                    delivery = await _discordVerificationService.SendVerificationCodeAsync(discordIdentity, User.Email, discordCode);
+                    if (string.IsNullOrWhiteSpace(delivery.DiscordUserId))
+                    {
+                        response.Data = null;
+                        response.Message = "Nao foi possivel localizar este Discord no servidor NKZ.";
+                        response.Success = false;
+                        return response;
+                    }
+
+                    var discordExists = await _context.Users.AnyAsync(u => u.DiscordUserId == delivery.DiscordUserId);
+                    if (discordExists)
+                    {
+                        response.Data = null;
+                        response.Message = "Este Discord ja esta vinculado a outra conta.";
+                        response.Success = false;
+                        return response;
+                    }
                 }
 
                 var user = new User
@@ -76,17 +85,23 @@ namespace NKZAPI.Services.AuthServices
                     PasswordSalt = passwordSalt,
                     Player = new List<Player>(),
                     Role = User.Role,
-                    DiscordUserId = delivery.DiscordUserId,
-                    DiscordUsername = string.IsNullOrWhiteSpace(delivery.DiscordUsername) ? discordIdentity : delivery.DiscordUsername,
-                    DiscordVerified = false,
-                    DiscordVerificationCodeHash = HashCode(discordCode),
-                    DiscordVerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15),
-                    EmailVerified = false,
-                    EmailVerificationCodeHash = HashCode(emailCode),
-                    EmailVerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(20),
+                    DiscordUserId = delivery?.DiscordUserId ?? "",
+                    DiscordUsername = string.IsNullOrWhiteSpace(delivery?.DiscordUsername) ? discordIdentity : delivery.DiscordUsername,
+                    DiscordVerified = !requireDiscordVerification,
+                    DiscordVerifiedAt = requireDiscordVerification ? null : DateTime.UtcNow,
+                    DiscordVerificationCodeHash = requireDiscordVerification ? HashCode(discordCode) : null,
+                    DiscordVerificationCodeExpiresAt = requireDiscordVerification ? DateTime.UtcNow.AddMinutes(15) : null,
+                    EmailVerified = !requireEmailVerification,
+                    EmailVerifiedAt = requireEmailVerification ? null : DateTime.UtcNow,
+                    EmailVerificationCodeHash = requireEmailVerification ? HashCode(emailCode) : null,
+                    EmailVerificationCodeExpiresAt = requireEmailVerification ? DateTime.UtcNow.AddMinutes(20) : null,
                 };
 
-                await SendEmailCodeAsync(user.Email, emailCode, "Confirme seu email NKZ", "Use este codigo para confirmar seu email na NKZ:");
+                if (requireEmailVerification)
+                {
+                    await SendEmailCodeAsync(user.Email, emailCode, "Confirme seu email NKZ", "Use este codigo para confirmar seu email na NKZ:");
+                }
+
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
@@ -99,7 +114,9 @@ namespace NKZAPI.Services.AuthServices
                     DiscordUserId = user.DiscordUserId,
                     DiscordUsername = user.DiscordUsername ?? "",
                 };
-                response.Message = "Conta criada. Enviamos codigos para seu email e para o privado do Discord.";
+                response.Message = requireDiscordVerification || requireEmailVerification
+                    ? "Conta criada. Enviamos os codigos de verificacao necessarios."
+                    : "Conta criada. Voce ja pode entrar.";
             }
             catch (Exception ex)
             {
@@ -134,7 +151,7 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
-                if (!user.EmailVerified)
+                if (GetFlag("Auth:RequireEmailVerification", true) && !user.EmailVerified)
                 {
                     response.Data = null;
                     response.Message = "Confirme seu email antes de entrar.";
@@ -142,11 +159,19 @@ namespace NKZAPI.Services.AuthServices
                     return response;
                 }
 
-                if (!user.DiscordVerified && !string.IsNullOrWhiteSpace(user.DiscordUserId))
+                if (GetFlag("Auth:RequireDiscordVerification", true) && !user.DiscordVerified && !string.IsNullOrWhiteSpace(user.DiscordUserId))
                 {
                     response.Data = null;
                     response.Message = "Confirme seu Discord antes de entrar.";
                     response.Success = false;
+                    return response;
+                }
+
+                if (!GetFlag("Auth:RequireTwoFactor", true))
+                {
+                    response.Message = "Login successful";
+                    response.Data = _passInterface.CreateToken(user);
+                    response.Success = true;
                     return response;
                 }
 
@@ -450,6 +475,11 @@ namespace NKZAPI.Services.AuthServices
         private static string GenerateSecureToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        }
+
+        private bool GetFlag(string key, bool defaultValue)
+        {
+            return bool.TryParse(_configuration[key], out var configuredValue) ? configuredValue : defaultValue;
         }
 
         private async Task SendEmailCodeAsync(string email, string code, string subject, string intro)

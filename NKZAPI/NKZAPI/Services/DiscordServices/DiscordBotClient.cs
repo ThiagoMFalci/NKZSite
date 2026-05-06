@@ -20,6 +20,9 @@ namespace NKZAPI.Services.DiscordServices
         {
             var baseUrl = _configuration["DiscordBot:BaseUrl"];
             var secret = _configuration["DiscordBot:Secret"];
+            var timeoutSeconds = int.TryParse(_configuration["DiscordBot:TimeoutSeconds"], out var configuredTimeout)
+                ? Math.Clamp(configuredTimeout, 5, 60)
+                : 10;
 
             if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(secret))
             {
@@ -38,8 +41,8 @@ namespace NKZAPI.Services.DiscordServices
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", secret);
             request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            using var response = await _httpClient.SendAsync(request);
-            var body = await response.Content.ReadAsStringAsync();
+            using var response = await _httpClient.SendAsync(request).WaitAsync(TimeSpan.FromSeconds(timeoutSeconds));
+            var body = await response.Content.ReadAsStringAsync().WaitAsync(TimeSpan.FromSeconds(timeoutSeconds));
             if (!response.IsSuccessStatusCode)
             {
                 throw new InvalidOperationException(string.IsNullOrWhiteSpace(body)

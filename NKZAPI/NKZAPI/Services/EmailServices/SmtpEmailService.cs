@@ -25,6 +25,9 @@ namespace NKZAPI.Services.EmailServices
             var fromName = _configuration["Email:Smtp:FromName"] ?? "NKZ Academy";
             var port = int.TryParse(_configuration["Email:Smtp:Port"], out var configuredPort) ? configuredPort : 587;
             var enableSsl = !bool.TryParse(_configuration["Email:Smtp:EnableSsl"], out var configuredSsl) || configuredSsl;
+            var timeoutSeconds = int.TryParse(_configuration["Email:Smtp:TimeoutSeconds"], out var configuredTimeout)
+                ? Math.Clamp(configuredTimeout, 5, 60)
+                : 15;
 
             if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(from))
             {
@@ -41,6 +44,7 @@ namespace NKZAPI.Services.EmailServices
             {
                 EnableSsl = enableSsl,
                 Credentials = new NetworkCredential(username, password),
+                Timeout = timeoutSeconds * 1000,
             };
 
             using var message = new MailMessage
@@ -52,7 +56,7 @@ namespace NKZAPI.Services.EmailServices
             };
             message.To.Add(to);
 
-            await client.SendMailAsync(message);
+            await client.SendMailAsync(message).WaitAsync(TimeSpan.FromSeconds(timeoutSeconds));
         }
     }
 }
