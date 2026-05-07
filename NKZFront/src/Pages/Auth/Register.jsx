@@ -6,7 +6,7 @@ import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const DISCORD_INVITE_URL = import.meta.env.VITE_DISCORD_INVITE_URL || "";
-const REQUIRE_DISCORD_VERIFICATION = import.meta.env.VITE_REQUIRE_DISCORD_VERIFICATION === "true";
+const REQUIRE_DISCORD_VERIFICATION = import.meta.env.VITE_REQUIRE_DISCORD_VERIFICATION !== "false";
 
 function getApiMessage(error) {
     return (
@@ -177,7 +177,10 @@ export default function Register() {
                                 <BsPersonPlusFill />
                                 <div>
                                     <strong>Confirme seu email</strong>
-                                    <span>Enviamos um codigo para {formData.email}. Depois disso voce confirma o Discord.</span>
+                                    <span>
+                                        Enviamos um codigo para {formData.email}.
+                                        {REQUIRE_DISCORD_VERIFICATION ? " Depois disso voce confirma o Discord." : ""}
+                                    </span>
                                 </div>
                             </div>
 
