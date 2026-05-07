@@ -5,7 +5,7 @@ namespace NKZAPI.Models
     public class League : BaseEntity
     {
         [Required]
-        [StringLength(60, MinimumLength = 2)]
+        [StringLength(60, MinimumLength = 4)]
         public string Name { get; set; } = string.Empty;
 
         public List<Team> Teams { get; set; } = new();

@@ -593,6 +593,29 @@
     cursor: not-allowed;
 }
 
+.league-create-form input[aria-invalid="true"],
+.league-create-form select[aria-invalid="true"] {
+    border-color: rgba(249, 115, 22, 0.68);
+    box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.18);
+}
+
+.field-hint,
+.field-error {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.35;
+    text-transform: none;
+}
+
+.field-hint {
+    color: rgba(245,245,245,0.48);
+}
+
+.field-error {
+    color: var(--laranja);
+}
+
 .league-create-form select option {
     background: #0d0d18;
 }

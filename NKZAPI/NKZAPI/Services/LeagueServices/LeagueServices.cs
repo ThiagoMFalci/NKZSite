@@ -50,9 +50,18 @@ namespace NKZAPI.Services.LeagueServices
                 if (string.IsNullOrWhiteSpace(league.Name))
                 {
                     response.Success = false;
-                    response.Message = "League name is required.";
+                    response.Message = "Informe o nome da liga.";
                     return response;
                 }
+
+                if (league.Name.Trim().Length < 4)
+                {
+                    response.Success = false;
+                    response.Message = "O nome da liga precisa ter mais de 3 caracteres.";
+                    return response;
+                }
+
+                league.Name = league.Name.Trim();
 
                 league.MaxTeams = 16;
                 league.MaximumTeamPoints = league.MaximumTeamPoints <= 0 ? 999999 : league.MaximumTeamPoints;

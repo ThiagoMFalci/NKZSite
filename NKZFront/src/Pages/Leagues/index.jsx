@@ -13,6 +13,7 @@ import "./style.css";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const LEAGUE_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
 const LEAGUE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
+const LEAGUE_NAME_MIN_LENGTH = 4;
 const DEFAULT_LEAGUE_FORM = {
     name: "",
     image: null,
@@ -46,6 +47,75 @@ function validateLeagueImage(image) {
         return "A imagem da liga deve ter no maximo 5 MB.";
     }
     return "";
+}
+
+function getApiErrorMessage(error, fallback) {
+    const data = error?.response?.data;
+    const modelErrors = data?.errors || data?.Errors;
+    if (modelErrors && typeof modelErrors === "object") {
+        const messages = Object.values(modelErrors).flat().filter(Boolean);
+        if (messages.length) return translateApiValidationMessage(String(messages[0]));
+    }
+
+    return data?.message || data?.Message || fallback;
+}
+
+function translateApiValidationMessage(message) {
+    if (/minimum length of ['"]?4/i.test(message) || /Name.*minimum length/i.test(message)) {
+        return "O nome da liga precisa ter mais de 3 caracteres.";
+    }
+
+    if (/maximum length of ['"]?60/i.test(message)) {
+        return "O nome da liga pode ter no maximo 60 caracteres.";
+    }
+
+    if (/field is required/i.test(message) || /required/i.test(message)) {
+        return "Preencha os campos obrigatorios antes de criar a liga.";
+    }
+
+    return message;
+}
+
+function validateCreateLeagueForm(form) {
+    const errors = {};
+    const trimmedName = form.name.trim();
+    const award = Number(form.award);
+    const entryFee = Number(form.entryFee);
+    const minimumTeamPoints = Number(form.minimumTeamPoints);
+    const maximumTeamPoints = Number(form.maximumTeamPoints);
+
+    if (!trimmedName) {
+        errors.name = "Informe o nome da liga.";
+    } else if (trimmedName.length < LEAGUE_NAME_MIN_LENGTH) {
+        errors.name = "O nome da liga precisa ter mais de 3 caracteres.";
+    } else if (trimmedName.length > 60) {
+        errors.name = "O nome da liga pode ter no maximo 60 caracteres.";
+    }
+
+    if (!Number.isFinite(award) || award < 0) errors.award = "A premiacao nao pode ser negativa.";
+    if (!Number.isFinite(entryFee) || entryFee < 0) errors.entryFee = "A entrada nao pode ser negativa.";
+    if (!Number.isFinite(minimumTeamPoints) || minimumTeamPoints < 0) errors.minimumTeamPoints = "Os pontos minimos precisam ser 0 ou mais.";
+    if (!Number.isFinite(maximumTeamPoints) || maximumTeamPoints < 0) errors.maximumTeamPoints = "Os pontos maximos precisam ser 0 ou mais.";
+    if (Number.isFinite(minimumTeamPoints) && Number.isFinite(maximumTeamPoints) && maximumTeamPoints < minimumTeamPoints) {
+        errors.maximumTeamPoints = "Os pontos maximos precisam ser maiores que os minimos.";
+    }
+
+    if (form.modality === "Ranking") {
+        if (!form.rankingQueueOpenTime) errors.rankingQueueOpenTime = "Informe o inicio da fila.";
+        if (!form.rankingQueueCloseTime) errors.rankingQueueCloseTime = "Informe o final da fila.";
+        if (form.rankingQueueOpenTime && form.rankingQueueCloseTime && form.rankingQueueOpenTime >= form.rankingQueueCloseTime) {
+            errors.rankingQueueCloseTime = "O final da fila precisa ser depois do inicio.";
+        }
+    }
+
+    if (form.startDate && form.endDate && new Date(form.endDate) < new Date(form.startDate)) {
+        errors.endDate = "A data final precisa ser depois da data de inicio.";
+    }
+
+    const imageError = validateLeagueImage(form.image);
+    if (imageError) errors.image = imageError;
+
+    return errors;
 }
 
 function getAverageEloFromPlayers(players = []) {
@@ -127,6 +197,7 @@ export default function LeaguesPage() {
     const [createOpen, setCreateOpen] = useState(false);
     const [createLoading, setCreateLoading] = useState(false);
     const [createFeedback, setCreateFeedback] = useState({ type: "", message: "" });
+    const [createValidationErrors, setCreateValidationErrors] = useState({});
     const [createForm, setCreateForm] = useState(DEFAULT_LEAGUE_FORM);
     const [ownedTeam, setOwnedTeam] = useState(null);
     const currentUser = getCurrentUser();
@@ -279,12 +350,20 @@ export default function LeaguesPage() {
 
     function handleCreateChange(event) {
         const { name, value, files, type } = event.target;
+        setCreateValidationErrors((current) => {
+            if (!current[name]) return current;
+            const next = { ...current };
+            delete next[name];
+            return next;
+        });
+
         if (type === "file") {
             const file = files?.[0] || null;
             const imageError = validateLeagueImage(file);
             if (imageError) {
                 event.target.value = "";
                 setCreateFeedback({ type: "error", message: imageError });
+                setCreateValidationErrors((current) => ({ ...current, image: imageError }));
                 setCreateForm((current) => ({ ...current, [name]: null }));
                 return;
             }
@@ -299,19 +378,10 @@ export default function LeaguesPage() {
 
     async function handleCreateLeague(event) {
         event.preventDefault();
-        if (!createForm.name.trim()) {
-            setCreateFeedback({ type: "error", message: "Informe o nome da liga." });
-            return;
-        }
-
-        if (createForm.startDate && createForm.endDate && new Date(createForm.endDate) < new Date(createForm.startDate)) {
-            setCreateFeedback({ type: "error", message: "A data final precisa ser depois da data de inicio." });
-            return;
-        }
-
-        const imageError = validateLeagueImage(createForm.image);
-        if (imageError) {
-            setCreateFeedback({ type: "error", message: imageError });
+        const validationErrors = validateCreateLeagueForm(createForm);
+        if (Object.keys(validationErrors).length) {
+            setCreateValidationErrors(validationErrors);
+            setCreateFeedback({ type: "error", message: Object.values(validationErrors)[0] });
             return;
         }
 
@@ -319,6 +389,7 @@ export default function LeaguesPage() {
 
         try {
             setCreateLoading(true);
+            setCreateValidationErrors({});
             setCreateFeedback({ type: "", message: "" });
             const payload = {
                 name: createForm.name.trim(),
@@ -349,6 +420,7 @@ export default function LeaguesPage() {
 
             setCreateFeedback({ type: "success", message: "Liga criada." });
             setCreateForm(DEFAULT_LEAGUE_FORM);
+            setCreateValidationErrors({});
             setCreateOpen(false);
             await loadLeagues();
         } catch (requestError) {
@@ -360,7 +432,7 @@ export default function LeaguesPage() {
 
             setCreateFeedback({
                 type: "error",
-                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel criar a liga. Se voce enviou imagem, ela nao foi aceita e a liga foi desfeita.",
+                message: getApiErrorMessage(requestError, "Nao foi possivel criar a liga. Se voce enviou imagem, ela nao foi aceita e a liga foi desfeita."),
             });
         } finally {
             setCreateLoading(false);
@@ -414,14 +486,15 @@ export default function LeaguesPage() {
                 onLeave={handleLeaveLeague}
             />
 
-            <CreateLeagueModal
-                open={createOpen}
-                formData={createForm}
-                loading={createLoading}
-                feedback={createFeedback}
-                onClose={() => setCreateOpen(false)}
-                onChange={handleCreateChange}
-                onSubmit={handleCreateLeague}
+                <CreateLeagueModal
+                    open={createOpen}
+                    formData={createForm}
+                    loading={createLoading}
+                    feedback={createFeedback}
+                    validationErrors={createValidationErrors}
+                    onClose={() => setCreateOpen(false)}
+                    onChange={handleCreateChange}
+                    onSubmit={handleCreateLeague}
             />
         </main>
     );

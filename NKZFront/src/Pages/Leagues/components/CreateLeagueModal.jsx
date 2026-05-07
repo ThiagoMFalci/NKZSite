@@ -20,6 +20,7 @@ export default function CreateLeagueModal({
     formData,
     loading,
     feedback,
+    validationErrors = {},
     onClose,
     onChange,
     onSubmit,
@@ -82,8 +83,14 @@ export default function CreateLeagueModal({
                             value={formData.name}
                             onChange={onChange}
                             placeholder="Ex: Split NKZ Academy"
+                            minLength={4}
+                            maxLength={60}
                             required
+                            aria-invalid={Boolean(validationErrors.name)}
                         />
+                        <small className={validationErrors.name ? "field-error" : "field-hint"}>
+                            {validationErrors.name || "Use mais de 3 caracteres, ate 60."}
+                        </small>
                     </label>
 
                     <div className="league-create-grid">
@@ -96,7 +103,9 @@ export default function CreateLeagueModal({
                                 step="0.01"
                                 value={formData.award}
                                 onChange={onChange}
+                                aria-invalid={Boolean(validationErrors.award)}
                             />
+                            {validationErrors.award && <small className="field-error">{validationErrors.award}</small>}
                         </label>
 
                         <label>
@@ -108,7 +117,9 @@ export default function CreateLeagueModal({
                                 step="0.01"
                                 value={formData.entryFee}
                                 onChange={onChange}
+                                aria-invalid={Boolean(validationErrors.entryFee)}
                             />
+                            {validationErrors.entryFee && <small className="field-error">{validationErrors.entryFee}</small>}
                         </label>
 
                         <label>
@@ -150,7 +161,9 @@ export default function CreateLeagueModal({
                                 min="0"
                                 value={formData.minimumTeamPoints}
                                 onChange={onChange}
+                                aria-invalid={Boolean(validationErrors.minimumTeamPoints)}
                             />
+                            {validationErrors.minimumTeamPoints && <small className="field-error">{validationErrors.minimumTeamPoints}</small>}
                         </label>
 
                         <label>
@@ -161,7 +174,9 @@ export default function CreateLeagueModal({
                                 min="0"
                                 value={formData.maximumTeamPoints}
                                 onChange={onChange}
+                                aria-invalid={Boolean(validationErrors.maximumTeamPoints)}
                             />
+                            {validationErrors.maximumTeamPoints && <small className="field-error">{validationErrors.maximumTeamPoints}</small>}
                         </label>
 
                         <label>
@@ -172,7 +187,9 @@ export default function CreateLeagueModal({
                                 value={formData.rankingQueueOpenTime}
                                 onChange={onChange}
                                 disabled={formData.modality !== "Ranking"}
+                                aria-invalid={Boolean(validationErrors.rankingQueueOpenTime)}
                             />
+                            {validationErrors.rankingQueueOpenTime && <small className="field-error">{validationErrors.rankingQueueOpenTime}</small>}
                         </label>
                     </div>
 
@@ -185,7 +202,9 @@ export default function CreateLeagueModal({
                                 value={formData.rankingQueueCloseTime}
                                 onChange={onChange}
                                 disabled={formData.modality !== "Ranking"}
+                                aria-invalid={Boolean(validationErrors.rankingQueueCloseTime)}
                             />
+                            {validationErrors.rankingQueueCloseTime && <small className="field-error">{validationErrors.rankingQueueCloseTime}</small>}
                         </label>
                     </div>
 
@@ -197,7 +216,9 @@ export default function CreateLeagueModal({
                                 name="startDate"
                                 value={formData.startDate}
                                 onChange={onChange}
+                                aria-invalid={Boolean(validationErrors.startDate)}
                             />
+                            {validationErrors.startDate && <small className="field-error">{validationErrors.startDate}</small>}
                         </label>
 
                         <label>
@@ -207,7 +228,9 @@ export default function CreateLeagueModal({
                                 name="endDate"
                                 value={formData.endDate}
                                 onChange={onChange}
+                                aria-invalid={Boolean(validationErrors.endDate)}
                             />
+                            {validationErrors.endDate && <small className="field-error">{validationErrors.endDate}</small>}
                         </label>
                     </div>
 
