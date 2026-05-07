@@ -203,7 +203,9 @@
 }
 
 .admin-form input,
-.admin-form textarea {
+.admin-form textarea,
+.admin-edit-fields input,
+.admin-edit-fields select {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.14);
     border-radius: 5px;
@@ -213,6 +215,10 @@
     outline: none;
     padding: 0.8rem;
     width: 100%;
+}
+
+.admin-edit-fields select {
+    appearance: none;
 }
 
 .admin-form textarea {
@@ -242,6 +248,12 @@
 .admin-secondary {
     background: rgba(255,255,255,0.08) !important;
     border: 1px solid rgba(255,255,255,0.12) !important;
+}
+
+.admin-danger {
+    background: rgba(249, 115, 22, 0.12) !important;
+    border: 1px solid rgba(249, 115, 22, 0.45) !important;
+    color: #ffd5bf !important;
 }
 
 .admin-list {
@@ -280,6 +292,96 @@
 .admin-table {
     display: grid;
     gap: 0.75rem;
+}
+
+.admin-edit-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.admin-edit-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    display: grid;
+    gap: 0.9rem;
+    min-width: 0;
+    padding: 1rem;
+}
+
+.admin-edit-meta {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.admin-edit-meta span {
+    background: rgba(255,255,255,0.025);
+    border-radius: 4px;
+    color: white;
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    padding: 0.6rem;
+}
+
+.admin-edit-fields {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.admin-edit-fields label {
+    color: rgba(245,245,245,0.74);
+    display: grid;
+    gap: 0.38rem;
+    min-width: 0;
+}
+
+.admin-edit-fields small,
+.admin-edit-meta small {
+    color: rgba(245,245,245,0.52);
+    font-size: 0.73rem;
+    font-weight: 900;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.admin-edit-check {
+    align-content: center;
+    background: rgba(255,255,255,0.035);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    grid-template-columns: 1fr auto;
+    min-height: 74px;
+    padding: 0.75rem;
+}
+
+.admin-edit-check input {
+    justify-self: end;
+    width: auto;
+}
+
+.admin-edit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.admin-edit-actions button {
+    background: linear-gradient(135deg, #7b2fbe, #a53df0);
+    border: 0;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    min-height: 44px;
+    min-width: 136px;
+    padding: 0.85rem 1rem;
+    text-transform: uppercase;
 }
 
 .admin-table article {
@@ -322,6 +424,14 @@
 
     .admin-list button {
         width: 100%;
+    }
+
+    .admin-edit-actions {
+        justify-content: stretch;
+    }
+
+    .admin-edit-actions button {
+        flex: 1 1 160px;
     }
 }
 
@@ -366,5 +476,14 @@
 
     .admin-table article {
         gap: 0.55rem;
+    }
+
+    .admin-edit-card {
+        padding: 0.8rem;
+    }
+
+    .admin-edit-fields,
+    .admin-edit-meta {
+        grid-template-columns: 1fr;
     }
 }

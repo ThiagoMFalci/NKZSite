@@ -7,19 +7,6 @@ import "./style.css";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const tabs = ["overview", "plans", "users", "teams", "leagues", "payments", "subscriptions"];
 
-function unwrap(response) {
-    return response?.data?.data ?? response?.data?.Data ?? response?.data ?? null;
-}
-
-function money(value) {
-    return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function date(value) {
-    if (!value) return "-";
-    return new Date(value).toLocaleDateString("pt-BR");
-}
-
 const emptyPlan = {
     name: "",
     description: "",
@@ -31,6 +18,151 @@ const emptyPlan = {
     sortOrder: 0,
 };
 
+function unwrap(response) {
+    return response?.data?.data ?? response?.data?.Data ?? response?.data ?? null;
+}
+
+function getValue(item, key, fallback = "") {
+    return item?.[key] ?? item?.[key.charAt(0).toUpperCase() + key.slice(1)] ?? fallback;
+}
+
+function getId(item) {
+    return getValue(item, "id");
+}
+
+function money(value) {
+    return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function date(value) {
+    if (!value) return "-";
+    return new Date(value).toLocaleDateString("pt-BR");
+}
+
+function datetimeLocal(value) {
+    if (!value) return "";
+    const dateValue = new Date(value);
+    if (Number.isNaN(dateValue.getTime())) return "";
+    return new Date(dateValue.getTime() - dateValue.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
+function toIsoOrNull(value) {
+    return value ? new Date(value).toISOString() : null;
+}
+
+function formatValue(key, value) {
+    const lowerKey = key.toLowerCase();
+    if (lowerKey.includes("amount") || lowerKey.includes("balance") || lowerKey.includes("revenue") || lowerKey.includes("fee") || lowerKey.includes("award")) {
+        return money(value);
+    }
+    if (lowerKey.includes("date") || lowerKey.includes("createdat") || lowerKey.includes("endsat") || lowerKey.includes("startsat")) {
+        return date(value);
+    }
+    return String(value ?? "-");
+}
+
+function normalizeUser(item) {
+    return {
+        email: getValue(item, "email"),
+        role: getValue(item, "role", "User"),
+        discordUsername: getValue(item, "discordUsername"),
+        discordVerified: Boolean(getValue(item, "discordVerified", false)),
+        emailVerified: Boolean(getValue(item, "emailVerified", false)),
+        walletBalance: Number(getValue(item, "walletBalance", 0)),
+    };
+}
+
+function normalizeTeam(item) {
+    return {
+        name: getValue(item, "name"),
+        tag: getValue(item, "tag"),
+        ownerId: getValue(item, "ownerId") || "",
+        isRecruiting: Boolean(getValue(item, "isRecruiting", false)),
+        points: Number(getValue(item, "points", 0)),
+    };
+}
+
+function normalizeLeague(item) {
+    return {
+        name: getValue(item, "name"),
+        modality: getValue(item, "modality", "Ranking"),
+        entryFee: Number(getValue(item, "entryFee", 0)),
+        award: Number(getValue(item, "award", 0)),
+        minimumTeamPoints: Number(getValue(item, "minimumTeamPoints", 0)),
+        maximumTeamPoints: Number(getValue(item, "maximumTeamPoints", 999999)),
+        maxTeams: Number(getValue(item, "maxTeams", 16)),
+        minimumElo: getValue(item, "minimumElo", "UNRANKED"),
+        maximumElo: getValue(item, "maximumElo", "CHALLENGER"),
+        imageUrl: getValue(item, "imageUrl"),
+        startDate: datetimeLocal(getValue(item, "startDate")),
+        endDate: datetimeLocal(getValue(item, "endDate")),
+        rankingQueueOpenTime: getValue(item, "rankingQueueOpenTime") || "",
+        rankingQueueCloseTime: getValue(item, "rankingQueueCloseTime") || "",
+    };
+}
+
+const editableConfig = {
+    users: {
+        title: "Usuarios",
+        endpoint: "users",
+        normalize: normalizeUser,
+        fields: [
+            { key: "email", label: "Email", type: "email" },
+            { key: "role", label: "Perfil", type: "select", options: ["User", "Admin"] },
+            { key: "discordUsername", label: "Discord" },
+            { key: "walletBalance", label: "Saldo", type: "number", step: "0.01" },
+            { key: "discordVerified", label: "Discord verificado", type: "checkbox" },
+            { key: "emailVerified", label: "Email verificado", type: "checkbox" },
+        ],
+        meta: (item) => [
+            ["ID", getId(item)],
+            ["Player", getValue(item, "playerName", "-")],
+            ["Criado em", date(getValue(item, "createdAt"))],
+        ],
+    },
+    teams: {
+        title: "Times",
+        endpoint: "teams",
+        normalize: normalizeTeam,
+        fields: [
+            { key: "name", label: "Nome" },
+            { key: "tag", label: "Tag", maxLength: 5 },
+            { key: "ownerId", label: "Owner ID" },
+            { key: "points", label: "Pontos", type: "number" },
+            { key: "isRecruiting", label: "Recrutando", type: "checkbox" },
+        ],
+        meta: (item) => [
+            ["ID", getId(item)],
+            ["Jogadores", getValue(item, "players", 0)],
+        ],
+    },
+    leagues: {
+        title: "Ligas",
+        endpoint: "leagues",
+        normalize: normalizeLeague,
+        fields: [
+            { key: "name", label: "Nome" },
+            { key: "modality", label: "Modalidade", type: "select", options: ["Ranking", "Chaveamento"] },
+            { key: "entryFee", label: "Entrada", type: "number", step: "0.01" },
+            { key: "award", label: "Premio", type: "number", step: "0.01" },
+            { key: "minimumTeamPoints", label: "Pontos min.", type: "number" },
+            { key: "maximumTeamPoints", label: "Pontos max.", type: "number" },
+            { key: "maxTeams", label: "Max times", type: "number" },
+            { key: "minimumElo", label: "Elo min." },
+            { key: "maximumElo", label: "Elo max." },
+            { key: "imageUrl", label: "Imagem URL" },
+            { key: "startDate", label: "Inicio", type: "datetime-local" },
+            { key: "endDate", label: "Fim", type: "datetime-local" },
+            { key: "rankingQueueOpenTime", label: "Fila abre", type: "time" },
+            { key: "rankingQueueCloseTime", label: "Fila fecha", type: "time" },
+        ],
+        meta: (item) => [
+            ["ID", getId(item)],
+            ["Times", getValue(item, "teams", 0)],
+        ],
+    },
+};
+
 export default function AdminPage() {
     const currentUser = getCurrentUser();
     const [activeTab, setActiveTab] = useState("overview");
@@ -38,6 +170,7 @@ export default function AdminPage() {
     const [lists, setLists] = useState({});
     const [planForm, setPlanForm] = useState(emptyPlan);
     const [editingPlanId, setEditingPlanId] = useState("");
+    const [editForms, setEditForms] = useState({});
     const [feedback, setFeedback] = useState("");
     const [loading, setLoading] = useState(true);
 
@@ -68,22 +201,24 @@ export default function AdminPage() {
                 payments: unwrap(paymentsResponse) ?? [],
                 subscriptions: unwrap(subscriptionsResponse) ?? [],
             });
+        } catch (error) {
+            setFeedback(error.response?.data?.message ?? error.response?.data?.Message ?? "Nao foi possivel carregar o painel admin.");
         } finally {
             setLoading(false);
         }
     }
 
     function startEditPlan(plan) {
-        setEditingPlanId(plan.id ?? plan.Id);
+        setEditingPlanId(getId(plan));
         setPlanForm({
-            name: plan.name ?? plan.Name ?? "",
-            description: plan.description ?? plan.Description ?? "",
-            price: plan.price ?? plan.Price ?? 0,
-            durationMonths: plan.durationMonths ?? plan.DurationMonths ?? 1,
-            benefits: plan.benefits ?? plan.Benefits ?? "",
-            isActive: plan.isActive ?? plan.IsActive ?? true,
-            isFeatured: plan.isFeatured ?? plan.IsFeatured ?? false,
-            sortOrder: plan.sortOrder ?? plan.SortOrder ?? 0,
+            name: getValue(plan, "name"),
+            description: getValue(plan, "description"),
+            price: getValue(plan, "price", 0),
+            durationMonths: getValue(plan, "durationMonths", 1),
+            benefits: getValue(plan, "benefits"),
+            isActive: getValue(plan, "isActive", true),
+            isFeatured: getValue(plan, "isFeatured", false),
+            sortOrder: getValue(plan, "sortOrder", 0),
         });
         setActiveTab("plans");
     }
@@ -118,6 +253,67 @@ export default function AdminPage() {
         await axios.delete(`${API_BASE_URL}/api/admin/plans/${planId}`, { headers: getAuthHeaders() });
         setFeedback("Plano removido ou desativado.");
         await loadAdmin();
+    }
+
+    function getDraft(type, item) {
+        const id = getId(item);
+        return editForms[type]?.[id] ?? editableConfig[type].normalize(item);
+    }
+
+    function setDraftValue(type, id, key, value) {
+        setEditForms((current) => ({
+            ...current,
+            [type]: {
+                ...(current[type] ?? {}),
+                [id]: {
+                    ...(current[type]?.[id] ?? {}),
+                    [key]: value,
+                },
+            },
+        }));
+    }
+
+    async function saveRecord(type, item) {
+        const id = getId(item);
+        const config = editableConfig[type];
+        const draft = getDraft(type, item);
+        const payload = {
+            ...draft,
+            ownerId: draft.ownerId || null,
+            startDate: toIsoOrNull(draft.startDate),
+            endDate: toIsoOrNull(draft.endDate),
+            walletBalance: Number(draft.walletBalance ?? 0),
+            points: Number(draft.points ?? 0),
+            entryFee: Number(draft.entryFee ?? 0),
+            award: Number(draft.award ?? 0),
+            minimumTeamPoints: Number(draft.minimumTeamPoints ?? 0),
+            maximumTeamPoints: Number(draft.maximumTeamPoints ?? 0),
+            maxTeams: Number(draft.maxTeams ?? 2),
+            rankingQueueOpenTime: draft.rankingQueueOpenTime || null,
+            rankingQueueCloseTime: draft.rankingQueueCloseTime || null,
+        };
+
+        try {
+            await axios.put(`${API_BASE_URL}/api/admin/${config.endpoint}/${id}`, payload, { headers: getAuthHeaders() });
+            setFeedback(`${config.title.slice(0, -1)} atualizado.`);
+            await loadAdmin();
+        } catch (error) {
+            setFeedback(error.response?.data?.message ?? error.response?.data?.Message ?? "Nao foi possivel salvar as alteracoes.");
+        }
+    }
+
+    async function deleteRecord(type, item) {
+        const id = getId(item);
+        const config = editableConfig[type];
+        if (!window.confirm(`Tem certeza que deseja excluir este registro de ${config.title.toLowerCase()}?`)) return;
+
+        try {
+            await axios.delete(`${API_BASE_URL}/api/admin/${config.endpoint}/${id}`, { headers: getAuthHeaders() });
+            setFeedback("Registro excluido.");
+            await loadAdmin();
+        } catch (error) {
+            setFeedback(error.response?.data?.message ?? error.response?.data?.Message ?? "Nao foi possivel excluir o registro.");
+        }
     }
 
     const metrics = useMemo(() => [
@@ -200,14 +396,14 @@ export default function AdminPage() {
                                 <section className="admin-panel admin-list">
                                     <h2>Planos cadastrados</h2>
                                     {(lists.plans || []).map((plan) => {
-                                        const id = plan.id ?? plan.Id;
+                                        const id = getId(plan);
                                         return (
                                             <article key={id}>
                                                 <div>
-                                                    <strong>{plan.name ?? plan.Name}</strong>
-                                                    <span>{money(plan.price ?? plan.Price)} - {plan.durationMonths ?? plan.DurationMonths} mes(es)</span>
+                                                    <strong>{getValue(plan, "name")}</strong>
+                                                    <span>{money(getValue(plan, "price"))} - {getValue(plan, "durationMonths")} mes(es)</span>
                                                 </div>
-                                                <em>{(plan.isActive ?? plan.IsActive) ? "Ativo" : "Inativo"}</em>
+                                                <em>{getValue(plan, "isActive", true) ? "Ativo" : "Inativo"}</em>
                                                 <button type="button" onClick={() => startEditPlan(plan)}>Editar</button>
                                                 <button type="button" onClick={() => deletePlan(id)}>Excluir</button>
                                             </article>
@@ -217,13 +413,24 @@ export default function AdminPage() {
                             </section>
                         )}
 
-                        {activeTab !== "overview" && activeTab !== "plans" && (
+                        {editableConfig[activeTab] && (
+                            <EditableAdminSection
+                                config={editableConfig[activeTab]}
+                                items={lists[activeTab] || []}
+                                getDraft={(item) => getDraft(activeTab, item)}
+                                onChange={(id, key, value) => setDraftValue(activeTab, id, key, value)}
+                                onSave={(item) => saveRecord(activeTab, item)}
+                                onDelete={(item) => deleteRecord(activeTab, item)}
+                            />
+                        )}
+
+                        {activeTab !== "overview" && activeTab !== "plans" && !editableConfig[activeTab] && (
                             <section className="admin-panel admin-table">
                                 <h2>{activeTab}</h2>
                                 {(lists[activeTab] || []).length ? (lists[activeTab] || []).map((item, index) => (
-                                    <article key={item.id ?? item.Id ?? index}>
+                                    <article key={getId(item) || index}>
                                         {Object.entries(item).slice(0, 8).map(([key, value]) => (
-                                            <span key={key}><small>{key}</small>{key.toLowerCase().includes("amount") || key.toLowerCase().includes("balance") || key.toLowerCase().includes("revenue") ? money(value) : key.toLowerCase().includes("date") || key.toLowerCase().includes("createdat") || key.toLowerCase().includes("endsat") ? date(value) : String(value ?? "-")}</span>
+                                            <span key={key}><small>{key}</small>{formatValue(key, value)}</span>
                                         ))}
                                     </article>
                                 )) : <p>Nenhum registro encontrado.</p>}
@@ -233,5 +440,52 @@ export default function AdminPage() {
                 )}
             </div>
         </main>
+    );
+}
+
+function EditableAdminSection({ config, items, getDraft, onChange, onSave, onDelete }) {
+    return (
+        <section className="admin-panel admin-edit-list">
+            <h2>{config.title}</h2>
+            {items.length ? items.map((item) => {
+                const id = getId(item);
+                const draft = getDraft(item);
+                return (
+                    <article className="admin-edit-card" key={id}>
+                        <div className="admin-edit-meta">
+                            {config.meta(item).map(([label, value]) => (
+                                <span key={label}><small>{label}</small>{value || "-"}</span>
+                            ))}
+                        </div>
+                        <div className="admin-edit-fields">
+                            {config.fields.map((field) => (
+                                <label className={field.type === "checkbox" ? "admin-edit-check" : ""} key={field.key}>
+                                    <small>{field.label}</small>
+                                    {field.type === "select" ? (
+                                        <select value={draft[field.key] ?? ""} onChange={(event) => onChange(id, field.key, event.target.value)}>
+                                            {field.options.map((option) => <option key={option} value={option}>{option}</option>)}
+                                        </select>
+                                    ) : field.type === "checkbox" ? (
+                                        <input type="checkbox" checked={Boolean(draft[field.key])} onChange={(event) => onChange(id, field.key, event.target.checked)} />
+                                    ) : (
+                                        <input
+                                            type={field.type ?? "text"}
+                                            step={field.step}
+                                            maxLength={field.maxLength}
+                                            value={draft[field.key] ?? ""}
+                                            onChange={(event) => onChange(id, field.key, event.target.value)}
+                                        />
+                                    )}
+                                </label>
+                            ))}
+                        </div>
+                        <div className="admin-edit-actions">
+                            <button type="button" onClick={() => onSave(item)}>Salvar</button>
+                            <button className="admin-danger" type="button" onClick={() => onDelete(item)}>Excluir</button>
+                        </div>
+                    </article>
+                );
+            }) : <p>Nenhum registro encontrado.</p>}
+        </section>
     );
 }
