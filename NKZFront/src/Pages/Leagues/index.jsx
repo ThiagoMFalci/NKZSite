@@ -11,6 +11,8 @@ import { ELO_SCORE, matchesSelectedElos, normalizeEloLabel, sortByElo } from "..
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const LEAGUE_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const LEAGUE_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
 const DEFAULT_LEAGUE_FORM = {
     name: "",
     image: null,
@@ -33,6 +35,17 @@ function unwrapApiData(responseData) {
 
 function money(value) {
     return Number(value || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function validateLeagueImage(image) {
+    if (!image) return "";
+    if (!LEAGUE_IMAGE_TYPES.includes(image.type)) {
+        return "A imagem precisa ser JPG, PNG, GIF, BMP ou WEBP.";
+    }
+    if (image.size > LEAGUE_IMAGE_MAX_SIZE) {
+        return "A imagem da liga deve ter no maximo 5 MB.";
+    }
+    return "";
 }
 
 function getAverageEloFromPlayers(players = []) {
@@ -264,9 +277,24 @@ export default function LeaguesPage() {
         }
     }
 
-function handleCreateChange(event) {
+    function handleCreateChange(event) {
         const { name, value, files, type } = event.target;
-        setCreateForm((current) => ({ ...current, [name]: type === "file" ? files?.[0] || null : value }));
+        if (type === "file") {
+            const file = files?.[0] || null;
+            const imageError = validateLeagueImage(file);
+            if (imageError) {
+                event.target.value = "";
+                setCreateFeedback({ type: "error", message: imageError });
+                setCreateForm((current) => ({ ...current, [name]: null }));
+                return;
+            }
+
+            setCreateFeedback({ type: "", message: "" });
+            setCreateForm((current) => ({ ...current, [name]: file }));
+            return;
+        }
+
+        setCreateForm((current) => ({ ...current, [name]: value }));
     }
 
     async function handleCreateLeague(event) {
@@ -280,6 +308,14 @@ function handleCreateChange(event) {
             setCreateFeedback({ type: "error", message: "A data final precisa ser depois da data de inicio." });
             return;
         }
+
+        const imageError = validateLeagueImage(createForm.image);
+        if (imageError) {
+            setCreateFeedback({ type: "error", message: imageError });
+            return;
+        }
+
+        let newLeagueId = "";
 
         try {
             setCreateLoading(true);
@@ -301,16 +337,13 @@ function handleCreateChange(event) {
             };
 
             const createResponse = await axios.post(`${API_BASE_URL}/api/league`, payload, { headers: getAuthHeaders() });
-            const leagueId = unwrapApiData(createResponse.data);
+            newLeagueId = unwrapApiData(createResponse.data);
 
-            if (createForm.image && leagueId) {
+            if (createForm.image && newLeagueId) {
                 const imagePayload = new FormData();
                 imagePayload.append("image", createForm.image);
-                await axios.post(`${API_BASE_URL}/api/league/${leagueId}/image`, imagePayload, {
-                    headers: {
-                        ...getAuthHeaders(),
-                        "Content-Type": "multipart/form-data",
-                    },
+                await axios.post(`${API_BASE_URL}/api/league/${newLeagueId}/image`, imagePayload, {
+                    headers: getAuthHeaders(),
                 });
             }
 
@@ -319,9 +352,15 @@ function handleCreateChange(event) {
             setCreateOpen(false);
             await loadLeagues();
         } catch (requestError) {
+            if (newLeagueId) {
+                await axios.delete(`${API_BASE_URL}/api/league/${newLeagueId}`, {
+                    headers: getAuthHeaders(),
+                }).catch(() => null);
+            }
+
             setCreateFeedback({
                 type: "error",
-                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel criar a liga.",
+                message: requestError?.response?.data?.message || requestError?.response?.data?.Message || "Nao foi possivel criar a liga. Se voce enviou imagem, ela nao foi aceita e a liga foi desfeita.",
             });
         } finally {
             setCreateLoading(false);

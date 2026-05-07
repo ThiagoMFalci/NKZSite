@@ -169,7 +169,7 @@ namespace NKZAPI.Controllers
         [Authorize]
         [EnableRateLimiting("UploadPolicy")]
         [HttpPost("{userId}/profile-image")]
-        public async Task<ActionResult> UploadProfileImage(Guid userId, IFormFile image)
+        public async Task<ActionResult> UploadProfileImage(Guid userId, [FromForm] IFormFile image)
         {
             var callerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("Id")?.Value;
             if (string.IsNullOrWhiteSpace(callerIdClaim) || !Guid.TryParse(callerIdClaim, out var callerId))

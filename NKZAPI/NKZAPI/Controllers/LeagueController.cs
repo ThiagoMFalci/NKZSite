@@ -39,7 +39,7 @@ namespace NKZAPI.Controllers
         [Authorize(Roles = "Admin")]
         [EnableRateLimiting("UploadPolicy")]
         [HttpPost("{leagueId:guid}/image")]
-        public async Task<ActionResult> UploadLeagueImageAsync(Guid leagueId, IFormFile image)
+        public async Task<ActionResult> UploadLeagueImageAsync(Guid leagueId, [FromForm] IFormFile image)
         {
             var league = await _leagueServices.GetLeagueByIdAsync(leagueId);
             if (league == null) return NotFound("League not found");
