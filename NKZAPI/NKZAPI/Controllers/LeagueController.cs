@@ -41,10 +41,8 @@ namespace NKZAPI.Controllers
         [HttpPost("{leagueId:guid}/image")]
         public async Task<ActionResult> UploadLeagueImageAsync(Guid leagueId, [FromForm] IFormFile image)
         {
-            var league = await _leagueServices.GetLeagueByIdAsync(leagueId);
-            if (league == null) return NotFound("League not found");
-
             var response = await _leagueServices.UploadLeagueImageAsync(leagueId, image);
+            if (!response.Success && response.Message == "League not found.") return NotFound(response);
             if (!response.Success) return BadRequest(response);
             return Ok(response);
         }
@@ -72,10 +70,10 @@ namespace NKZAPI.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult> DeleteLeagueAsync(Guid id)
         {
-            var league = await _leagueServices.GetLeagueByIdAsync(id);
-            if (league == null) return NotFound("League not found");
-            await _leagueServices.DeleteLeagueAsync(league);
-            return Ok("League deleted successfully");
+            var response = await _leagueServices.DeleteLeagueByIdAsync(id);
+            if (!response.Success && response.Message == "League not found.") return NotFound(response);
+            if (!response.Success) return BadRequest(response);
+            return Ok(response);
         }
         [Authorize]
         [EnableRateLimiting("PaymentPolicy")]

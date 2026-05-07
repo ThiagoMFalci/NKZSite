@@ -270,6 +270,7 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<NKZAPI.Data.NKZAPIContext>();
     await dbContext.Database.MigrateAsync();
+    await NKZAPI.Data.LeagueSchemaRepair.EnsureLeagueStandingRatingColumnsAsync(dbContext);
 }
 
 await NKZAPI.Data.AdminSeed.SeedAsync(app.Services, app.Configuration);

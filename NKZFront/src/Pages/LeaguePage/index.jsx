@@ -35,9 +35,26 @@ const ROLE_SPOTLIGHTS = [
     { key: "ADC", label: "Atirador" },
     { key: "Support", label: "Suporte" },
 ];
+const IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
 
 function unwrapApiData(responseData) {
     return responseData?.data ?? responseData?.Data ?? responseData ?? null;
+}
+
+function getApiErrorMessage(error, fallback) {
+    return error?.response?.data?.message || error?.response?.data?.Message || fallback;
+}
+
+function validateImageFile(file, label = "imagem") {
+    if (!file) return "";
+    if (!IMAGE_TYPES.includes(file.type)) {
+        return `A ${label} precisa ser JPG, PNG, GIF, BMP ou WEBP.`;
+    }
+    if (file.size > IMAGE_MAX_SIZE) {
+        return `A ${label} deve ter no maximo 5 MB.`;
+    }
+    return "";
 }
 
 function normalizePlayer(player) {
@@ -226,7 +243,7 @@ export default function LeaguePage() {
         } catch (requestError) {
             setFeedback({
                 type: "error",
-                message: requestError?.response?.data?.message || "Nao foi possivel carregar a liga.",
+                message: getApiErrorMessage(requestError, "Nao foi possivel carregar a liga."),
             });
         } finally {
             setLoading(false);
@@ -553,16 +570,19 @@ export default function LeaguePage() {
     async function handleUploadLeagueBanner(file) {
         if (!file) return;
 
+        const imageError = validateImageFile(file, "imagem da liga");
+        if (imageError) {
+            setFeedback({ type: "error", message: imageError });
+            return;
+        }
+
         try {
             setActionLoading("banner");
             setFeedback({ type: "", message: "" });
             const payload = new FormData();
             payload.append("image", file);
             await axios.post(`${API_BASE_URL}/api/league/${league.id}/image`, payload, {
-                headers: {
-                    ...getAuthHeaders(),
-                    "Content-Type": "multipart/form-data",
-                },
+                headers: getAuthHeaders(),
             });
             setFeedback({ type: "success", message: "Banner da liga atualizado." });
             await loadLeague();
@@ -623,6 +643,12 @@ export default function LeaguePage() {
             return;
         }
 
+        const imageError = validateImageFile(proofImage, "imagem do resultado");
+        if (imageError) {
+            setFeedback({ type: "error", message: imageError });
+            return;
+        }
+
         const winner = teamById.get(winnerTeamId);
         if (!window.confirm(`Enviar resultado com vitoria de ${winner?.name || "este time"}?`)) return;
 
@@ -633,7 +659,7 @@ export default function LeaguePage() {
             formData.append("reportedWinnerTeamId", winnerTeamId);
             formData.append("proofImage", proofImage);
             const response = await axios.post(`${API_BASE_URL}/api/league/matches/${match.id}/report`, formData, {
-                headers: { ...getAuthHeaders(), "Content-Type": "multipart/form-data" },
+                headers: getAuthHeaders(),
             });
             setFeedback({
                 type: "success",

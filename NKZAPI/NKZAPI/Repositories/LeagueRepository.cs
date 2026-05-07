@@ -31,6 +31,16 @@ namespace NKZAPI.Repositories
                 .Include(l => l.QueueEntries)
                 .FirstOrDefaultAsync(l => l.Id == id);
         }
+
+        public async Task<bool> LeagueExistsAsync(Guid id)
+        {
+            return await _context.Leagues.AnyAsync(l => l.Id == id);
+        }
+
+        public async Task<League?> GetLeagueShellByIdAsync(Guid id)
+        {
+            return await _context.Leagues.FirstOrDefaultAsync(l => l.Id == id);
+        }
         public async Task<League> AddLeagueAsync(League league)
         {
             var entry = await _context.Leagues.AddAsync(league);
@@ -77,6 +87,18 @@ namespace NKZAPI.Repositories
         }
         public async Task DeleteLeagueAsync(League league)
         {
+            _context.Leagues.Remove(league);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteLeagueByIdAsync(Guid leagueId)
+        {
+            var league = await _context.Leagues.FirstOrDefaultAsync(l => l.Id == leagueId);
+            if (league == null)
+            {
+                throw new DbUpdateConcurrencyException("The league was not found in the database.");
+            }
+
             _context.Leagues.Remove(league);
             await _context.SaveChangesAsync();
         }

@@ -69,10 +69,10 @@ namespace NKZAPI.Services.LeagueServices
                 response.Message = "League created.";
                 response.Data = added.Id.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 response.Success = false;
-                response.Message = $"An error occurred while adding the league: {ex.Message}";
+                response.Message = "Nao foi possivel criar a liga.";
             }
             return response;
         }
@@ -89,7 +89,7 @@ namespace NKZAPI.Services.LeagueServices
                     return response;
                 }
 
-                var existing = await _leagueRepository.GetLeagueByIdAsync(league.Id);
+                var existing = await _leagueRepository.GetLeagueShellByIdAsync(league.Id);
                 if (existing == null)
                 {
                     response.Success = false;
@@ -127,10 +127,10 @@ namespace NKZAPI.Services.LeagueServices
                 response.Message = "League updated.";
                 response.Data = existing.Id.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 response.Success = false;
-                response.Message = $"An error occurred while updating the league: {ex.Message}";
+                response.Message = "Nao foi possivel atualizar a liga.";
             }
             return response;
         }
@@ -140,8 +140,8 @@ namespace NKZAPI.Services.LeagueServices
             var response = new Response<League>();
             try
             {
-                var league = await _leagueRepository.GetLeagueByIdAsync(leagueId);
-                if (league == null)
+                var leagueExists = await _leagueRepository.LeagueExistsAsync(leagueId);
+                if (!leagueExists)
                 {
                     response.Success = false;
                     response.Message = "League not found.";
@@ -189,10 +189,10 @@ namespace NKZAPI.Services.LeagueServices
                 response.Message = "League image uploaded successfully.";
                 response.Data = updated;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 response.Success = false;
-                response.Message = ex.Message;
+                response.Message = "Nao foi possivel enviar a imagem da liga.";
             }
 
             return response;
@@ -202,6 +202,34 @@ namespace NKZAPI.Services.LeagueServices
         {
             await RefundLeaguePaymentsToWalletAsync(league.Id);
             await _leagueRepository.DeleteLeagueAsync(league);
+        }
+
+        public async Task<Response<string>> DeleteLeagueByIdAsync(Guid leagueId)
+        {
+            var response = new Response<string>();
+            try
+            {
+                var leagueExists = await _leagueRepository.LeagueExistsAsync(leagueId);
+                if (!leagueExists)
+                {
+                    response.Success = false;
+                    response.Message = "League not found.";
+                    return response;
+                }
+
+                await RefundLeaguePaymentsToWalletAsync(leagueId);
+                await _leagueRepository.DeleteLeagueByIdAsync(leagueId);
+
+                response.Success = true;
+                response.Message = "League deleted successfully.";
+            }
+            catch (Exception)
+            {
+                response.Success = false;
+                response.Message = "Nao foi possivel excluir a liga.";
+            }
+
+            return response;
         }
 
         public async Task<Response<string>> AddTeamToLeagueAsync(Guid leagueId, Guid teamId)

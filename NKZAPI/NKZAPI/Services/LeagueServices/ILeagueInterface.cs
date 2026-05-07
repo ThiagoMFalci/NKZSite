@@ -11,6 +11,7 @@ namespace NKZAPI.Services.LeagueServices
         Task<Response<string>> UpdateLeagueAsync(League league);
         Task<Response<League>> UploadLeagueImageAsync(Guid leagueId, IFormFile image);
         Task DeleteLeagueAsync(League league);
+        Task<Response<string>> DeleteLeagueByIdAsync(Guid leagueId);
 
         Task<Response<string>> AddTeamToLeagueAsync(Guid leagueId, Guid teamId);
         Task<Response<string>> ConfirmLeaguePaymentAsync(Guid paymentId);
