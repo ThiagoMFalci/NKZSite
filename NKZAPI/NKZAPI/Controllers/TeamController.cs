@@ -48,7 +48,7 @@ namespace NKZAPI.Controllers
         [Authorize]
         [EnableRateLimiting("UploadPolicy")]
         [HttpPost("{teamId:guid}/image")]
-        public async Task<ActionResult> UploadTeamImageAsync(Guid teamId, IFormFile image)
+        public async Task<ActionResult> UploadTeamImageAsync(Guid teamId, [FromForm] IFormFile image)
         {
             var existing = await _teamServices.GetTeamByIdAsync(teamId);
             if (existing == null) return NotFound("Team not found");

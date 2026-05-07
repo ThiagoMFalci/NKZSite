@@ -9,6 +9,8 @@ import { calculateRankPoints, ELO_SCORE, matchesSelectedElos, normalizeEloLabel,
 import "./style.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const TEAM_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const TEAM_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
 
 function unwrapApiData(responseData) {
     return responseData?.data ?? responseData?.Data ?? responseData ?? [];
@@ -515,6 +517,17 @@ export default function TeamsPage() {
         return unwrapApiData(response.data);
     }
 
+    function validateTeamImage(image) {
+        if (!image) return "";
+        if (!TEAM_IMAGE_TYPES.includes(image.type)) {
+            return "A imagem precisa ser JPG, PNG, GIF, BMP ou WEBP.";
+        }
+        if (image.size > TEAM_IMAGE_MAX_SIZE) {
+            return "A imagem do time deve ter no maximo 5 MB.";
+        }
+        return "";
+    }
+
     async function handleUpdateTeam({ name, tag, image }) {
         if (!selectedTeam) return;
 
@@ -573,6 +586,14 @@ export default function TeamsPage() {
             return;
         }
 
+        const imageError = validateTeamImage(teamImage);
+        if (imageError) {
+            setCreateFeedback({ type: "error", message: imageError });
+            return;
+        }
+
+        let newTeamId = "";
+
         try {
             setCreateLoading(true);
             setCreateFeedback({ type: "", message: "" });
@@ -593,8 +614,18 @@ export default function TeamsPage() {
                 return;
             }
 
-            const newTeamId = response.data?.data ?? response.data?.Data;
-            const uploadedTeam = teamImage && newTeamId ? await uploadTeamImage(newTeamId, teamImage) : null;
+            newTeamId = response.data?.data ?? response.data?.Data;
+            let uploadedTeam = null;
+            if (teamImage && newTeamId) {
+                try {
+                    uploadedTeam = await uploadTeamImage(newTeamId, teamImage);
+                } catch (uploadError) {
+                    await axios.delete(`${API_BASE_URL}/api/team/${newTeamId}`, {
+                        headers: getAuthHeaders(),
+                    }).catch(() => null);
+                    throw uploadError;
+                }
+            }
             const newTeam = normalizeTeam(uploadedTeam || {
                 id: newTeamId,
                 name: teamName.trim(),
@@ -611,7 +642,7 @@ export default function TeamsPage() {
         } catch (requestError) {
             setCreateFeedback({
                 type: "error",
-                message: requestError?.response?.data?.message || "Nao foi possivel criar o time.",
+                message: requestError?.response?.data?.message || "Nao foi possivel criar o time. Se voce enviou imagem, ela nao foi aceita e o time foi desfeito.",
             });
         } finally {
             setCreateLoading(false);

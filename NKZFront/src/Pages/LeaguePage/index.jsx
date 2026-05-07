@@ -109,6 +109,8 @@ function normalizeStanding(standing) {
         mapsPlayed: standing.mapsPlayed ?? standing.MapsPlayed ?? 0,
         mapDiff: standing.mapDiff ?? standing.MapDiff ?? 0,
         penalties: standing.penalties ?? standing.Penalties ?? 0,
+        ratingPoints: standing.ratingPoints ?? standing.RatingPoints ?? 1500,
+        lastRatingChange: standing.lastRatingChange ?? standing.LastRatingChange ?? 0,
     };
 }
 
@@ -288,13 +290,17 @@ export default function LeaguePage() {
         if (!league) return [];
         const base = league.standings.length
             ? league.standings
-            : league.teams.map((team) => ({ teamId: team.id, wins: 0, losses: 0, mapsPlayed: 0, mapDiff: 0, penalties: 0 }));
+            : league.teams.map((team) => ({ teamId: team.id, wins: 0, losses: 0, mapsPlayed: 0, mapDiff: 0, penalties: 0, ratingPoints: 1500, lastRatingChange: 0 }));
 
         return base
             .map((standing) => ({ ...standing, team: teamById.get(standing.teamId) }))
             .filter((standing) => standing.team)
-            .sort((a, b) => b.wins - a.wins || b.mapDiff - a.mapDiff || a.penalties - b.penalties || a.losses - b.losses);
-    }, [league, teamById]);
+            .sort((a, b) => (
+                isRankingLeague
+                    ? b.ratingPoints - a.ratingPoints || b.wins - a.wins || b.mapDiff - a.mapDiff || a.penalties - b.penalties || a.losses - b.losses
+                    : b.wins - a.wins || b.mapDiff - a.mapDiff || a.penalties - b.penalties || a.losses - b.losses
+            ));
+    }, [isRankingLeague, league, teamById]);
 
     const matchesByRound = useMemo(() => {
         const grouped = new Map();
@@ -1190,7 +1196,11 @@ export default function LeaguePage() {
 
                 {activeTab === "standings" && (
                     <section className="league-panel">
-                        <PanelTitle icon={BsTrophyFill} title="Classificacao atual" subtitle="Vitorias, derrotas, mapas jogados e penalidades." />
+                        <PanelTitle
+                            icon={BsTrophyFill}
+                            title="Classificacao atual"
+                            subtitle={isRankingLeague ? "Pontuacao de ranking, vitorias, derrotas e variacao recente." : "Vitorias, derrotas, mapas jogados e penalidades."}
+                        />
                         <div className="standings-list">
                             {standings.map((standing, index) => (
                                 <article key={standing.teamId} className={`standing-row ${isOwnedTeamId(standing.teamId) ? "my-team" : ""}`}>
@@ -1200,9 +1210,11 @@ export default function LeaguePage() {
                                         <strong>{isOwnedTeamId(standing.teamId) ? renderTeamNameNode(standing.teamId) : standing.team.name}</strong>
                                         <span>{standing.team.tag}</span>
                                     </div>
+                                    {isRankingLeague && <StatPill value={standing.ratingPoints} label="Pontos" tone="blue" />}
+                                    {isRankingLeague && <StatPill value={standing.lastRatingChange > 0 ? `+${standing.lastRatingChange}` : standing.lastRatingChange} label="Ultima" tone={standing.lastRatingChange >= 0 ? "green" : "red"} />}
                                     <StatPill value={standing.wins} label="Vitorias" tone="green" />
                                     <StatPill value={standing.losses} label="Derrotas" tone="red" />
-                                    <StatPill value={standing.mapsPlayed} label="Mapas" tone="blue" />
+                                    {!isRankingLeague && <StatPill value={standing.mapsPlayed} label="Mapas" tone="blue" />}
                                     <StatPill value={standing.penalties} label="Penalidades" tone="yellow" />
                                 </article>
                             ))}

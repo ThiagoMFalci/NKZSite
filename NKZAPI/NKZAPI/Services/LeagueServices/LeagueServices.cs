@@ -1055,6 +1055,20 @@ namespace NKZAPI.Services.LeagueServices
         private async Task CompleteMatchCoreAsync(LeagueMatch match, Guid winnerId, int teamAScore, int teamBScore)
         {
             var loserId = winnerId == match.TeamAId ? match.TeamBId!.Value : match.TeamAId!.Value;
+            var isRankingMatch = IsRankingMatch(match);
+            var winnerRatingChange = 0;
+            var loserRatingChange = 0;
+
+            if (isRankingMatch)
+            {
+                var winnerStanding = await _leagueRepository.GetStandingAsync(match.LeagueId, winnerId);
+                var loserStanding = await _leagueRepository.GetStandingAsync(match.LeagueId, loserId);
+                var ratingDelta = CalculateRankingRatingDelta(
+                    winnerStanding?.RatingPoints ?? 1500,
+                    loserStanding?.RatingPoints ?? 1500);
+                winnerRatingChange = ratingDelta;
+                loserRatingChange = -ratingDelta;
+            }
 
             match.WinnerTeamId = winnerId;
             match.LoserTeamId = loserId;
@@ -1064,9 +1078,9 @@ namespace NKZAPI.Services.LeagueServices
             match.CompletedAt = DateTime.UtcNow;
             await _leagueRepository.UpdateLeagueMatchAsync(match);
 
-            await UpdateStandingAsync(match.LeagueId, winnerId, true, teamAScore, teamBScore, match.TeamAId == winnerId);
-            await UpdateStandingAsync(match.LeagueId, loserId, false, teamAScore, teamBScore, match.TeamAId == loserId);
-            if (!IsRankingMatch(match))
+            await UpdateStandingAsync(match.LeagueId, winnerId, true, teamAScore, teamBScore, match.TeamAId == winnerId, winnerRatingChange);
+            await UpdateStandingAsync(match.LeagueId, loserId, false, teamAScore, teamBScore, match.TeamAId == loserId, loserRatingChange);
+            if (!isRankingMatch)
             {
                 await AdvanceBracketAsync(match, winnerId, loserId);
             }
@@ -1217,7 +1231,7 @@ namespace NKZAPI.Services.LeagueServices
             };
         }
 
-        private async Task UpdateStandingAsync(Guid leagueId, Guid teamId, bool won, int scoreA, int scoreB, bool isTeamA)
+        private async Task UpdateStandingAsync(Guid leagueId, Guid teamId, bool won, int scoreA, int scoreB, bool isTeamA, int ratingChange = 0)
         {
             var standing = await _leagueRepository.GetStandingAsync(leagueId, teamId);
             if (standing == null) return;
@@ -1228,7 +1242,16 @@ namespace NKZAPI.Services.LeagueServices
             else standing.Losses += 1;
             standing.MapsPlayed += Math.Max(1, ownScore + opponentScore);
             standing.MapDiff += ownScore - opponentScore;
+            standing.RatingPoints += ratingChange;
+            standing.LastRatingChange = ratingChange;
             await _leagueRepository.SaveChangesAsync();
+        }
+
+        private static int CalculateRankingRatingDelta(int winnerRating, int loserRating)
+        {
+            var expectedWinnerScore = 1d / (1d + Math.Pow(10d, (loserRating - winnerRating) / 400d));
+            var rawDelta = (int)Math.Round(32d * (1d - expectedWinnerScore), MidpointRounding.AwayFromZero);
+            return Math.Clamp(rawDelta, 8, 32);
         }
 
         private static bool IsRankingLeague(League league)

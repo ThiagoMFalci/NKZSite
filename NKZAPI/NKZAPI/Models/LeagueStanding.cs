@@ -9,5 +9,7 @@ namespace NKZAPI.Models
         public int MapsPlayed { get; set; }
         public int MapDiff { get; set; }
         public int Penalties { get; set; }
+        public int RatingPoints { get; set; } = 1500;
+        public int LastRatingChange { get; set; }
     }
 }

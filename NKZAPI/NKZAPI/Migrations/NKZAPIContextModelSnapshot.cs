@@ -360,6 +360,9 @@ namespace NKZAPI.Migrations
                     b.Property<Guid>("LeagueId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("LastRatingChange")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Losses")
                         .HasColumnType("integer");
 
@@ -370,6 +373,9 @@ namespace NKZAPI.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("Penalties")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RatingPoints")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("TeamId")
